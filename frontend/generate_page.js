@@ -44,6 +44,11 @@ function generatePage(pageName, title, breadcrumb, contentHtml) {
     }
 
     const outputPath = path.join(__dirname, 'public', `${pageName}-static.html`);
+    
+    // Final cleanup of any leftover links
+    page = page.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php/g, '/dashboard');
+    page = page.replace(/https:\/\/ultahost\.com/g, 'http://localhost:3001');
+    
     fs.writeFileSync(outputPath, page);
     console.log(`Generated ${outputPath}`);
 }

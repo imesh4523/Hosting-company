@@ -601,7 +601,7 @@ if ($('body').hasClass("lagom-futuristic")) {
                                             <li class="dropdown-header">Billing</li>
                                                                                  
                         <li menuitemname="My Invoices" class=" " id="Primary_Navbar-Billing-My_Invoices">
-                                                            <a href="/dashboard/billing">
+                                                            <a href="/dashboard?action=invoices">
                                                                             <i class="fab fa-test ls ls-document"></i>
                                                                         My Invoices
                                                                     </a>
@@ -1164,16 +1164,19 @@ ym(107735218,"init",{ssr:!0,webvisor:!0,clickmap:!0,ecommerce:"dataLayer",referr
         </div>
                                 <div class="main-header">
             <div class="container">
-                                                        <h1>My Domains</h1>
+                                                        <h1 class="main-header-title">
+                My Dashboard
+            </h1>
                             <div class="main-header-bottom">
                     
-    
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard">Portal Home</a></li>
-            <li class="breadcrumb-item"><a href="/dashboard">Client Area</a></li>
-            <li class="breadcrumb-item active">My Domains</li>
-        </ol>
-    
+    <ol class="breadcrumb">
+                    <li>
+                <a href="/dashboard">                Portal Home
+                </a>            </li>
+                    <li class="active">
+                                Client Area
+                            </li>
+            </ol>
             </div>
                                         </div>
         </div>
@@ -2332,7 +2335,7 @@ function replaceText() {
             <div class="tiles home_tiles swiper-container swiper-container-initialized swiper-container-horizontal">
         <div class="row swiper-wrapper">
             <div class="col-md-3 swiper-slide swiper-slide-active" onclick="window.location='clientarea.php?action=services'" style="margin-right: 16px;">
-                <a class="tile" href="/dashboard/services">
+                <a class="tile" href="clientarea.php?action=services">
                     <div class="tile-icon-absolute"><i class="ls ls-hosting"></i></div>
                     <div>
 						<div class="tile-title">Services</div>
@@ -2341,7 +2344,7 @@ function replaceText() {
                 </a>
             </div>
                             <div class="col-md-3 swiper-slide swiper-slide-next" onclick="window.location='clientarea.php?action=domains'" style="margin-right: 16px;">
-                    <a class="tile" href="/dashboard/domains">
+                    <a class="tile" href="clientarea.php?action=domains">
                         <div class="tile-icon-absolute"><i class="ls ls-dns"></i></div>
 						<div>
 							<div class="tile-title"> Domains</div>
@@ -2350,7 +2353,7 @@ function replaceText() {
                     </a>
                 </div>
                         <div class="col-md-3 swiper-slide" onclick="window.location='clientarea.php?action=invoices'" style="margin-right: 16px;">
-                <a class="tile" href="/dashboard/billing">
+                <a class="tile" href="clientarea.php?action=invoices">
                     <div class="tile-icon-absolute">
                                                     <i class="ls ls-document"></i>    
                                             </div>

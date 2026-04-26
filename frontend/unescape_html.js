@@ -44,9 +44,12 @@ content = content.replace(/(href|src|url)\s*=\s*["']\//g, (match) => {
 });
 
 // Intercept dashboard links
-content = content.replace(/href="[^"]*clientarea\.php\?action=domains"/g, 'href="/dashboard/domains"');
-content = content.replace(/href="[^"]*clientarea\.php\?action=services"/g, 'href="/dashboard/services"');
-content = content.replace(/href="[^"]*clientarea\.php\?action=invoices"/g, 'href="/dashboard/billing"');
+content = content.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php\?action=domains/g, '/dashboard/domains');
+content = content.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php\?action=services/g, '/dashboard/services');
+content = content.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php/g, '/dashboard');
+content = content.replace(/https:\/\/bill\.ultahost\.com/g, '/dashboard');
+content = content.replace(/https:\/\/ultahost\.com/g, 'http://localhost:3001');
+content = content.replace(/href="[^"]*clientarea\.php"/g, 'href="http://localhost:3000/dashboard"');
 content = content.replace(/href="[^"]*index\.php"/g, 'href="/dashboard"');
 
 // Add custom CSS overrides and local assets
