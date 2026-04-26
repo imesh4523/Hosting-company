@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String   @default("customer") // "customer", "admin"
+  vps       VPS[]
+  createdAt DateTime @default(now())
+}
+
+model DOAccount {
+  id        String   @id @default(uuid())
+  name      String
+  apiKey    String   @unique
+  status    String   @default("active") // "active", "suspended", "limited"
+  limit     Int      @default(10)
+  usage     Int      @default(0)
+  vps       VPS[]
+  createdAt DateTime @default(now())
+}
+
+model VPS {
+  id            String   @id @default(uuid())
+  dropletId     String   @unique
+  name          String
+  ipAddress     String?
+  status        String   @default("provisioning")
+  planId        String
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  accountId     String
+  account       DOAccount @relation(fields: [accountId], references: [id])
+  snapshots     Snapshot[]
+  recoveryLogs  RecoveryLog[]
+  createdAt     DateTime @default(now())
+}
+
+model Snapshot {
+  id          String   @id @default(uuid())
+  snapshotId  String   @unique
+  vpsId       String
+  vps         VPS      @relation(fields: [vpsId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model RecoveryLog {
+  id          String   @id @default(uuid())
+  vpsId       String
+  vps         VPS      @relation(fields: [vpsId], references: [id])
+  action      String   // "snapshot_restore", "migration"
+  status      String   // "success", "failed"
+  message     String?
+  createdAt   DateTime @default(now())
+}
