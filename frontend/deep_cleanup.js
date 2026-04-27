@@ -12,6 +12,10 @@ function cleanupFile(filePath) {
     content = content.replace(/\/dashboard\/index\.php\/login\?language=english/ig, 'http://localhost:3000/login');
     content = content.replace(/https:\/\/bill\.ultahost\.com\/index\.php\/login\?language=english/ig, 'http://localhost:3000/login');
     
+    // Convert relative dashboard links to absolute port 3000 links
+    content = content.replace(/href="\/dashboard\//ig, 'href="http://localhost:3000/dashboard/');
+    content = content.replace(/href="\/dashboard"/ig, 'href="http://localhost:3000/dashboard"');
+    
     // For files that are NOT the dashboard itself, any link to the dashboard should go through login
     if (!filePath.includes('dashboard-static.html') && !filePath.includes('domains-static.html')) {
         content = content.replace(/href="http:\/\/localhost:3000\/dashboard"/ig, 'href="http://localhost:3000/login"');
