@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         destination: 'https://bill.ultahost.com/templates/:path*',
       },
       {
+        source: '/api/:path*',
+        destination: 'http://localhost:5000/api/:path*',
+      },
+      {
         source: '/dashboard/assets/:path*',
         destination: 'https://bill.ultahost.com/assets/:path*',
       }
