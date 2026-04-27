@@ -27,7 +27,7 @@ export const deployVPS = async (req: Request, res: Response) => {
     });
 
     // 3. Save to DB
-    const vps = await prisma.vps.create({
+    const vps = await prisma.vPS.create({
       data: {
         name,
         dropletId: droplet.id.toString(),
@@ -55,7 +55,7 @@ export const deployVPS = async (req: Request, res: Response) => {
 export const getMyVPS = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const vpsList = await prisma.vps.findMany({
+    const vpsList = await prisma.vPS.findMany({
       where: { userId },
       include: { doAccount: true },
     });
@@ -71,12 +71,12 @@ export const vpsAction = async (req: Request, res: Response) => {
     const { action } = req.body; // power_on, power_off, reboot
     const userId = (req as any).user.id;
 
-    const vps = await prisma.vps.findFirst({
-      where: { id, userId },
+    const vps = await prisma.vPS.findFirst({
+      where: { id: id as string, userId },
       include: { doAccount: true },
     });
 
-    if (!vps || !vps.dropletId) {
+    if (!vps || !vps.dropletId || !vps.doAccount) {
       return res.status(404).json({ message: 'VPS not found' });
     }
 

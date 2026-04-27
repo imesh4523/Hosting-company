@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Map of action params → Next.js routes
@@ -14,13 +14,13 @@ const ACTION_ROUTES: Record<string, string> = {
   quotes: '/dashboard/billing',
 };
 
-export default function DashboardPage() {
+function DashboardContent() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) { router.replace('/login'); return; }
 
     // Handle action query params (e.g. /dashboard?action=details)
@@ -51,5 +51,13 @@ export default function DashboardPage() {
         title="Customer Dashboard"
       />
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading Dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }

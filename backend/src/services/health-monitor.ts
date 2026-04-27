@@ -7,17 +7,17 @@ export class HealthMonitor {
    * Performs heartbeat checks on all droplets
    */
   static async checkDroplets() {
-    const vpsList = await prisma.vPS.findMany({ include: { account: true } });
+    const vpsList = await prisma.vPS.findMany({ include: { doAccount: true } });
 
     for (const vps of vpsList) {
       try {
         const response = await axios.get(`https://api.digitalocean.com/v2/droplets/${vps.dropletId}`, {
-          headers: { Authorization: `Bearer ${vps.account.apiKey}` }
+          headers: { Authorization: `Bearer ${vps.doAccount.apiKey}` }
         });
 
         const currentStatus = response.data.droplet.status;
-        if (currentStatus === 'active' && vps.status !== 'active') {
-          await prisma.vPS.update({ where: { id: vps.id }, data: { status: 'active' } });
+        if (currentStatus === 'active' && vps.status !== 'ACTIVE') {
+          await prisma.vPS.update({ where: { id: vps.id }, data: { status: 'ACTIVE' } });
         }
       } catch (error: any) {
         if (error.response && error.response.status === 404) {
@@ -44,6 +44,7 @@ export class HealthMonitor {
     }
 
     const latestSnapshot = vps.snapshots[0];
+    if (!latestSnapshot) return;
     
     // Log recovery start
     await prisma.recoveryLog.create({

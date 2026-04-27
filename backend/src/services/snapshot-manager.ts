@@ -8,7 +8,7 @@ export class SnapshotManager {
   static async takeSnapshot(vpsId: string) {
     const vps = await prisma.vPS.findUnique({
       where: { id: vpsId },
-      include: { account: true }
+      include: { doAccount: true }
     });
 
     if (!vps) throw new Error('VPS not found');
@@ -20,7 +20,7 @@ export class SnapshotManager {
           type: 'snapshot',
           name: `${vps.name}-auto-${Date.now()}`
         },
-        { headers: { Authorization: `Bearer ${vps.account.apiKey}` } }
+        { headers: { Authorization: `Bearer ${vps.doAccount.apiKey}` } }
       );
 
       console.log(`Snapshot triggered for ${vps.name}: ${response.data.action.id}`);
@@ -35,7 +35,7 @@ export class SnapshotManager {
    * Schedules snapshots for all active VPS instances
    */
   static async runAutomatedBackups() {
-    const activeVPS = await prisma.vPS.findMany({ where: { status: 'active' } });
+    const activeVPS = await prisma.vPS.findMany({ where: { status: 'ACTIVE' } });
     for (const vps of activeVPS) {
       // Logic to check if 6 hours passed since last snapshot
       await this.takeSnapshot(vps.id);

@@ -21,23 +21,23 @@ export class DOAccountService {
    * Checks the health and limits of all registered accounts
    */
   static async syncAccountHealth() {
-    const accounts = await prisma.dOAccount.findMany({ where: { status: 'active' } });
+    const accounts = await prisma.digitalOceanAccount.findMany({ where: { isActive: true } });
     
     for (const account of accounts) {
       try {
         const info = await this.validateKey(account.apiKey);
-        await prisma.dOAccount.update({
+        await prisma.digitalOceanAccount.update({
           where: { id: account.id },
           data: {
             limit: info.droplet_limit,
-            status: info.status === 'active' ? 'active' : 'limited'
+            isActive: info.status === 'active'
           }
         });
       } catch (error) {
         // Mark as suspended if API call fails (likely key revoked or account suspended)
-        await prisma.dOAccount.update({
+        await prisma.digitalOceanAccount.update({
           where: { id: account.id },
-          data: { status: 'suspended' }
+          data: { isActive: false }
         });
         console.error(`Account ${account.name} suspended or key invalid.`);
       }
@@ -48,8 +48,8 @@ export class DOAccountService {
    * Returns the best account to provision a new VPS (Least Loaded)
    */
   static async getBestAccount() {
-    const account = await prisma.dOAccount.findFirst({
-      where: { status: 'active' },
+    const account = await prisma.digitalOceanAccount.findFirst({
+      where: { isActive: true },
       orderBy: { usage: 'asc' }
     });
     

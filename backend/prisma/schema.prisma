@@ -15,6 +15,7 @@ enum Role {
 enum VPSStatus {
   STARTING
   RUNNING
+  ACTIVE
   STOPPED
   REBUILDING
   SUSPENDED
@@ -93,6 +94,27 @@ model VPS {
   
   doAccountId   String
   doAccount     DigitalOceanAccount @relation(fields: [doAccountId], references: [id])
+
+  snapshots     VPSSnapshot[]
+}
+
+model VPSSnapshot {
+  id            String   @id @default(uuid())
+  snapshotId    String   @unique
+  name          String
+  createdAt     DateTime @default(now())
+  
+  vpsId         String
+  vps           VPS      @relation(fields: [vpsId], references: [id])
+}
+
+model RecoveryLog {
+  id            String   @id @default(uuid())
+  vpsId         String
+  action        String
+  status        String
+  message       String?
+  createdAt     DateTime @default(now())
 }
 
 model Invoice {
@@ -173,3 +195,4 @@ model PaymentMethod {
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
