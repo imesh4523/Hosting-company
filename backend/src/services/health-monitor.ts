@@ -1,8 +1,6 @@
 import axios from 'axios';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../config/prisma';
 import { SnapshotManager } from './snapshot-manager';
-
-const prisma = new PrismaClient();
 
 export class HealthMonitor {
   /**

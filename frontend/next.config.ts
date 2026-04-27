@@ -1,7 +1,26 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: '/templates/:path*',
+        destination: 'https://bill.ultahost.com/templates/:path*',
+      },
+      {
+        source: '/assets/:path*',
+        destination: 'https://bill.ultahost.com/assets/:path*',
+      },
+      {
+        source: '/dashboard/templates/:path*',
+        destination: 'https://bill.ultahost.com/templates/:path*',
+      },
+      {
+        source: '/dashboard/assets/:path*',
+        destination: 'https://bill.ultahost.com/assets/:path*',
+      }
+    ];
+  },
 };
 
 export default nextConfig;

@@ -1,92 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 15, 23, 42;
-  --background-start-rgb: 248, 250, 252;
-  --background-end-rgb: 255, 255, 255;
-  
-  --primary: #2E6DFF;
-  --primary-foreground: #FFFFFF;
-  
-  --secondary: #7C3AED;
-  --secondary-foreground: #FFFFFF;
-  
-  --accent: #F1F5F9;
-  --accent-foreground: #0F172A;
-  
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  
-  --muted: #64748B;
-  --muted-foreground: #94A3B8;
-  
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
-  
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #2E6DFF;
-  
-  --radius: 1rem;
+@theme {
+  --font-outfit: "Outfit", sans-serif;
+  --color-primary: #5145FF;
+  --color-primary-hover: #4336E5;
 }
 
-[data-theme='dark'] {
-  --foreground-rgb: 248, 250, 252;
-  --background-start-rgb: 15, 23, 42;
-  --background-end-rgb: 2, 6, 23;
-  
-  --primary: #2E6DFF;
-  --primary-foreground: #FFFFFF;
-  
-  --secondary: #7C3AED;
-  --secondary-foreground: #FFFFFF;
-  
-  --accent: #1E293B;
-  --accent-foreground: #F8FAFC;
-  
-  --card: #1E293B;
-  --card-foreground: #F8FAFC;
-  
-  --border: #334155;
-  --input: #334155;
+@layer base {
+  body {
+    @apply bg-[#F8F9FA] text-gray-900;
+    font-family: var(--font-outfit);
+  }
+}
+
+:root {
+  --background: #F8F9FA;
+  --foreground: #111827;
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  font-family: 'Outfit', sans-serif;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-}
-
-.premium-gradient {
-  background: linear-gradient(135deg, #2E6DFF 0%, #7C3AED 100%);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, #2E6DFF 0%, #7C3AED 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Base styles removed to avoid build errors with Tailwind 4 */
+/* Fallback for when Tailwind might be slow to load */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.flex-col { flex-direction: column; }

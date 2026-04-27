@@ -3,8 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
 }
 
 enum Role {
@@ -40,6 +39,14 @@ model User {
   email         String   @unique
   password      String
   name          String
+  firstName     String?
+  lastName      String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  postcode      String?
+  country       String?
   role          Role     @default(CUSTOMER)
   twoFactorSecret String?
   isTwoFactorEnabled Boolean @default(false)
@@ -53,6 +60,7 @@ model User {
   tickets       Ticket[]
   fraudProfile  FraudProfile?
   transactions  Transaction[]
+  paymentMethods PaymentMethod[]
 }
 
 model DigitalOceanAccount {
@@ -150,4 +158,18 @@ model FraudProfile {
 
   userId        String   @unique
   user          User     @relation(fields: [userId], references: [id])
+}
+
+model PaymentMethod {
+  id            String   @id @default(uuid())
+  last4         String
+  cardType      String
+  cardHolder    String
+  expiryDate    String
+  nickname      String?
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

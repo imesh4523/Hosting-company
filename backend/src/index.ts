@@ -3,14 +3,14 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import prisma from './config/prisma';
 import authRoutes from './routes/auth.routes';
 import vpsRoutes from './routes/vps.routes';
+import userRoutes from './routes/user.routes';
 
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -22,6 +22,7 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/vps', vpsRoutes);
+app.use('/api/user', userRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'VPS Reseller Platform API is running' });

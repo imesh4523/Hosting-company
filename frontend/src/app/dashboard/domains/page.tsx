@@ -1,14 +1,22 @@
 'use client';
-
-import React from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function DomainsPage() {
+  const router = useRouter();
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
+
   return (
-    <div className="w-full h-screen overflow-hidden bg-[#fdfdfd]">
-      <iframe
-        src="/domains-static.html"
-        className="w-full h-full border-none"
-        title="My Domains"
+    <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
+      <iframe 
+        src="/domains-static.html" 
+        style={{ width: '100%', height: '100%', border: 'none' }}
+        title="domains Dashboard"
       />
     </div>
   );
