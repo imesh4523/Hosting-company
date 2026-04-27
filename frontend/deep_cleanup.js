@@ -12,6 +12,11 @@ function cleanupFile(filePath) {
     content = content.replace(/\/dashboard\/index\.php\/login\?language=english/ig, 'http://localhost:3000/login');
     content = content.replace(/https:\/\/bill\.ultahost\.com\/index\.php\/login\?language=english/ig, 'http://localhost:3000/login');
     
+    // For files that are NOT the dashboard itself, any link to the dashboard should go through login
+    if (!filePath.includes('dashboard-static.html') && !filePath.includes('domains-static.html')) {
+        content = content.replace(/href="http:\/\/localhost:3000\/dashboard"/ig, 'href="http://localhost:3000/login"');
+    }
+    
     // Replace URL encoded ones
     content = content.replace(/https%3A%2F%2Fbill\.ultahost\.com/g, 'http://localhost:3000');
     content = content.replace(/bill\.ultahost\.com/g, 'localhost:3000');
