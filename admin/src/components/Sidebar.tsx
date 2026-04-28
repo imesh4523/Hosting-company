@@ -9,7 +9,7 @@ const navItems = [
   { label: "Servers",       href: "/servers",     icon: "/icons/dedicated-2x.webp",  isSvg: false },
   { label: "Global VPS",    href: "/vps",         icon: "/icons/vds-2x.webp",        isSvg: false },
   { label: "Hosting Plans", href: "/plans",       icon: "/icons/vps-2x.webp",        isSvg: false },
-  { label: "DO Accounts",   href: "/accounts",    icon: "/icons/domain-2x.webp",     isSvg: false },
+  { label: "Cloud Accounts", href: "/cloud-accounts", icon: "/icons/domain-2x.webp",     isSvg: false },
   { label: "Recovery",      href: "/recovery",    icon: "/icons/transfer-2x.webp",   isSvg: false },
   { label: "Migrations",    href: "/migrations",  icon: "/icons/transfer-2x.webp",   isSvg: false },
   { label: "Account Health",href: "/migrations/accounts", icon: "/icons/domain-2x.webp", isSvg: false },
@@ -20,6 +20,7 @@ const navItems = [
   { label: "Alerts",        href: "/alerts",      icon: "/icons/email.svg",           isSvg: true  },
   { label: "Fraud Center",  href: "/fraud",       icon: "/icons/domain-ssl.svg",      isSvg: true  },
   { label: "Audit Log",     href: "/audit",       icon: "/icons/knowledge.svg",       isSvg: true  },
+  { label: "Auth Settings",  href: "/settings/auth",icon: "/icons/domain-ssl.svg",      isSvg: true  },
   { label: "Settings",      href: "/settings",    icon: "/icons/uptime.svg",          isSvg: true  },
 ];
 

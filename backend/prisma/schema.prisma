@@ -20,160 +20,230 @@ model User {
   lastLoginIp   String?
   banReason     String?
   activeVpsId   String?
+  avatar          String?
+  emailVerified   Boolean     @default(false)
+  githubToken     String?
 
-  vps           VPS[]
+  vms           VM[]
   invoices      Invoice[]
   tickets       SupportTicket[]
   affiliate     Affiliate?
   ipLogs        UserIPLog[]
   fraudLogs     FraudLog[]
   migrations    Migration[]
-  dropletHistory DropletHistory[]
+  vmHistory     VMHistory[]
+  oauthAccounts   UserOAuth[]
+  deployedApps    DeployedApp[]
+  
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 }
 
-// ─── DO Accounts ───────────────────────────────────────────────────────────
-model DOAccount {
+// ─── Cloud Accounts ────────────────────────────────────────────────────────
+model CloudAccount {
   id              String      @id @default(uuid())
-  name            String
-  apiKey          String      // AES-256 encrypted
-  status          String      @default("active") // active/suspended/disabled
-  suspendedAt     DateTime?
+  name            String      // "DO-Trial-1", "Vultr-Main"
+  provider        String      // digitalocean/vultr/linode/aws/azure/upcloud/kamatera
+  
+  // Credentials (encrypted AES-256)
+  credentials     Json        
+  
+  // Credit info
+  credits         Float       @default(0)
+  creditExpiry    DateTime?   
+  daysRemaining   Int?        
+  balance         Float       @default(0)
+  
+  // Resource limits
+  vmLimit         Int         @default(10)
+  vmCount         Int         @default(0)
+  
+  // Status
+  status          String      @default("active") // active/suspended/credits_low/credits_expired
   suspendReason   String?
-  region          String      @default("sgp1")
-  dropletLimit    Int         @default(10)
-  dropletCount    Int         @default(0)
-  bandwidthUsed   Float       @default(0)
-  lastChecked     DateTime?
-  isPrimaryFailover Boolean   @default(false)
+  
+  region          String      @default("global")
   notes           String?
-
-  droplets        VPS[]
+  lastChecked     DateTime?
+  
+  vms             VM[]
   migrations      Migration[]
   migrationsTo    Migration[] @relation("MigrationToAccount")
-  snapshots       DOSnapshot[]
-  history         DropletHistory[]
+  snapshots       Snapshot[]
+  vmHistory       VMHistory[]
+  creditHistory   CreditHistory[]
+  
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
 
-// ─── VPS (formerly VPS) ─────────────────────────────────────────────────────
-model VPS {
+model AuthSettings {
+  id              String  @id @default(cuid())
+  googleEnabled   Boolean @default(false)
+  googleClientId  String?
+  googleSecret    String? // encrypted
+  
+  facebookEnabled Boolean @default(false)
+  facebookAppId   String?
+  facebookSecret  String? // encrypted
+  
+  githubEnabled   Boolean @default(false)
+  githubClientId  String?
+  githubSecret    String? // encrypted
+  
+  emailEnabled    Boolean @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+model UserOAuth {
+  id           String @id @default(cuid())
+  userId       String
+  provider     String // google/facebook/github
+  providerId   String // provider's user ID
+  email        String
+  name         String
+  avatar       String?
+  accessToken  String? // encrypted
+  createdAt    DateTime @default(now())
+  
+  user         User @relation(fields: [userId], references: [id])
+  
+  @@unique([provider, providerId])
+}
+
+model CreditHistory {
+  id            String   @id @default(uuid())
+  accountId     String
+  credits       Float
+  balance       Float
+  daysRemaining Int?
+  checkedAt     DateTime @default(now())
+  
+  account       CloudAccount @relation(fields: [accountId], references: [id])
+}
+
+// ─── VM Management ──────────────────────────────────────────────────────────
+model VM {
   id              String      @id @default(uuid())
-  dropletId       String      @unique   // DO droplet ID
-  doAccountId     String
-  proxmoxServerId String?
+  cloudAccountId  String      
+  provider        String      
+  providerId      String?     @unique // e.g. DO droplet ID or AWS instance ID
   userId          String
-  vmId            String?               // Proxmox VM ID
+  serverId        String?     // If linked to a local Proxmox server
+  
   name            String
-  ipAddress       String?
+  ip              String?
   status          String      @default("provisioning") // active/suspended/migrated/deleted
   planId          String?
   plan            Plan?       @relation(fields: [planId], references: [id])
   region          String?
+  
+  // Auth
   username        String      @default("root")
-  rootPassword    String?               // AES encrypted
+  rootPassword    String?     // AES encrypted
+  
+  // Timeline
   suspendedAt     DateTime?
   migratedAt      DateTime?
-  migratedTo      String?               // new VPS id
-  serverId        String?
-
+  migratedTo      String?     // new VM id
+  
   user            User        @relation(fields: [userId], references: [id])
-  account         DOAccount   @relation(fields: [doAccountId], references: [id])
+  account         CloudAccount @relation(fields: [cloudAccountId], references: [id])
   server          Server?     @relation(fields: [serverId], references: [id])
-  snapshots       DOSnapshot[]
+  snapshots       Snapshot[]
   migrations      Migration[]
-  history         DropletHistory[]
+  accountHistory  VMAccountHistory[]
+  vmHistory       VMHistory[]
   recoveryLogs    RecoveryLog[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
 
-// ─── DO Snapshots ──────────────────────────────────────────────────────────
-model DOSnapshot {
-  id            String      @id @default(uuid())
-  vpsId         String
-  doAccountId   String
-  userId        String
-  doSnapshotId  String?     @unique
-  b2FileId      String?
-  name          String
-  sizeGb        Float       @default(0)
-  status        String      @default("pending") // pending/ready/failed
-  type          String      @default("auto")    // auto/manual/pre-migration
-  restoredAt    DateTime?
-  restoredTo    String?
-  expiresAt     DateTime?
-
-  vps           VPS         @relation(fields: [vpsId], references: [id])
-  account       DOAccount   @relation(fields: [doAccountId], references: [id])
-  migrations    Migration[]
-  createdAt     DateTime    @default(now())
+model VMAccountHistory {
+  id          String   @id @default(uuid())
+  vmId        String
+  accountId   String
+  provider    String
+  ip          String?
+  startedAt   DateTime @default(now())
+  endedAt     DateTime? 
+  reason      String?   
+  
+  vm          VM       @relation(fields: [vmId], references: [id])
 }
 
-// ─── Droplet History (every event) ─────────────────────────────────────────
-model DropletHistory {
+// ─── Snapshots ─────────────────────────────────────────────────────────────
+model Snapshot {
   id              String      @id @default(uuid())
-  vpsId           String
+  vmId            String
+  cloudAccountId  String
+  userId          String
+  providerSnapshotId String?  @unique
+  b2FileId        String?
+  name            String
+  sizeGb          Float       @default(0)
+  status          String      @default("pending") // pending/ready/failed
+  type            String      @default("auto")    // auto/manual/pre-migration
+  restoredAt      DateTime?
+  restoredTo      String?
+  expiresAt       DateTime?
+ 
+  vm              VM           @relation(fields: [vmId], references: [id])
+  account         CloudAccount @relation(fields: [cloudAccountId], references: [id])
+  migrations      Migration[]
+  createdAt       DateTime     @default(now())
+}
+
+// ─── VM History (every event) ──────────────────────────────────────────────
+model VMHistory {
+  id              String      @id @default(uuid())
+  vmId            String
   userId          String
   event           String
-  // created/started/stopped/suspended/migrated/restored/
-  // snapshot_taken/account_changed/ip_changed/
-  // migration_started/migration_completed/migration_failed/
-  // user_notified/vps_unreachable/account_suspended
   fromAccountId   String?
   toAccountId     String?
   fromIp          String?
   toIp            String?
-  fromServer      String?
-  toServer        String?
   snapshotId      String?
   reason          String?
   triggeredBy     String      @default("auto") // auto/admin/user
   adminId         String?
   metadata        Json?
-  duration        Int?        // seconds if relevant
+  duration        Int?        
 
-  vps             VPS         @relation(fields: [vpsId], references: [id])
-  user            User        @relation(fields: [userId], references: [id])
-  fromAccount     DOAccount?  @relation(fields: [fromAccountId], references: [id])
-  createdAt       DateTime    @default(now())
+  vm              VM           @relation(fields: [vmId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
+  fromAccount     CloudAccount? @relation(fields: [fromAccountId], references: [id])
+  createdAt       DateTime     @default(now())
 }
 
 // ─── Migrations ────────────────────────────────────────────────────────────
 model Migration {
   id              String          @id @default(uuid())
   userId          String
-  vpsId           String
+  vmId            String
   fromAccountId   String
   toAccountId     String
-  fromVpsId       String
-  toVpsId         String?
+  fromVpsId       String          // Original VM ID
+  toVpsId         String?         // Target VM ID
   snapshotId      String?
   fromIp          String?
   toIp            String?
-  fromServer      String?
-  toServer        String?
   status          String          @default("pending")
-  // pending/snapshot_taken/deploying/restoring/completed/failed
   trigger         String
-  // account_suspended/manual/scheduled/failover
   retryCount      Int             @default(0)
   startedAt       DateTime        @default(now())
   completedAt     DateTime?
   failedAt        DateTime?
   failReason      String?
   notifiedUser    Boolean         @default(false)
-  notifiedAt      DateTime?
   downtimeMinutes Int?
-  useB2Backup     Boolean         @default(false)
 
   user            User            @relation(fields: [userId], references: [id])
-  vps             VPS             @relation(fields: [vpsId], references: [id])
-  fromAccount     DOAccount       @relation(fields: [fromAccountId], references: [id])
-  toAccount       DOAccount       @relation("MigrationToAccount", fields: [toAccountId], references: [id])
-  snapshot        DOSnapshot?     @relation(fields: [snapshotId], references: [id])
+  vm              VM              @relation(fields: [vmId], references: [id])
+  fromAccount     CloudAccount    @relation(fields: [fromAccountId], references: [id])
+  toAccount       CloudAccount    @relation("MigrationToAccount", fields: [toAccountId], references: [id])
+  snapshot        Snapshot?       @relation(fields: [snapshotId], references: [id])
   steps           MigrationStep[]
   createdAt       DateTime        @default(now())
 }
@@ -208,7 +278,7 @@ model Server {
   maintenanceMode Boolean   @default(false)
   notes           String?
 
-  vps             VPS[]
+  vms             VM[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }
@@ -234,7 +304,7 @@ model Plan {
   storage       String?
   bandwidth     String?
   doSize        String?      // DO slug e.g. "s-1vcpu-2gb"
-  vps           VPS[]
+  vms           VM[]
   createdAt     DateTime     @default(now())
 }
 
@@ -323,7 +393,7 @@ model FraudLog {
 model RecoveryLog {
   id          String    @id @default(uuid())
   vpsId       String
-  vps         VPS       @relation(fields: [vpsId], references: [id])
+  vps         VM       @relation(fields: [vpsId], references: [id])
   action      String
   status      String
   message     String?
@@ -347,4 +417,88 @@ model UserIPLog {
   city          String?
   isSuspicious  Boolean   @default(false)
   createdAt     DateTime  @default(now())
+}
+// ─── DigitalOcean App Platform ──────────────────────────────────────────────
+model DOAppAccount {
+  id              String   @id @default(uuid())
+  name            String   // "DO-App-1"
+  apiKey          String   // encrypted
+  status          String   @default("active") // active/suspended
+  appsCount       Int      @default(0)
+  appsLimit       Int      @default(5)
+  region          String   @default("sgp")
+  suspendedAt     DateTime?
+  createdAt       DateTime @default(now())
+
+  apps            DeployedApp[]
+}
+
+model DeployedApp {
+  id              String   @id @default(uuid())
+  userId          String
+  doAccountId     String
+  doAppId         String   // DO App Platform ID
+  
+  // Repo info
+  repoUrl         String
+  repoBranch      String   @default("main")
+  repoProvider    String   @default("github") // github/gitlab
+  
+  // Detected config
+  framework       String   // nodejs/docker/python
+  buildCommand    String?
+  runCommand      String?
+  port            Int      @default(8080)
+  
+  // Deployment info
+  status          String   @default("queued") 
+  // queued/building/deploying/running/failed/suspended
+  
+  // URLs
+  doUrl           String?  // DO provided URL
+  customSubdomain String?  // appname-userid.yourdomain.com
+  
+  // Database
+  dbUrl           String?  // encrypted
+  
+  // Env vars
+  envVars         Json?
+  
+  createdAt       DateTime @default(now())
+  deployedAt      DateTime?
+  failedAt        DateTime?
+  
+  deployments     Deployment[]
+  account         DOAppAccount @relation(fields: [doAccountId], references: [id])
+  user            User @relation(fields: [userId], references: [id])
+}
+
+model Deployment {
+  id              String   @id @default(uuid())
+  appId           String
+  doDeploymentId  String
+  status          String   // pending/running/success/failed
+  
+  // Logs
+  buildLogs       String?  @db.Text
+  errorLogs       String?  @db.Text
+  
+  // AI Analysis
+  errorAnalysis   String?  // AI analyzed error
+  suggestedFix    String?  // AI suggested fix
+  
+  startedAt       DateTime @default(now())
+  completedAt     DateTime?
+  
+  app             DeployedApp @relation(fields: [appId], references: [id])
+}
+
+model SubDomain {
+  id          String   @id @default(uuid())
+  appId       String   @unique
+  subdomain   String   @unique
+  // format: appname-userid.yourdomain.com
+  fullUrl     String
+  sslActive   Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }

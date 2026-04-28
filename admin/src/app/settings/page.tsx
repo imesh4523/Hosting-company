@@ -84,6 +84,26 @@ export default function SettingsPage() {
           <Toggle label="Telegram Alerts"    sub="Send critical alerts to Telegram admin chat" defaultOn={true} />
         </Section>
 
+        {/* Authentication & OAuth */}
+        <Section title="Authentication & OAuth" sub="Manage social login methods and security">
+          <div style={{ background: "#F9FAFB", padding: "16px", borderRadius: "12px", border: "1px solid #E5E7EB", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <div style={{ fontSize: "14px", fontWeight: 600, color: "#111827" }}>Multi-Provider OAuth</div>
+              <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "2px" }}>Configure Google, Facebook, and GitHub login methods</div>
+            </div>
+            <a 
+              href="/settings/auth" 
+              style={{ 
+                fontSize: "13px", fontWeight: 600, color: "#fff", background: "#5145FF", 
+                textDecoration: "none", borderRadius: "8px", padding: "8px 16px", 
+                boxShadow: "0 2px 6px rgba(81,69,255,0.2)" 
+              }}
+            >
+              Configure Auth
+            </a>
+          </div>
+        </Section>
+
         {/* Stripe */}
         <Section title="Stripe Billing" sub="Payment gateway configuration">
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>

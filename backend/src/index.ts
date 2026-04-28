@@ -10,7 +10,12 @@ import userRoutes from './routes/user.routes.js';
 import aiRoutes from './routes/ai.routes.js';
 import adminServerRoutes from './routes/admin.servers.route.js';
 import adminMigrationRoutes from './routes/admin.migrations.route.js';
+import adminAuthRoutes from './routes/admin.auth.route.js';
+import appDeployRoutes from './routes/app-deploy.routes.js';
 import { SuspensionDetector } from './services/suspension.service.js';
+
+import passport from 'passport';
+import { OAuthService } from './services/oauth.service.js';
 
 dotenv.config();
 
@@ -23,6 +28,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -31,6 +37,8 @@ app.use('/api/user', userRoutes);
 app.use('/api/xhr.php', aiRoutes);
 app.use('/api/admin/servers',    adminServerRoutes);
 app.use('/api/admin/migrations', adminMigrationRoutes);
+app.use('/api/admin/auth',       adminAuthRoutes);
+app.use('/api/apps',             appDeployRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'VPS Reseller Platform API is running' });
@@ -46,8 +54,16 @@ app.get('/health', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+
+  // Initialize OAuth strategies
+  try {
+    await OAuthService.init();
+    console.log('[OAuth] Strategies initialized');
+  } catch (e) {
+    console.error('[OAuth] Init failed:', e);
+  }
 
   // ─── Suspension Monitor (every 60s) ────────────────────────────────────
   const detector = new SuspensionDetector();

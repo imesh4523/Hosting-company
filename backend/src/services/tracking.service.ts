@@ -2,15 +2,13 @@ import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma.js";
 
 interface LogEventData {
-  vpsId: string;
+  vmId: string;
   userId: string;
   event: string;
   fromAccountId?: string;
   toAccountId?: string;
   fromIp?: string;
   toIp?: string;
-  fromServer?: string;
-  toServer?: string;
   snapshotId?: string;
   reason?: string;
   triggeredBy: "auto" | "admin" | "user";
@@ -23,17 +21,15 @@ export class TrackingService {
 
   // ─── Log every event ──────────────────────────────────────────────────────
   async logEvent(data: LogEventData) {
-    return prisma.dropletHistory.create({
+    return prisma.vMHistory.create({
       data: {
-        vpsId:         data.vpsId,
+        vmId:          data.vmId,
         userId:        data.userId,
         event:         data.event,
         fromAccountId: data.fromAccountId,
         toAccountId:   data.toAccountId,
         fromIp:        data.fromIp,
         toIp:          data.toIp,
-        fromServer:    data.fromServer,
-        toServer:      data.toServer,
         snapshotId:    data.snapshotId,
         reason:        data.reason,
         triggeredBy:   data.triggeredBy,
@@ -44,14 +40,14 @@ export class TrackingService {
     });
   }
 
-  // ─── User's complete VPS journey ──────────────────────────────────────────
+  // ─── User's complete VM journey ──────────────────────────────────────────
   async getUserJourney(userId: string) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        vps: {
+        vms: {
           where: { status: { in: ["active", "provisioning"] } },
-          include: { account: true, server: true, plan: true },
+          include: { account: true, server: true },
           take: 1,
         },
       },
@@ -59,26 +55,26 @@ export class TrackingService {
 
     if (!user) throw new Error("User not found");
 
-    const history = await prisma.dropletHistory.findMany({
+    const history = await prisma.vMHistory.findMany({
       where: { userId },
       include: { fromAccount: true },
       orderBy: { createdAt: "asc" },
     });
 
-    const currentVPS = user.vps[0];
+    const currentVM = user.vms[0];
 
     return {
       user: { id: user.id, name: user.name, email: user.email },
-      currentVPS: currentVPS ? {
-        id:        currentVPS.id,
-        ip:        currentVPS.ipAddress,
-        account:   currentVPS.account?.name,
-        server:    currentVPS.server?.name,
-        status:    currentVPS.status,
-        plan:      currentVPS.plan?.name,
-        createdAt: currentVPS.createdAt,
+      currentVM: currentVM ? {
+        id:        currentVM.id,
+        ip:        currentVM.ip,
+        account:   currentVM.account?.name,
+        server:    currentVM.server?.name,
+        status:    currentVM.status,
+        plan:      currentVM.plan,
+        createdAt: currentVM.createdAt,
       } : null,
-      history: history.map((h: typeof history[number]) => ({
+      history: history.map((h: any) => ({
         id:           h.id,
         date:         h.createdAt,
         event:        h.event,
@@ -94,46 +90,46 @@ export class TrackingService {
     };
   }
 
-  // ─── Droplet full timeline ────────────────────────────────────────────────
-  async getDropletTimeline(vpsId: string) {
-    const vps = await prisma.vPS.findUnique({
-      where: { id: vpsId },
-      include: { user: true, account: true, plan: true },
+  // ─── VM full timeline ────────────────────────────────────────────────
+  async getVMTimeline(vmId: string) {
+    const vm = await prisma.vM.findUnique({
+      where: { id: vmId },
+      include: { user: true, account: true },
     });
-    if (!vps) throw new Error("VPS not found");
+    if (!vm) throw new Error("VM not found");
 
-    const events = await prisma.dropletHistory.findMany({
-      where: { vpsId },
+    const events = await prisma.vMHistory.findMany({
+      where: { vmId },
       include: { fromAccount: true },
       orderBy: { createdAt: "asc" },
     });
 
     const migrations = await prisma.migration.findMany({
-      where: { vpsId },
+      where: { vmId },
       include: { fromAccount: true, toAccount: true, steps: { orderBy: { step: "asc" } } },
       orderBy: { createdAt: "desc" },
     });
 
-    return { vps, events, migrations };
+    return { vm, events, migrations };
   }
 
   // ─── Account event history ────────────────────────────────────────────────
   async getAccountHistory(accountId: string) {
-    const account = await prisma.dOAccount.findUnique({
+    const account = await prisma.cloudAccount.findUnique({
       where: { id: accountId },
-      include: { droplets: { include: { user: true } } },
+      include: { vms: { include: { user: true } } },
     });
 
-    const history = await prisma.dropletHistory.findMany({
+    const history = await prisma.vMHistory.findMany({
       where: { fromAccountId: accountId },
-      include: { vps: true, user: true },
+      include: { vm: true, user: true },
       orderBy: { createdAt: "desc" },
       take: 200,
     });
 
     const migrations = await prisma.migration.findMany({
       where: { OR: [{ fromAccountId: accountId }, { toAccountId: accountId }] },
-      include: { user: true, vps: true },
+      include: { user: true, vm: true },
       orderBy: { createdAt: "desc" },
     });
 
@@ -146,7 +142,7 @@ export class TrackingService {
     accountId?: string; dateFrom?: Date; dateTo?: Date;
     limit?: number;
   }) {
-    return prisma.dropletHistory.findMany({
+    return prisma.vMHistory.findMany({
       where: {
         ...(filters.event     && { event:         filters.event }),
         ...(filters.userId    && { userId:         filters.userId }),
@@ -156,7 +152,7 @@ export class TrackingService {
           : {}),
       },
       include: {
-        vps:         true,
+        vm:          true,
         user:        { select: { id: true, name: true, email: true } },
         fromAccount: { select: { id: true, name: true } },
       },

@@ -3,10 +3,23 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL!;
 
-const pool = new Pool({ connectionString });
+// DigitalOcean managed PostgreSQL requires SSL
+const pool = new Pool({
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false,
+    // Allow self-signed certs from DO managed databases
+  },
+});
+
+// Handle pool errors gracefully
+pool.on('error', (err) => {
+  console.error('[DB] Unexpected pool error:', err.message);
+});
+
 const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
+export const prisma = new PrismaClient({ adapter });
 export default prisma;

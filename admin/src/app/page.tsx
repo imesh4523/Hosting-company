@@ -1,5 +1,6 @@
 import Sidebar from "@/components/Sidebar";
 import { prisma } from "@/lib/prisma";
+import AutoRefresh from "@/components/AutoRefresh";
 
 async function getDashboardMetrics() {
   try {
@@ -136,6 +137,7 @@ export default async function Dashboard() {
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#F8F9FA" }}>
       <Sidebar />
+      <AutoRefresh interval={15000} />
 
       <main style={{ flex: 1, padding: "28px 32px", overflowY: "auto" }}>
 

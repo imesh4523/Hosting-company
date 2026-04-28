@@ -56,9 +56,36 @@ export const login = async (req: Request, res: Response) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        avatar: user.avatar,
       },
     });
   } catch (error) {
     res.status(500).json({ message: 'Error logging in', error });
   }
+};
+
+export const getAuthMethods = async (req: Request, res: Response) => {
+  try {
+    const settings = await prisma.authSettings.findFirst();
+    res.json({
+      email: settings?.emailEnabled ?? true,
+      google: settings?.googleEnabled ?? false,
+      facebook: settings?.facebookEnabled ?? false,
+      github: settings?.githubEnabled ?? false,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching auth methods' });
+  }
+};
+
+export const oauthCallback = async (req: Request, res: Response) => {
+  const user = req.user as any;
+  if (!user) return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=auth_failed`);
+
+  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+  const refreshToken = jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '7d' });
+
+  // Redirect to frontend with tokens in URL (or use cookies if preferred)
+  // For simplicity using URL params, but in production consider more secure methods
+  res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?token=${token}&refreshToken=${refreshToken}`);
 };

@@ -1,51 +1,52 @@
 import prisma from '../config/prisma.js';
-import { getDOClient } from './digitalocean.service.js';
+import { CloudProviderFactory } from '../lib/providers/factory.js';
 
 export class SnapshotManager {
   /**
-   * Triggers a snapshot for a specific VPS
+   * Triggers a snapshot for a specific VM
    */
-  static async takeSnapshot(vpsId: string) {
-    const vps = await prisma.vPS.findUnique({
-      where: { id: vpsId },
+  static async takeSnapshot(vmId: string) {
+    const vm = await prisma.vM.findUnique({
+      where: { id: vmId },
       include: { account: true }
     });
 
-    if (!vps || !vps.account) throw new Error('VPS or account not found');
+    if (!vm || !vm.account) throw new Error('VM or account not found');
 
     try {
-      const doClient = getDOClient(vps.account.apiKey);
-      const snapName = `${vps.name}-auto-${Date.now()}`;
-      const result = await doClient.createSnapshot(vps.dropletId, snapName);
+      const provider = CloudProviderFactory.create(vm.account.provider, vm.account.credentials);
+      const snapName = `${vm.name}-auto-${Date.now()}`;
+      const snap = await provider.createSnapshot(vm.providerId!, snapName);
 
       // Save snapshot to DB
-      await prisma.dOSnapshot.create({
+      await prisma.snapshot.create({
         data: {
-          vpsId: vps.id,
-          doAccountId: vps.account.id,
-          userId: vps.userId,
-          doSnapshotId: result.snapshot_id?.toString(),
+          vmId: vm.id,
+          cloudAccountId: vm.account.id,
+          userId: vm.userId,
+          providerSnapshotId: snap.id,
           name: snapName,
           status: 'ready',
-          type: 'auto'
+          type: 'auto',
+          sizeGb: snap.sizeGb
         }
       });
 
-      console.log(`Snapshot completed for ${vps.name}: ${result.snapshot_id}`);
-      return result;
+      console.log(`Snapshot completed for ${vm.name}: ${snap.id}`);
+      return snap;
     } catch (error) {
-      console.error(`Failed to take snapshot for ${vps.name}:`, error);
+      console.error(`Failed to take snapshot for ${vm.name}:`, error);
       throw error;
     }
   }
 
   /**
-   * Schedules snapshots for all active VPS instances
+   * Schedules snapshots for all active VM instances
    */
   static async runAutomatedBackups() {
-    const activeVPS = await prisma.vPS.findMany({ where: { status: 'active' } });
-    for (const vps of activeVPS) {
-      await this.takeSnapshot(vps.id);
+    const activeVMs = await prisma.vM.findMany({ where: { status: 'active' } });
+    for (const vm of activeVMs) {
+      await this.takeSnapshot(vm.id);
     }
   }
 }

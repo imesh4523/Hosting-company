@@ -127,8 +127,8 @@ export class FraudDetectionService {
       data: { status: "banned", trustLevel: "BANNED", banReason: reason },
     });
 
-    // Suspend all their VPS
-    await prisma.vPS.updateMany({
+    // Suspend all their VMs
+    await prisma.vM.updateMany({
       where: { userId },
       data: { status: "suspended" },
     });

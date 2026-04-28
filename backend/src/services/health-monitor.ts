@@ -1,31 +1,27 @@
-import axios from 'axios';
 import prisma from '../config/prisma.js';
-import { decryptKey } from './digitalocean.service.js';
+import { CloudProviderFactory } from '../lib/providers/factory.js';
 
 export class HealthMonitor {
   /**
-   * Performs heartbeat checks on all droplets
+   * Performs heartbeat checks on all VMs
    */
-  static async checkDroplets() {
-    const vpsList = await prisma.vPS.findMany({ include: { account: true } });
+  static async checkVMs() {
+    const vmList = await prisma.vM.findMany({ include: { account: true } });
 
-    for (const vps of vpsList) {
-      if (!vps.account) continue;
+    for (const vm of vmList) {
+      if (!vm.account) continue;
       try {
-        const apiKey = decryptKey(vps.account.apiKey);
-        const response = await axios.get(`https://api.digitalocean.com/v2/droplets/${vps.dropletId}`, {
-          headers: { Authorization: `Bearer ${apiKey}` }
-        });
+        const provider = CloudProviderFactory.create(vm.account.provider, vm.account.credentials);
+        const remoteVM = await provider.getVM(vm.providerId!);
 
-        const currentStatus = response.data.droplet.status;
-        if (currentStatus === 'active' && vps.status !== 'active') {
-          await prisma.vPS.update({ where: { id: vps.id }, data: { status: 'active' } });
+        if (remoteVM.status === 'active' && vm.status !== 'active') {
+          await prisma.vM.update({ where: { id: vm.id }, data: { status: 'active' } });
         }
       } catch (error: any) {
         if (error.response && error.response.status === 404) {
-          // Droplet is missing or account suspended
-          console.warn(`VPS ${vps.name} is missing! Initiating recovery...`);
-          await this.initiateRecovery(vps.id);
+          // VM is missing or account suspended
+          console.warn(`VM ${vm.name} is missing! Initiating recovery...`);
+          await this.initiateRecovery(vm.id);
         }
       }
     }
@@ -34,38 +30,40 @@ export class HealthMonitor {
   /**
    * Automated Recovery Logic
    */
-  static async initiateRecovery(vpsId: string) {
-    const vps = await prisma.vPS.findUnique({
-      where: { id: vpsId },
+  static async initiateRecovery(vmId: string) {
+    const vm = await prisma.vM.findUnique({
+      where: { id: vmId },
       include: { snapshots: { orderBy: { createdAt: 'desc' }, take: 1 } }
     });
 
-    if (!vps || vps.snapshots.length === 0) {
-      console.error(`Recovery failed for ${vpsId}: No snapshots available.`);
+    if (!vm || vm.snapshots.length === 0) {
+      console.error(`Recovery failed for ${vmId}: No snapshots available.`);
       return;
     }
 
-    const latestSnapshot = vps.snapshots[0];
+    const latestSnapshot = vm.snapshots[0];
     if (!latestSnapshot) return;
     
     // Log recovery start
     await prisma.recoveryLog.create({
       data: {
-        vpsId: vps.id,
+        vpsId: vm.id,
         action: 'snapshot_restore',
         status: 'in_progress',
-        message: `Restoring from snapshot ${latestSnapshot.doSnapshotId}`
+        message: `Restoring from snapshot ${latestSnapshot.providerSnapshotId}`
       }
     });
 
     try {
-      // Logic to recreate droplet from latestSnapshot.doSnapshotId
-      console.log(`Restoring ${vps.name} from snapshot ${latestSnapshot.doSnapshotId}...`);
+      console.log(`Restoring ${vm.name} from snapshot ${latestSnapshot.providerSnapshotId}...`);
+      
+      // Logic would be to deploy a new VM from snapshot
+      // ...
       
       // Update log on success
       await prisma.recoveryLog.create({
         data: {
-          vpsId: vps.id,
+          vpsId: vm.id,
           action: 'snapshot_restore',
           status: 'success',
           message: 'Restored successfully'
@@ -74,7 +72,7 @@ export class HealthMonitor {
     } catch (err: any) {
       await prisma.recoveryLog.create({
         data: {
-          vpsId: vps.id,
+          vpsId: vm.id,
           action: 'snapshot_restore',
           status: 'failed',
           message: err.message

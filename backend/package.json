@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 tsx watch src/index.ts",
     "build": "npx prisma generate && tsc",
     "start": "node dist/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,6 +20,10 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/passport": "^1.0.17",
+    "@types/passport-facebook": "^3.0.4",
+    "@types/passport-github2": "^1.2.9",
+    "@types/passport-google-oauth20": "^2.0.17",
     "@types/pg": "^8.20.0",
     "axios": "^1.15.2",
     "bcryptjs": "^3.0.3",
@@ -36,6 +40,10 @@
     "node-ssh": "^13.2.1",
     "nodemailer": "^8.0.7",
     "otplib": "^13.4.0",
+    "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
     "pg": "^8.20.0",
     "prisma": "^7.8.0",
     "qrcode": "^1.5.4",
@@ -55,6 +63,7 @@
     "@types/node-ssh": "^7.0.6",
     "@types/nodemailer": "^8.0.0",
     "@types/qrcode": "^1.5.6",
+    "cross-env": "^10.1.0",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
