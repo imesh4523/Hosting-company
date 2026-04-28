@@ -1,5 +1,5 @@
-import axios from 'axios';
 import prisma from '../config/prisma.js';
+import { getDOClient } from './digitalocean.service.js';
 
 export class SnapshotManager {
   /**
@@ -8,23 +8,31 @@ export class SnapshotManager {
   static async takeSnapshot(vpsId: string) {
     const vps = await prisma.vPS.findUnique({
       where: { id: vpsId },
-      include: { doAccount: true }
+      include: { account: true }
     });
 
-    if (!vps) throw new Error('VPS not found');
+    if (!vps || !vps.account) throw new Error('VPS or account not found');
 
     try {
-      const response = await axios.post(
-        `https://api.digitalocean.com/v2/droplets/${vps.dropletId}/actions`,
-        {
-          type: 'snapshot',
-          name: `${vps.name}-auto-${Date.now()}`
-        },
-        { headers: { Authorization: `Bearer ${vps.doAccount.apiKey}` } }
-      );
+      const doClient = getDOClient(vps.account.apiKey);
+      const snapName = `${vps.name}-auto-${Date.now()}`;
+      const result = await doClient.createSnapshot(vps.dropletId, snapName);
 
-      console.log(`Snapshot triggered for ${vps.name}: ${response.data.action.id}`);
-      return response.data.action;
+      // Save snapshot to DB
+      await prisma.dOSnapshot.create({
+        data: {
+          vpsId: vps.id,
+          doAccountId: vps.account.id,
+          userId: vps.userId,
+          doSnapshotId: result.snapshot_id?.toString(),
+          name: snapName,
+          status: 'ready',
+          type: 'auto'
+        }
+      });
+
+      console.log(`Snapshot completed for ${vps.name}: ${result.snapshot_id}`);
+      return result;
     } catch (error) {
       console.error(`Failed to take snapshot for ${vps.name}:`, error);
       throw error;
@@ -35,9 +43,8 @@ export class SnapshotManager {
    * Schedules snapshots for all active VPS instances
    */
   static async runAutomatedBackups() {
-    const activeVPS = await prisma.vPS.findMany({ where: { status: 'ACTIVE' } });
+    const activeVPS = await prisma.vPS.findMany({ where: { status: 'active' } });
     for (const vps of activeVPS) {
-      // Logic to check if 6 hours passed since last snapshot
       await this.takeSnapshot(vps.id);
     }
   }

@@ -121,7 +121,7 @@ export default function ServerCard({ server, isSelected, onClick, onEdit, onDisa
       <div style={{ display: "flex", gap: "10px", marginBottom: "14px" }}>
         <div style={{ flex: 1, background: "#F9FAFB", borderRadius: "8px", padding: "9px 12px", textAlign: "center" }}>
           <div style={{ fontSize: "10px", color: "#9CA3AF", fontWeight: 600, textTransform: "uppercase" }}>VPS Instances</div>
-          <div style={{ fontSize: "20px", fontWeight: 700, color: "#111827", marginTop: "2px" }}>{server._count.vPS}</div>
+          <div style={{ fontSize: "20px", fontWeight: 700, color: "#111827", marginTop: "2px" }}>{server._count.vps}</div>
         </div>
         <div style={{ flex: 1, background: "#F9FAFB", borderRadius: "8px", padding: "9px 12px", textAlign: "center" }}>
           <div style={{ fontSize: "10px", color: "#9CA3AF", fontWeight: 600, textTransform: "uppercase" }}>Type</div>

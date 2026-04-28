@@ -19,7 +19,9 @@ function encrypt(text: string): string {
 }
 
 function decrypt(enc: string): string {
-  const [ivHex, encrypted] = enc.split(":");
+  const parts    = enc.split(":");
+  const ivHex    = parts[0] ?? "";
+  const encrypted = parts[1] ?? "";
   const iv  = Buffer.from(ivHex, "hex");
   const key = Buffer.from(ENC_KEY.slice(0, 64), "hex");
   const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
@@ -35,13 +37,13 @@ function proxmoxFor(server: { apiUrl: string; apiUser?: string | null; apiKey?: 
 router.get("/", async (_req: Request, res: Response) => {
   try {
     const servers = await prisma.server.findMany({
-      include: { _count: { select: { vPS: true } } },
+      include: { _count: { select: { vps: true } } },
       orderBy: { createdAt: "asc" },
     });
 
     // Enrich with live Proxmox data in parallel
     const enriched = await Promise.all(
-      servers.map(async (s) => {
+      servers.map(async (s: typeof servers[number]) => {
         if (s.type !== "proxmox") return { ...s, liveNodes: [], liveStats: null };
         try {
           const px = proxmoxFor(s);
@@ -70,9 +72,9 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const server = await prisma.server.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: {
-        vPS: {
+        vps: {
           include: { user: { select: { id: true, name: true, email: true } } },
         },
       },
@@ -128,7 +130,7 @@ router.put("/:id", async (req: Request, res: Response) => {
   const { name, apiUrl, apiUser, apiKey, region, node, maxVMs, notes, status, maintenanceMode } = req.body;
   try {
     const server = await prisma.server.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: {
         ...(name            && { name }),
         ...(apiUrl          && { apiUrl }),
@@ -151,7 +153,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 // ─── POST /api/admin/servers/:id/test ───────────────────────────────────────
 router.post("/:id/test", async (req: Request, res: Response) => {
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id } });
+    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
     if (!server) { res.status(404).json({ error: "Server not found" }); return; }
 
     const px = proxmoxFor(server);
@@ -178,7 +180,7 @@ router.post("/test-credentials", async (req: Request, res: Response) => {
 // ─── GET /api/admin/servers/:id/vms ─────────────────────────────────────────
 router.get("/:id/vms", async (req: Request, res: Response) => {
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id } });
+    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
     if (!server || server.type !== "proxmox") { res.json({ vms: [] }); return; }
 
     const px = proxmoxFor(server);
@@ -194,10 +196,10 @@ router.get("/:id/vms", async (req: Request, res: Response) => {
 router.post("/:id/vm/:vmId/start", async (req: Request, res: Response) => {
   const { node, type } = req.body;
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id } });
+    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
     if (!server) { res.status(404).json({ error: "Server not found" }); return; }
     const px = proxmoxFor(server);
-    const task = await px.startVM(node, parseInt(req.params.vmId), type ?? "lxc");
+    const task = await px.startVM(node as string, parseInt((req.params.vmId as string) ?? "0"), (type as "qemu" | "lxc") ?? "lxc");
     res.json({ task });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
@@ -208,10 +210,10 @@ router.post("/:id/vm/:vmId/start", async (req: Request, res: Response) => {
 router.post("/:id/vm/:vmId/stop", async (req: Request, res: Response) => {
   const { node, type } = req.body;
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id } });
+    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
     if (!server) { res.status(404).json({ error: "Server not found" }); return; }
     const px = proxmoxFor(server);
-    const task = await px.stopVM(node, parseInt(req.params.vmId), type ?? "lxc");
+    const task = await px.stopVM(node as string, parseInt((req.params.vmId as string) ?? "0"), (type as "qemu" | "lxc") ?? "lxc");
     res.json({ task });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
@@ -225,17 +227,18 @@ router.post("/:id/disable", async (req: Request, res: Response) => {
   try {
     if (action === "suspend") {
       await prisma.vPS.updateMany({
-        where: { serverId: req.params.id },
-        data:  { status: "suspended" },
+        where: { serverId: req.params.id as string },
+        data:  { status: "suspended" as const },
       });
     } else if (action === "migrate" && targetServerId) {
+      // Move all VPS to target server
       await prisma.vPS.updateMany({
-        where: { serverId: req.params.id },
-        data:  { serverId: targetServerId },
+        where: { serverId: req.params.id as string },
+        data:  { serverId: String(targetServerId) },
       });
     }
     const server = await prisma.server.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data:  { status: "disabled" },
     });
     res.json({ server });
@@ -249,7 +252,7 @@ router.post("/:id/maintenance", async (req: Request, res: Response) => {
   const { enabled } = req.body;
   try {
     const server = await prisma.server.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data:  { maintenanceMode: enabled },
     });
 
@@ -267,7 +270,7 @@ router.post("/:id/maintenance", async (req: Request, res: Response) => {
 // Real-time stats for polling
 router.get("/:id/stats", async (req: Request, res: Response) => {
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id } });
+    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
     if (!server || server.type !== "proxmox") { res.json({ nodes: [] }); return; }
 
     const px    = proxmoxFor(server);

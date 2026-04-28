@@ -16,19 +16,7 @@ interface MigrationOpts {
   adminId?: string;
 }
 
-const STEP_NAMES = [
-  "", // 0 = unused
-  "detect_suspension",
-  "find_best_account",
-  "take_snapshot",
-  "transfer_snapshot",
-  "create_new_droplet",
-  "restore_snapshot",
-  "verify_vps",
-  "update_database",
-  "notify_user",
-  "cleanup",
-];
+
 
 export class MigrationService {
 
@@ -107,7 +95,7 @@ export class MigrationService {
 
       // ── Step 2: Verify space on target
       { n: "find_best_account", action: async () => {
-        const client = getDOClient(targetAccount.apiKey);
+        const client = getDOClient(targetAccount.apiKey ?? "");
         const acc    = await client.getAccount();
         const current = await client.getDropletCount();
         if (current >= acc.droplet_limit) throw new Error(`Target account ${targetAccount.name} is at droplet limit`);
@@ -116,7 +104,7 @@ export class MigrationService {
       // ── Step 3: Take snapshot
       { n: "take_snapshot", action: async () => {
         try {
-          const fromClient = getDOClient(fromAccount.apiKey);
+          const fromClient = getDOClient(fromAccount.apiKey ?? "");
           const snapName   = `mig-${vps.dropletId}-${Date.now()}`;
           const result     = await fromClient.createSnapshot(vps.dropletId, snapName);
 
@@ -144,14 +132,14 @@ export class MigrationService {
 
       // ── Step 4: Transfer snapshot to target account
       { n: "transfer_snapshot", action: async () => {
-        if (ctx.useB2Backup || !ctx.snapshotDoId) return; // B2 — skip transfer
-        const fromClient = getDOClient(fromAccount.apiKey);
-        await fromClient.transferSnapshot(ctx.snapshotDoId, targetAccount.region);
+        if (ctx.useB2Backup || !ctx.snapshotDoId) return;
+        const fromClient2 = getDOClient(fromAccount.apiKey ?? "");
+        await fromClient2.transferSnapshot(ctx.snapshotDoId, targetAccount.region);
       }},
 
       // ── Step 5: Create new droplet
       { n: "create_new_droplet", action: async () => {
-        const toClient  = getDOClient(targetAccount.apiKey);
+        const toClient  = getDOClient(targetAccount.apiKey ?? "");
         const imageId   = ctx.useB2Backup ? "ubuntu-22-04-x64" : ctx.snapshotDoId!;
         const newDroplet = await toClient.createDroplet({
           name:   vps.name,
@@ -245,7 +233,9 @@ export class MigrationService {
     await prisma.migration.update({ where: { id: migration.id }, data: { status: "deploying" } });
 
     for (let i = 0; i < steps.length; i++) {
-      const { n, action } = steps[i];
+      // steps[i] is guaranteed defined by the for-loop bounds
+      const step = steps[i]!;
+      const { n, action } = step;
       const stepNum = i + 1;
       await tracking.setStep(migration.id, stepNum, n, "running");
 

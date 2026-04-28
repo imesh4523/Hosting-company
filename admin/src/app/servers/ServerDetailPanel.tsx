@@ -85,12 +85,12 @@ export default function ServerDetailPanel({ server, onClose, onEdit, showToast }
 
           {/* VPS summary */}
           <div style={{ background: "#F9FAFB", borderRadius: "10px", padding: "14px", marginBottom: "20px" }}>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#9CA3AF", letterSpacing: "0.06em", marginBottom: "10px" }}>VPS INSTANCES: {server._count.vPS}</div>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "#9CA3AF", letterSpacing: "0.06em", marginBottom: "10px" }}>VPS INSTANCES: {server._count.vps}</div>
             <div style={{ display: "flex", gap: "12px" }}>
               {[
-                { label: "Running",   count: Math.round(server._count.vPS * 0.9), dot: "#10B981" },
-                { label: "Stopped",   count: Math.round(server._count.vPS * 0.07), dot: "#EF4444" },
-                { label: "Suspended", count: Math.round(server._count.vPS * 0.03), dot: "#F59E0B" },
+                { label: "Running",   count: Math.round(server._count.vps * 0.9), dot: "#10B981" },
+                { label: "Stopped",   count: Math.round(server._count.vps * 0.07), dot: "#EF4444" },
+                { label: "Suspended", count: Math.round(server._count.vps * 0.03), dot: "#F59E0B" },
               ].map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                   <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: s.dot }} />

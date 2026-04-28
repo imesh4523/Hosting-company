@@ -48,13 +48,13 @@ export default function DisableServerModal({ server, servers, onClose, onConfirm
             <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#FEF3C7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>⚠️</div>
             <div>
               <div style={{ fontSize: "15px", fontWeight: 700, color: "#111827" }}>Disable {server.name}?</div>
-              <div style={{ fontSize: "12px", color: "#9CA3AF" }}>This server has {server._count.vPS} active VPS instances</div>
+              <div style={{ fontSize: "12px", color: "#9CA3AF" }}>This server has {server._count.vps} active VPS instances</div>
             </div>
           </div>
         </div>
 
         <div style={{ padding: "20px 24px" }}>
-          <div style={{ fontSize: "13px", color: "#374151", marginBottom: "14px", fontWeight: 500 }}>Choose what to do with the {server._count.vPS} VPS instances:</div>
+          <div style={{ fontSize: "13px", color: "#374151", marginBottom: "14px", fontWeight: 500 }}>Choose what to do with the {server._count.vps} VPS instances:</div>
 
           {radio("keep",    "Keep VPS running",      "Mark server as disabled in panel only — VPS continue running")}
           {radio("suspend", "Suspend all VPS",        "Stop all VPS on this server immediately")}
@@ -66,7 +66,7 @@ export default function DisableServerModal({ server, servers, onClose, onConfirm
               <select value={target} onChange={e => setTarget(e.target.value)} style={{ width: "100%", padding: "8px 12px", border: "1px solid #E5E7EB", borderRadius: "8px", fontSize: "13px", background: "#FAFAFA", outline: "none" }}>
                 <option value="">Select target server…</option>
                 {otherServers.map(s => (
-                  <option key={s.id} value={s.id}>{s.name} ({s._count.vPS}/{s.maxVMs ?? 50} VPS)</option>
+                  <option key={s.id} value={s.id}>{s.name} ({s._count.vps}/{s.maxVMs ?? 50} VPS)</option>
                 ))}
               </select>
             </div>

@@ -26,22 +26,27 @@ const navItems = [
 // ─── Smart icon renderer ───────────────────────────────────────────────────────
 // SVGs from frontend have their own built-in white/light rounded background (40x40)
 // WEBPs are artwork-only — need a styled container
-function SidebarIcon({ src, alt, isSvg, isActive }: { src: string; alt: string; isSvg: boolean; isActive: boolean }) {
+function SidebarIcon({ src, alt, isSvg, isActive, label }: { src: string; alt: string; isSvg: boolean; isActive: boolean, label: string }) {
+  // User requested Dashboard and Billing to stay "like before" or specifically adjusted
+  const isSpecial = label === "Dashboard" || label === "Billing";
+  
   if (isSvg) {
-    // SVG already has rx=8 rounded white background built in — show at full 36px
+    // Increase size for "other" SVGs, keep special ones slightly smaller if needed
+    const size = isSpecial ? 34 : 38;
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={src}
         alt={alt}
-        width={34}
-        height={34}
+        width={size}
+        height={size}
         style={{ display: "block", flexShrink: 0, borderRadius: "8px" }}
       />
     );
   }
 
   // WEBP — artwork only, needs container
+  const iconSize = isSpecial ? 22 : 26;
   return (
     <div style={{
       width: "32px",
@@ -57,7 +62,7 @@ function SidebarIcon({ src, alt, isSvg, isActive }: { src: string; alt: string; 
       transition: "background 0.15s ease",
     }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} width={22} height={22} style={{ objectFit: "contain" }} />
+      <img src={src} alt={alt} width={iconSize} height={iconSize} style={{ objectFit: "contain" }} />
     </div>
   );
 }
@@ -121,7 +126,7 @@ export default function Sidebar() {
                 if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent";
               }}
             >
-              <SidebarIcon src={icon} alt={label} isSvg={isSvg} isActive={isActive} />
+              <SidebarIcon src={icon} alt={label} isSvg={isSvg} isActive={isActive} label={label} />
 
               <span style={{
                 fontSize: "13px",

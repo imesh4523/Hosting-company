@@ -1,5 +1,4 @@
 import axios from "axios";
-import nodemailer from "nodemailer";
 
 export class NotificationService {
   private botToken   = process.env.TELEGRAM_BOT_TOKEN ?? "";

@@ -6,193 +6,345 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  ADMIN
-  RESELLER
-  CUSTOMER
-}
-
-enum VPSStatus {
-  STARTING
-  RUNNING
-  ACTIVE
-  STOPPED
-  REBUILDING
-  SUSPENDED
-  FAILED
-}
-
-enum TicketStatus {
-  OPEN
-  IN_PROGRESS
-  CLOSED
-}
-
-enum InvoiceStatus {
-  PENDING
-  PAID
-  CANCELLED
-  REFUNDED
-}
-
+// ─── Users ─────────────────────────────────────────────────────────────────
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
+  id            String          @id @default(uuid())
+  email         String          @unique
+  name          String?
   password      String
-  name          String
-  firstName     String?
-  lastName      String?
-  phone         String?
-  address       String?
-  city          String?
-  state         String?
-  postcode      String?
-  country       String?
-  role          Role     @default(CUSTOMER)
-  twoFactorSecret String?
-  isTwoFactorEnabled Boolean @default(false)
-  fraudScore    Int      @default(0)
-  isBanned      Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  role          String          @default("customer")
+  status        String          @default("active")
+  suspended     Boolean         @default(false)
+  fraudScore    Float           @default(0.0)
+  trustLevel    String          @default("new")
+  lastLoginIp   String?
+  banReason     String?
+  activeVpsId   String?
 
   vps           VPS[]
   invoices      Invoice[]
-  tickets       Ticket[]
-  fraudProfile  FraudProfile?
-  transactions  Transaction[]
-  paymentMethods PaymentMethod[]
+  tickets       SupportTicket[]
+  affiliate     Affiliate?
+  ipLogs        UserIPLog[]
+  fraudLogs     FraudLog[]
+  migrations    Migration[]
+  dropletHistory DropletHistory[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
-model DigitalOceanAccount {
-  id            String   @id @default(uuid())
-  name          String
-  apiKey        String   // Encrypted
-  limit         Int      @default(10)
-  usage         Int      @default(0)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+// ─── DO Accounts ───────────────────────────────────────────────────────────
+model DOAccount {
+  id              String      @id @default(uuid())
+  name            String
+  apiKey          String      // AES-256 encrypted
+  status          String      @default("active") // active/suspended/disabled
+  suspendedAt     DateTime?
+  suspendReason   String?
+  region          String      @default("sgp1")
+  dropletLimit    Int         @default(10)
+  dropletCount    Int         @default(0)
+  bandwidthUsed   Float       @default(0)
+  lastChecked     DateTime?
+  isPrimaryFailover Boolean   @default(false)
+  notes           String?
 
-  vps           VPS[]
+  droplets        VPS[]
+  migrations      Migration[]
+  migrationsTo    Migration[] @relation("MigrationToAccount")
+  snapshots       DOSnapshot[]
+  history         DropletHistory[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
+// ─── VPS (formerly VPS) ─────────────────────────────────────────────────────
 model VPS {
-  id            String   @id @default(uuid())
-  name          String
-  dropletId     String?  @unique
-  ipAddress     String?
-  status        VPSStatus @default(STARTING)
-  planId        String
-  region        String
-  image         String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String      @id @default(uuid())
+  dropletId       String      @unique   // DO droplet ID
+  doAccountId     String
+  proxmoxServerId String?
+  userId          String
+  vmId            String?               // Proxmox VM ID
+  name            String
+  ipAddress       String?
+  status          String      @default("provisioning") // active/suspended/migrated/deleted
+  planId          String?
+  plan            Plan?       @relation(fields: [planId], references: [id])
+  region          String?
+  username        String      @default("root")
+  rootPassword    String?               // AES encrypted
+  suspendedAt     DateTime?
+  migratedAt      DateTime?
+  migratedTo      String?               // new VPS id
+  serverId        String?
 
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
-  
+  user            User        @relation(fields: [userId], references: [id])
+  account         DOAccount   @relation(fields: [doAccountId], references: [id])
+  server          Server?     @relation(fields: [serverId], references: [id])
+  snapshots       DOSnapshot[]
+  migrations      Migration[]
+  history         DropletHistory[]
+  recoveryLogs    RecoveryLog[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+// ─── DO Snapshots ──────────────────────────────────────────────────────────
+model DOSnapshot {
+  id            String      @id @default(uuid())
+  vpsId         String
   doAccountId   String
-  doAccount     DigitalOceanAccount @relation(fields: [doAccountId], references: [id])
-
-  snapshots     VPSSnapshot[]
-}
-
-model VPSSnapshot {
-  id            String   @id @default(uuid())
-  snapshotId    String   @unique
-  name          String
-  createdAt     DateTime @default(now())
-  
-  vpsId         String
-  vps           VPS      @relation(fields: [vpsId], references: [id])
-}
-
-model RecoveryLog {
-  id            String   @id @default(uuid())
-  vpsId         String
-  action        String
-  status        String
-  message       String?
-  createdAt     DateTime @default(now())
-}
-
-model Invoice {
-  id            String   @id @default(uuid())
-  amount        Float
-  currency      String   @default("USD")
-  status        InvoiceStatus @default(PENDING)
-  paymentMethod String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
   userId        String
-  user          User     @relation(fields: [userId], references: [id])
-  
-  transaction   Transaction?
+  doSnapshotId  String?     @unique
+  b2FileId      String?
+  name          String
+  sizeGb        Float       @default(0)
+  status        String      @default("pending") // pending/ready/failed
+  type          String      @default("auto")    // auto/manual/pre-migration
+  restoredAt    DateTime?
+  restoredTo    String?
+  expiresAt     DateTime?
+
+  vps           VPS         @relation(fields: [vpsId], references: [id])
+  account       DOAccount   @relation(fields: [doAccountId], references: [id])
+  migrations    Migration[]
+  createdAt     DateTime    @default(now())
+}
+
+// ─── Droplet History (every event) ─────────────────────────────────────────
+model DropletHistory {
+  id              String      @id @default(uuid())
+  vpsId           String
+  userId          String
+  event           String
+  // created/started/stopped/suspended/migrated/restored/
+  // snapshot_taken/account_changed/ip_changed/
+  // migration_started/migration_completed/migration_failed/
+  // user_notified/vps_unreachable/account_suspended
+  fromAccountId   String?
+  toAccountId     String?
+  fromIp          String?
+  toIp            String?
+  fromServer      String?
+  toServer        String?
+  snapshotId      String?
+  reason          String?
+  triggeredBy     String      @default("auto") // auto/admin/user
+  adminId         String?
+  metadata        Json?
+  duration        Int?        // seconds if relevant
+
+  vps             VPS         @relation(fields: [vpsId], references: [id])
+  user            User        @relation(fields: [userId], references: [id])
+  fromAccount     DOAccount?  @relation(fields: [fromAccountId], references: [id])
+  createdAt       DateTime    @default(now())
+}
+
+// ─── Migrations ────────────────────────────────────────────────────────────
+model Migration {
+  id              String          @id @default(uuid())
+  userId          String
+  vpsId           String
+  fromAccountId   String
+  toAccountId     String
+  fromVpsId       String
+  toVpsId         String?
+  snapshotId      String?
+  fromIp          String?
+  toIp            String?
+  fromServer      String?
+  toServer        String?
+  status          String          @default("pending")
+  // pending/snapshot_taken/deploying/restoring/completed/failed
+  trigger         String
+  // account_suspended/manual/scheduled/failover
+  retryCount      Int             @default(0)
+  startedAt       DateTime        @default(now())
+  completedAt     DateTime?
+  failedAt        DateTime?
+  failReason      String?
+  notifiedUser    Boolean         @default(false)
+  notifiedAt      DateTime?
+  downtimeMinutes Int?
+  useB2Backup     Boolean         @default(false)
+
+  user            User            @relation(fields: [userId], references: [id])
+  vps             VPS             @relation(fields: [vpsId], references: [id])
+  fromAccount     DOAccount       @relation(fields: [fromAccountId], references: [id])
+  toAccount       DOAccount       @relation("MigrationToAccount", fields: [toAccountId], references: [id])
+  snapshot        DOSnapshot?     @relation(fields: [snapshotId], references: [id])
+  steps           MigrationStep[]
+  createdAt       DateTime        @default(now())
+}
+
+// ─── Migration Steps ───────────────────────────────────────────────────────
+model MigrationStep {
+  id            String      @id @default(uuid())
+  migrationId   String
+  step          Int
+  name          String
+  status        String      @default("pending") // pending/running/done/failed/skipped
+  startedAt     DateTime?
+  completedAt   DateTime?
+  error         String?
+  metadata      Json?
+
+  migration     Migration   @relation(fields: [migrationId], references: [id])
+}
+
+// ─── Servers (Proxmox nodes) ────────────────────────────────────────────────
+model Server {
+  id              String    @id @default(uuid())
+  name            String
+  type            String    @default("proxmox") // proxmox/digitalocean
+  apiUrl          String
+  apiUser         String?
+  apiKey          String?
+  region          String?
+  node            String?
+  maxVMs          Int       @default(50)
+  status          String    @default("active")
+  maintenanceMode Boolean   @default(false)
+  notes           String?
+
+  vps             VPS[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// ─── Plans ─────────────────────────────────────────────────────────────────
+model PlanCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  plans       Plan[]
+  createdAt   DateTime @default(now())
+}
+
+model Plan {
+  id            String       @id @default(uuid())
+  name          String
+  categoryId    String
+  category      PlanCategory @relation(fields: [categoryId], references: [id])
+  priceMonthly  Float
+  priceYearly   Float?
+  ram           String?
+  cpu           String?
+  storage       String?
+  bandwidth     String?
+  doSize        String?      // DO slug e.g. "s-1vcpu-2gb"
+  vps           VPS[]
+  createdAt     DateTime     @default(now())
+}
+
+// ─── Billing ───────────────────────────────────────────────────────────────
+model Invoice {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  amount        Float
+  status        String        @default("pending")
+  plan          String?
+  stripeSessionId String?
+  provider      String        @default("stripe")
+  dueDate       DateTime      @default(now())
+  transactions  Transaction[]
+  createdAt     DateTime      @default(now())
 }
 
 model Transaction {
-  id            String   @id @default(uuid())
-  externalId    String?  @unique // Stripe/PayPal ID
-  amount        Float
-  status        String
-  createdAt     DateTime @default(now())
-
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
-  
-  invoiceId     String   @unique
-  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
+  id              String    @id @default(uuid())
+  userId          String?
+  invoiceId       String?
+  invoice         Invoice?  @relation(fields: [invoiceId], references: [id])
+  amount          Float
+  method          String    @default("stripe")
+  status          String    @default("success")
+  stripeSessionId String?
+  plan            String?
+  createdAt       DateTime  @default(now())
 }
 
-model Ticket {
-  id            String   @id @default(uuid())
-  subject       String
-  status        TicketStatus @default(OPEN)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
-  
-  messages      TicketMessage[]
+// ─── Support ───────────────────────────────────────────────────────────────
+model SupportTicket {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  subject     String
+  status      String          @default("open")
+  priority    String          @default("medium")
+  messages    TicketMessage[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model TicketMessage {
-  id            String   @id @default(uuid())
-  message       String
-  isAdmin       Boolean  @default(false)
-  createdAt     DateTime @default(now())
-
-  ticketId      String
-  ticket        Ticket   @relation(fields: [ticketId], references: [id])
+  id          String        @id @default(uuid())
+  ticketId    String
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id])
+  sender      String
+  message     String
+  createdAt   DateTime      @default(now())
 }
 
-model FraudProfile {
-  id            String   @id @default(uuid())
-  score         Int
-  ipAddress     String?
-  isVpn         Boolean  @default(false)
-  isProxy       Boolean  @default(false)
-  isTor         Boolean  @default(false)
-  lastChecked   DateTime @default(now())
-
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id])
+// ─── Affiliate ─────────────────────────────────────────────────────────────
+model Affiliate {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  code        String    @unique
+  commission  Float     @default(0.0)
+  payouts     Payout[]
+  createdAt   DateTime  @default(now())
 }
 
-model PaymentMethod {
-  id            String   @id @default(uuid())
-  last4         String
-  cardType      String
-  cardHolder    String
-  expiryDate    String
-  nickname      String?
-  isDefault     Boolean  @default(false)
-  createdAt     DateTime @default(now())
+model Payout {
+  id          String    @id @default(uuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  amount      Float
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+}
 
+// ─── Fraud Detection ───────────────────────────────────────────────────────
+model FraudLog {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  score       Float
+  reasons     String[]
+  action      String
+  createdAt   DateTime  @default(now())
+}
+
+// ─── Recovery ──────────────────────────────────────────────────────────────
+model RecoveryLog {
+  id          String    @id @default(uuid())
+  vpsId       String
+  vps         VPS       @relation(fields: [vpsId], references: [id])
+  action      String
+  status      String
+  message     String?
+  createdAt   DateTime  @default(now())
+}
+
+// ─── Analytics ─────────────────────────────────────────────────────────────
+model SystemMetric {
+  id          String    @id @default(uuid())
+  type        String
+  value       Float
+  timestamp   DateTime  @default(now())
+}
+
+model UserIPLog {
+  id            String    @id @default(uuid())
   userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id])
+  ipAddress     String
+  country       String?
+  city          String?
+  isSuspicious  Boolean   @default(false)
+  createdAt     DateTime  @default(now())
 }
-

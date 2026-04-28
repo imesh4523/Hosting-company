@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma.js";
 
 interface LogEventData {
@@ -14,7 +15,7 @@ interface LogEventData {
   reason?: string;
   triggeredBy: "auto" | "admin" | "user";
   adminId?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Prisma.InputJsonValue;
   duration?: number;
 }
 
@@ -48,7 +49,7 @@ export class TrackingService {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        vPS: {
+        vps: {
           where: { status: { in: ["active", "provisioning"] } },
           include: { account: true, server: true, plan: true },
           take: 1,
@@ -64,7 +65,7 @@ export class TrackingService {
       orderBy: { createdAt: "asc" },
     });
 
-    const currentVPS = user.vPS[0];
+    const currentVPS = user.vps[0];
 
     return {
       user: { id: user.id, name: user.name, email: user.email },
@@ -77,7 +78,7 @@ export class TrackingService {
         plan:      currentVPS.plan?.name,
         createdAt: currentVPS.createdAt,
       } : null,
-      history: history.map(h => ({
+      history: history.map((h: typeof history[number]) => ({
         id:           h.id,
         date:         h.createdAt,
         event:        h.event,
@@ -165,7 +166,7 @@ export class TrackingService {
   }
 
   // ─── Update migration step status ────────────────────────────────────────
-  async setStep(migrationId: string, step: number, name: string, status: "pending" | "running" | "done" | "failed", opts?: { error?: string; metadata?: Record<string, unknown> }) {
+  async setStep(migrationId: string, step: number, name: string, status: "pending" | "running" | "done" | "failed", opts?: { error?: string; metadata?: Prisma.InputJsonValue }) {
     const existing = await prisma.migrationStep.findFirst({ where: { migrationId, step } });
 
     const data = {

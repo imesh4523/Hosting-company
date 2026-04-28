@@ -159,7 +159,9 @@ const ENC_KEY = process.env.AES_ENCRYPTION_KEY ?? "";
 
 export function decryptKey(enc: string): string {
   try {
-    const [ivHex, encrypted] = enc.split(":");
+    const parts = enc.split(":");
+    const ivHex     = parts[0] ?? "";
+    const encrypted = parts[1] ?? "";
     const iv  = Buffer.from(ivHex, "hex");
     const key = Buffer.from(ENC_KEY.slice(0, 64), "hex");
     const d   = crypto.createDecipheriv("aes-256-cbc", key, iv);

@@ -6,7 +6,7 @@ async function getFraudData() {
     const users = await prisma.user.findMany({
       where: { fraudScore: { gte: 30 } },
       orderBy: { fraudScore: "desc" },
-      include: { _count: { select: { vPS: true } } },
+      include: { _count: { select: { vps: true } } },
     });
     return users;
   } catch {
@@ -36,10 +36,10 @@ export default async function FraudPage() {
 
   // Fallback mock data if DB empty
   const displayData = flagged.length > 0 ? flagged : [
-    { id: "u1", name: "John Doe",    email: "j@tempmail.io",    fraudScore: 87, trustLevel: "BANNED",  status: "banned",   createdAt: new Date("2026-04-27"), _count: { vPS: 2 }, fraudReasons: ["VPN/Proxy detected", "Disposable email", "Multiple accounts"] },
-    { id: "u2", name: "Mike Chen",   email: "m@protonmail.com", fraudScore: 65, trustLevel: "FLAGGED", status: "active",   createdAt: new Date("2026-04-26"), _count: { vPS: 1 }, fraudReasons: ["Payment declined", "Unusual signup pattern"] },
-    { id: "u3", name: "Sara Kim",    email: "s@yopmail.com",    fraudScore: 55, trustLevel: "FLAGGED", status: "active",   createdAt: new Date("2026-04-25"), _count: { vPS: 0 }, fraudReasons: ["Disposable email", "Multiple failed logins"] },
-    { id: "u4", name: "Dave Wilson", email: "d@guerrillamail.com", fraudScore: 78, trustLevel: "FLAGGED", status: "active", createdAt: new Date("2026-04-24"), _count: { vPS: 3 }, fraudReasons: ["VPN detected", "Same IP multiple accounts", "Payment declined"] },
+    { id: "u1", name: "John Doe",    email: "j@tempmail.io",    fraudScore: 87, trustLevel: "BANNED",  status: "banned",   createdAt: new Date("2026-04-27"), _count: { vps: 2 }, fraudReasons: ["VPN/Proxy detected", "Disposable email", "Multiple accounts"] },
+    { id: "u2", name: "Mike Chen",   email: "m@protonmail.com", fraudScore: 65, trustLevel: "FLAGGED", status: "active",   createdAt: new Date("2026-04-26"), _count: { vps: 1 }, fraudReasons: ["Payment declined", "Unusual signup pattern"] },
+    { id: "u3", name: "Sara Kim",    email: "s@yopmail.com",    fraudScore: 55, trustLevel: "FLAGGED", status: "active",   createdAt: new Date("2026-04-25"), _count: { vps: 0 }, fraudReasons: ["Disposable email", "Multiple failed logins"] },
+    { id: "u4", name: "Dave Wilson", email: "d@guerrillamail.com", fraudScore: 78, trustLevel: "FLAGGED", status: "active", createdAt: new Date("2026-04-24"), _count: { vps: 3 }, fraudReasons: ["VPN detected", "Same IP multiple accounts", "Payment declined"] },
   ];
 
   const summary = [
@@ -148,7 +148,7 @@ export default async function FraudPage() {
                       </div>
                     </td>
                     <td style={{ padding: "14px 18px" }}>
-                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>{user._count.vPS}</span>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>{user._count.vps}</span>
                     </td>
                     <td style={{ padding: "14px 18px" }}>
                       <span style={{

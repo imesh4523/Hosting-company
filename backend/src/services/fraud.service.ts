@@ -1,5 +1,5 @@
 import axios from "axios";
-import { prisma } from "../lib/prisma.js";
+import prisma from "../config/prisma.js";
 import { NotificationService } from "./notification.service.js";
 
 const notify = new NotificationService();

@@ -1,23 +1,25 @@
 import axios from 'axios';
 import prisma from '../config/prisma.js';
-import { SnapshotManager } from './snapshot-manager.js';
+import { decryptKey } from './digitalocean.service.js';
 
 export class HealthMonitor {
   /**
    * Performs heartbeat checks on all droplets
    */
   static async checkDroplets() {
-    const vpsList = await prisma.vPS.findMany({ include: { doAccount: true } });
+    const vpsList = await prisma.vPS.findMany({ include: { account: true } });
 
     for (const vps of vpsList) {
+      if (!vps.account) continue;
       try {
+        const apiKey = decryptKey(vps.account.apiKey);
         const response = await axios.get(`https://api.digitalocean.com/v2/droplets/${vps.dropletId}`, {
-          headers: { Authorization: `Bearer ${vps.doAccount.apiKey}` }
+          headers: { Authorization: `Bearer ${apiKey}` }
         });
 
         const currentStatus = response.data.droplet.status;
-        if (currentStatus === 'active' && vps.status !== 'ACTIVE') {
-          await prisma.vPS.update({ where: { id: vps.id }, data: { status: 'ACTIVE' } });
+        if (currentStatus === 'active' && vps.status !== 'active') {
+          await prisma.vPS.update({ where: { id: vps.id }, data: { status: 'active' } });
         }
       } catch (error: any) {
         if (error.response && error.response.status === 404) {
@@ -52,14 +54,13 @@ export class HealthMonitor {
         vpsId: vps.id,
         action: 'snapshot_restore',
         status: 'in_progress',
-        message: `Restoring from snapshot ${latestSnapshot.snapshotId}`
+        message: `Restoring from snapshot ${latestSnapshot.doSnapshotId}`
       }
     });
 
     try {
-      // Logic to recreate droplet from latestSnapshot.snapshotId
-      // Note: In a real scenario, this would choose a NEW healthy DO account if the original was suspended
-      console.log(`Restoring ${vps.name} from snapshot ${latestSnapshot.snapshotId}...`);
+      // Logic to recreate droplet from latestSnapshot.doSnapshotId
+      console.log(`Restoring ${vps.name} from snapshot ${latestSnapshot.doSnapshotId}...`);
       
       // Update log on success
       await prisma.recoveryLog.create({

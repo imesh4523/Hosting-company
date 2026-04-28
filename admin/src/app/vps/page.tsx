@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 async function getVPSData() {
   try {
     const vpsInstances = await prisma.vPS.findMany({
-      include: { user: { select: { name: true, email: true } } },
+      include: { user: { select: { name: true, email: true } }, plan: true },
       orderBy: { createdAt: "desc" },
     });
     const total = vpsInstances.length;
@@ -131,7 +131,7 @@ export default async function VPSPage() {
                         </td>
                         <td style={{ padding: "14px 20px" }}>
                           <span style={{ fontSize: "12.5px", color: "#374151" }}>
-                            {vps.size ?? "s-1vcpu-1gb"}
+                            {vps.plan?.doSize ?? "s-1vcpu-1gb"}
                           </span>
                         </td>
                         <td style={{ padding: "14px 20px" }}>

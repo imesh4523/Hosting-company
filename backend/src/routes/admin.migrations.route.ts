@@ -31,7 +31,7 @@ router.get("/", async (_req: Request, res: Response) => {
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const m = await prisma.migration.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: {
         user:        { select: { id: true, name: true, email: true } },
         vps:         true,
@@ -78,7 +78,7 @@ router.get("/accounts/health", async (_req: Request, res: Response) => {
 // ─── GET /api/admin/tracking/user/:userId ──────────────────────────────────
 router.get("/user/:userId/journey", async (req: Request, res: Response) => {
   try {
-    const journey = await tracking.getUserJourney(req.params.userId);
+    const journey = await tracking.getUserJourney(req.params.userId as string);
     res.json(journey);
   } catch (err) { res.status(500).json({ error: (err as Error).message }); }
 });
@@ -86,7 +86,7 @@ router.get("/user/:userId/journey", async (req: Request, res: Response) => {
 // ─── GET /api/admin/tracking/vps/:vpsId ────────────────────────────────────
 router.get("/vps/:vpsId/timeline", async (req: Request, res: Response) => {
   try {
-    const timeline = await tracking.getDropletTimeline(req.params.vpsId);
+    const timeline = await tracking.getDropletTimeline(req.params.vpsId as string);
     res.json(timeline);
   } catch (err) { res.status(500).json({ error: (err as Error).message }); }
 });
@@ -110,7 +110,7 @@ router.get("/log", async (req: Request, res: Response) => {
 // ─── GET /api/admin/migrations/accounts/:id/history ─────────────────────────
 router.get("/accounts/:id/history", async (req: Request, res: Response) => {
   try {
-    const data = await tracking.getAccountHistory(req.params.id);
+    const data = await tracking.getAccountHistory(req.params.id as string);
     res.json(data);
   } catch (err) { res.status(500).json({ error: (err as Error).message }); }
 });
@@ -119,7 +119,7 @@ router.get("/accounts/:id/history", async (req: Request, res: Response) => {
 router.post("/accounts/:id/set-primary", async (req: Request, res: Response) => {
   try {
     await prisma.dOAccount.updateMany({ data: { isPrimaryFailover: false } });
-    const acc = await prisma.dOAccount.update({ where: { id: req.params.id }, data: { isPrimaryFailover: true } });
+    const acc = await prisma.dOAccount.update({ where: { id: req.params.id as string }, data: { isPrimaryFailover: true } });
     res.json({ account: acc });
   } catch (err) { res.status(500).json({ error: (err as Error).message }); }
 });

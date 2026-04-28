@@ -11,7 +11,7 @@ export interface Server {
   id: string; name: string; type: "proxmox" | "digitalocean";
   apiUrl: string; apiUser?: string; region?: string; node?: string;
   maxVMs?: number; notes?: string; status: string; maintenanceMode?: boolean;
-  _count: { vPS: number };
+  _count: { vps: number };
   liveNodes?: { node: string; status: string; cpu: number; mem: number; maxmem: number; disk: number; maxdisk: number; uptime: number }[];
   liveStats?: { totalMem: number; usedMem: number; avgCpu: number } | null;
 }
@@ -60,10 +60,10 @@ export default function ServersPage() {
   useEffect(() => {
     if (!loading && servers.length === 0) {
       setServers([
-        { id: "s1", name: "SGP1-Proxmox",  type: "proxmox",      apiUrl: "https://10.12.0.1:8006", region: "Singapore", status: "active",  maintenanceMode: false, _count: { vPS: 31 }, liveNodes: [{ node: "pve-node-1", status: "online", cpu: 0.38, mem: 34359738368, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 86400 }, { node: "pve-node-2", status: "online", cpu: 0.52, mem: 49392123904, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 82000 }], liveStats: { totalMem: 137438953472, usedMem: 83751862272, avgCpu: 45 } },
-        { id: "s2", name: "US-DO-Primary", type: "digitalocean",  apiUrl: "https://api.digitalocean.com", region: "New York", status: "active",  maintenanceMode: false, _count: { vPS: 24 }, liveStats: null },
-        { id: "s3", name: "EU-AMS3",       type: "proxmox",      apiUrl: "https://10.20.0.1:8006", region: "Amsterdam", status: "warning", maintenanceMode: false, _count: { vPS: 18 }, liveStats: { totalMem: 68719476736, usedMem: 66571993088, avgCpu: 94 } },
-        { id: "s4", name: "SGP2-Backup",   type: "proxmox",      apiUrl: "https://10.12.0.2:8006", region: "Singapore", status: "active",  maintenanceMode: true,  _count: { vPS: 5  }, liveStats: { totalMem: 68719476736, usedMem: 12884901888, avgCpu: 18 } },
+        { id: "s1", name: "SGP1-Proxmox",  type: "proxmox",      apiUrl: "https://10.12.0.1:8006", region: "Singapore", status: "active",  maintenanceMode: false, _count: { vps: 31 }, liveNodes: [{ node: "pve-node-1", status: "online", cpu: 0.38, mem: 34359738368, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 86400 }, { node: "pve-node-2", status: "online", cpu: 0.52, mem: 49392123904, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 82000 }], liveStats: { totalMem: 137438953472, usedMem: 83751862272, avgCpu: 45 } },
+        { id: "s2", name: "US-DO-Primary", type: "digitalocean",  apiUrl: "https://api.digitalocean.com", region: "New York", status: "active",  maintenanceMode: false, _count: { vps: 24 }, liveStats: null },
+        { id: "s3", name: "EU-AMS3",       type: "proxmox",      apiUrl: "https://10.20.0.1:8006", region: "Amsterdam", status: "warning", maintenanceMode: false, _count: { vps: 18 }, liveStats: { totalMem: 68719476736, usedMem: 66571993088, avgCpu: 94 } },
+        { id: "s4", name: "SGP2-Backup",   type: "proxmox",      apiUrl: "https://10.12.0.2:8006", region: "Singapore", status: "active",  maintenanceMode: true,  _count: { vps: 5  }, liveStats: { totalMem: 68719476736, usedMem: 12884901888, avgCpu: 18 } },
       ]);
     }
   }, [loading, servers.length]);
@@ -78,7 +78,7 @@ export default function ServersPage() {
     .sort((a, b) => {
       if (sortBy === "ram")      return (b.liveStats?.usedMem ?? 0) - (a.liveStats?.usedMem ?? 0);
       if (sortBy === "cpu")      return (b.liveStats?.avgCpu  ?? 0) - (a.liveStats?.avgCpu  ?? 0);
-      if (sortBy === "vpsCount") return b._count.vPS - a._count.vPS;
+      if (sortBy === "vpsCount") return b._count.vps - a._count.vps;
       return a.name.localeCompare(b.name);
     });
 
@@ -106,7 +106,7 @@ export default function ServersPage() {
   const summaryCards = [
     { label: "Total Nodes",   value: servers.length,                        color: "#5145FF" },
     { label: "Online",        value: servers.filter(s => s.status !== "disabled" && s.status !== "offline").length, color: "#10B981" },
-    { label: "Total VPS",     value: servers.reduce((a, s) => a + s._count.vPS, 0), color: "#8B5CF6" },
+    { label: "Total VPS",     value: servers.reduce((a, s) => a + s._count.vps, 0), color: "#8B5CF6" },
     { label: "Total RAM",     value: `${totalRAM_GB}GB`,                   color: "#3B82F6" },
     { label: "Avg CPU",       value: `${avgCPU}%`,                         color: avgCPU > 80 ? "#EF4444" : "#F59E0B" },
     { label: "Warnings",      value: warnings,                              color: warnings > 0 ? "#EF4444" : "#9CA3AF" },

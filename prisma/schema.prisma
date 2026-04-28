@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ─── Users ─────────────────────────────────────────────────────────────────
@@ -22,7 +21,7 @@ model User {
   banReason     String?
   activeVpsId   String?
 
-  vPS           VPS[]
+  vps           VPS[]
   invoices      Invoice[]
   tickets       SupportTicket[]
   affiliate     Affiliate?
@@ -209,7 +208,7 @@ model Server {
   maintenanceMode Boolean   @default(false)
   notes           String?
 
-  vPS             VPS[]
+  vps             VPS[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }
@@ -235,7 +234,7 @@ model Plan {
   storage       String?
   bandwidth     String?
   doSize        String?      // DO slug e.g. "s-1vcpu-2gb"
-  vPS           VPS[]
+  vps           VPS[]
   createdAt     DateTime     @default(now())
 }
 

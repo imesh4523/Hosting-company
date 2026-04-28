@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma.js';
-import { DigitalOceanService } from '../services/digitalocean.service.js';
+import { getDOClient, DigitalOceanService } from '../services/digitalocean.service.js';
 
 export const deployVPS = async (req: Request, res: Response) => {
   try {
@@ -8,9 +8,9 @@ export const deployVPS = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
 
     // 1. Find best available DO account (Load Balancing)
-    const doAccount = await prisma.digitalOceanAccount.findFirst({
-      where: { isActive: true },
-      orderBy: { usage: 'asc' }, // Get account with least usage
+    const doAccount = await prisma.dOAccount.findFirst({
+      where: { status: 'active' },
+      orderBy: { dropletCount: 'asc' }, // Get account with least usage
     });
 
     if (!doAccount) {
@@ -18,13 +18,15 @@ export const deployVPS = async (req: Request, res: Response) => {
     }
 
     // 2. Create droplet via DO API
-    // Note: In real production, apiKey would be decrypted here
-    const droplet = await DigitalOceanService.createDroplet(doAccount.apiKey, {
+    const doClient = getDOClient(doAccount.apiKey);
+    const droplet = await doClient.createDroplet({
       name,
-      region,
+      region: region || doAccount.region,
       size: planId,
       image,
     });
+
+    const publicIp = DigitalOceanService.getPublicIP(droplet);
 
     // 3. Save to DB
     const vps = await prisma.vPS.create({
@@ -32,18 +34,18 @@ export const deployVPS = async (req: Request, res: Response) => {
         name,
         dropletId: droplet.id.toString(),
         planId,
-        region,
-        image,
+        region: droplet.region.slug,
+        ipAddress: publicIp,
         userId,
         doAccountId: doAccount.id,
-        status: 'STARTING',
+        status: 'active',
       },
     });
 
     // 4. Update DO account usage
-    await prisma.digitalOceanAccount.update({
+    await prisma.dOAccount.update({
       where: { id: doAccount.id },
-      data: { usage: { increment: 1 } },
+      data: { dropletCount: { increment: 1 } },
     });
 
     res.status(201).json({ message: 'VPS deployment started', vps });
@@ -57,7 +59,7 @@ export const getMyVPS = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
     const vpsList = await prisma.vPS.findMany({
       where: { userId },
-      include: { doAccount: true },
+      include: { account: true, plan: true },
     });
     res.json(vpsList);
   } catch (error) {
@@ -73,14 +75,19 @@ export const vpsAction = async (req: Request, res: Response) => {
 
     const vps = await prisma.vPS.findFirst({
       where: { id: id as string, userId },
-      include: { doAccount: true },
+      include: { account: true },
     });
 
-    if (!vps || !vps.dropletId || !vps.doAccount) {
+    if (!vps || !vps.dropletId || !vps.account) {
       return res.status(404).json({ message: 'VPS not found' });
     }
 
-    await DigitalOceanService.performAction(vps.doAccount.apiKey, vps.dropletId, action);
+    const doClient = getDOClient(vps.account.apiKey);
+    
+    if (action === 'power_on') await doClient.powerOnDroplet(vps.dropletId);
+    else if (action === 'power_off') await doClient.powerOffDroplet(vps.dropletId);
+    else if (action === 'reboot') await doClient.rebootDroplet(vps.dropletId);
+    else return res.status(400).json({ message: 'Invalid action' });
     
     res.json({ message: `Action ${action} initiated` });
   } catch (error) {

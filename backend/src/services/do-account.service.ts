@@ -1,7 +1,6 @@
 import axios from 'axios';
 import prisma from '../config/prisma.js';
 
-
 export class DOAccountService {
   /**
    * Validates a DigitalOcean API key and returns account info
@@ -21,23 +20,24 @@ export class DOAccountService {
    * Checks the health and limits of all registered accounts
    */
   static async syncAccountHealth() {
-    const accounts = await prisma.digitalOceanAccount.findMany({ where: { isActive: true } });
+    const accounts = await prisma.dOAccount.findMany({ where: { status: 'active' } });
     
     for (const account of accounts) {
       try {
         const info = await this.validateKey(account.apiKey);
-        await prisma.digitalOceanAccount.update({
+        await prisma.dOAccount.update({
           where: { id: account.id },
           data: {
-            limit: info.droplet_limit,
-            isActive: info.status === 'active'
+            dropletLimit: info.droplet_limit,
+            status: info.status === 'active' ? 'active' : 'suspended',
+            lastChecked: new Date()
           }
         });
       } catch (error) {
         // Mark as suspended if API call fails (likely key revoked or account suspended)
-        await prisma.digitalOceanAccount.update({
+        await prisma.dOAccount.update({
           where: { id: account.id },
-          data: { isActive: false }
+          data: { status: 'suspended', suspendReason: 'API Validation Failed' }
         });
         console.error(`Account ${account.name} suspended or key invalid.`);
       }
@@ -48,9 +48,9 @@ export class DOAccountService {
    * Returns the best account to provision a new VPS (Least Loaded)
    */
   static async getBestAccount() {
-    const account = await prisma.digitalOceanAccount.findFirst({
-      where: { isActive: true },
-      orderBy: { usage: 'asc' }
+    const account = await prisma.dOAccount.findFirst({
+      where: { status: 'active' },
+      orderBy: { dropletCount: 'asc' }
     });
     
     if (!account) throw new Error('No active DigitalOcean accounts available.');

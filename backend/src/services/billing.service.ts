@@ -1,9 +1,9 @@
 import Stripe from "stripe";
-import { prisma } from "../lib/prisma.js";
+import prisma from "../config/prisma.js";
 import { NotificationService } from "./notification.service.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-  apiVersion: "2025-01-27.acacia",
+  apiVersion: "2026-04-22.dahlia",
 });
 
 const notify = new NotificationService();
@@ -100,7 +100,6 @@ export class BillingService {
         status: "success",
         stripeSessionId: session.id,
         plan: planId,
-        provider: "stripe",
       },
     });
 
