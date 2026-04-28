@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "npx prisma generate && tsc",
     "start": "node dist/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,6 +14,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1038.0",
+    "@google/genai": "^1.50.1",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
@@ -26,14 +28,21 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.4.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
+    "node-ssh": "^13.2.1",
+    "nodemailer": "^8.0.7",
     "otplib": "^13.4.0",
     "pg": "^8.20.0",
     "prisma": "^7.8.0",
     "qrcode": "^1.5.4",
     "redis": "^5.12.1",
+    "ssh2": "^1.17.0",
+    "stripe": "^22.1.0",
+    "ws": "^8.20.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -45,6 +54,7 @@
     "@types/node": "^25.6.0",
     "@types/qrcode": "^1.5.6",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   }
 }

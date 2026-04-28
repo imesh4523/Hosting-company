@@ -1,0 +1,110 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/vpsplatform
+
+jobs:
+  # ─── Test ────────────────────────────────────────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: cd backend && npm ci && npx tsc --noEmit
+      - run: cd admin   && npm ci && npx tsc --noEmit
+      - run: cd frontend && npm ci && npx tsc --noEmit
+
+  # ─── Build & Push Docker Images ──────────────────────────────────────────────
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        service: [frontend, admin, backend, worker, monitor]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─── Deploy to Production Server ─────────────────────────────────────────────
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host:     ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key:      ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/vpsplatform
+
+            # Pull latest compose file
+            git pull origin main
+
+            # Login to GHCR
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull new images
+            export IMAGE_TAG=${{ github.sha }}
+            docker compose pull
+
+            # Zero-downtime rolling restart
+            docker compose up -d --no-build --remove-orphans
+
+            # Wait for health checks
+            sleep 20
+
+            # Verify all services healthy
+            UNHEALTHY=$(docker compose ps --filter status=unhealthy --quiet)
+            if [ -n "$UNHEALTHY" ]; then
+              echo "❌ Unhealthy containers detected — rolling back"
+              git checkout HEAD~1 -- docker-compose.yml
+              docker compose up -d --no-build
+              exit 1
+            fi
+
+            # Clean up old images
+            docker image prune -f
+
+            echo "✅ Deployment successful — commit ${{ github.sha }}"
+
+      - name: Notify Telegram
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          EMOJI=$([[ "$STATUS" == "success" ]] && echo "✅" || echo "❌")
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_ADMIN_CHAT_ID }}" \
+            -d "text=${EMOJI} *Deployment ${STATUS}*%0ACommit: \`${{ github.sha }}\`%0ABranch: main" \
+            -d "parse_mode=Markdown"

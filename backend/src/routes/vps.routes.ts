@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { deployVPS, getMyVPS, vpsAction } from '../controllers/vps.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { deployVPS, getMyVPS, vpsAction } from '../controllers/vps.controller.js';
+import { authenticate } from '../middleware/auth.middleware.js';
 
 const router = Router();
 

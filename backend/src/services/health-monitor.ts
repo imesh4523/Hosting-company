@@ -1,6 +1,6 @@
 import axios from 'axios';
-import prisma from '../config/prisma';
-import { SnapshotManager } from './snapshot-manager';
+import prisma from '../config/prisma.js';
+import { SnapshotManager } from './snapshot-manager.js';
 
 export class HealthMonitor {
   /**

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth.middleware.js';
 import {
   getProfile,
   updateProfile,
@@ -7,7 +7,7 @@ import {
   getPaymentMethods,
   addPaymentMethod,
   deletePaymentMethod,
-} from '../controllers/user.controller';
+} from '../controllers/user.controller.js';
 
 const router = Router();
 

@@ -13,6 +13,10 @@ const pages = [
   { file: 'contacts-static.html', title: 'Contacts / Sub-Accounts', icon: 'fa-users', tableHeaders: ['Name', 'Email', 'Company'], emptyText: 'No Contacts Found' },
   { file: 'email-history-static.html', title: 'Email History', icon: 'fa-envelope', tableHeaders: ['Date', 'Message Subject'], emptyText: 'No Emails Found' },
   { file: 'user-management-static.html', title: 'User Management', icon: 'fa-users-cog', tableHeaders: ['User', 'Role', 'Status'], emptyText: 'No Users Found' },
+  { file: 'announcements-static.html', title: 'Announcements', icon: 'fa-bullhorn', content: '<div class="alert alert-info">No announcements at this time.</div>' },
+  { file: 'downloads-static.html', title: 'Downloads', icon: 'fa-download', content: '<div class="alert alert-info">No downloads available.</div>' },
+  { file: 'server-status-static.html', title: 'Server Status', icon: 'fa-signal', tableHeaders: ['Server', 'Status', 'Uptime'], emptyText: 'All systems operational.' },
+  { file: 'support-kb-static.html', title: 'Knowledge Base', icon: 'fa-book', content: '<div class="alert alert-info">Search our knowledge base for answers to common questions.</div>' },
 ];
 
 pages.forEach(page => {
@@ -22,7 +26,7 @@ pages.forEach(page => {
   let html = fs.readFileSync(filePath, 'utf8');
   
   // Replace the title
-  html = html.replace(/<title>.*?<\/title>/, `<title>${page.title} - UltaHost</title>`);
+  html = html.replace(/<title>.*?<\/title>/, `<title>${page.title} - Hosting Company</title>`);
   
   // Replace "My Dashboard" text if present
   html = html.replace(/>\\s*My Dashboard\\s*</g, `>${page.title}<`);

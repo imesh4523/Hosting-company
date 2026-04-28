@@ -1,26 +1,264 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors - matching frontend exactly */
+  --primary: #5145FF;
+  --primary-hover: #4336E5;
+  --primary-light: #EEF0FF;
+  --primary-soft: #F0EFFE;
+
+  /* Backgrounds */
+  --bg-page: #F8F9FA;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+
+  /* Text */
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+
+  /* Borders */
+  --border: #E5E7EB;
+  --border-light: #F3F4F6;
+
+  /* Status Colors */
+  --success: #10B981;
+  --success-bg: #ECFDF5;
+  --warning: #F59E0B;
+  --warning-bg: #FFFBEB;
+  --danger: #EF4444;
+  --danger-bg: #FEF2F2;
+  --info: #3B82F6;
+  --info-bg: #EFF6FF;
+
+  /* Icon Colors (matching frontend's icon palette) */
+  --icon-blue: #5145FF;
+  --icon-blue-bg: #EEF0FF;
+  --icon-green: #10B981;
+  --icon-green-bg: #D1FAE5;
+  --icon-orange: #F59E0B;
+  --icon-orange-bg: #FEF3C7;
+  --icon-red: #EF4444;
+  --icon-red-bg: #FEE2E2;
+  --icon-purple: #8B5CF6;
+  --icon-purple-bg: #EDE9FE;
+  --icon-teal: #14B8A6;
+  --icon-teal-bg: #CCFBF1;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+/* ─── Card ─── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.04);
+}
+
+.card-hover {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+/* ─── Icon Box (matching frontend icon containers) ─── */
+.icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.icon-box-sm { width: 32px; height: 32px; }
+.icon-box-md { width: 40px; height: 40px; }
+.icon-box-lg { width: 48px; height: 48px; }
+
+.icon-blue   { background: var(--icon-blue-bg);   color: var(--icon-blue); }
+.icon-green  { background: var(--icon-green-bg);  color: var(--icon-green); }
+.icon-orange { background: var(--icon-orange-bg); color: var(--icon-orange); }
+.icon-red    { background: var(--icon-red-bg);    color: var(--icon-red); }
+.icon-purple { background: var(--icon-purple-bg); color: var(--icon-purple); }
+.icon-teal   { background: var(--icon-teal-bg);   color: var(--icon-teal); }
+
+/* ─── Badges ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.badge-success { background: var(--success-bg); color: var(--success); }
+.badge-warning { background: var(--warning-bg); color: var(--warning); }
+.badge-danger  { background: var(--danger-bg);  color: var(--danger); }
+.badge-info    { background: var(--info-bg);    color: var(--info); }
+.badge-primary { background: var(--primary-light); color: var(--primary); }
+
+/* ─── Buttons ─── */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ─── Table ─── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.data-table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: #FAFAFA;
+}
+.data-table tbody td {
+  padding: 14px 16px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-light);
+}
+.data-table tbody tr:hover { background: #FAFBFF; }
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+/* ─── Input ─── */
+.input-field {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(81, 69, 255, 0.1);
+}
+.input-field::placeholder { color: var(--text-muted); }
+
+/* ─── Modal ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-box {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+/* ─── Section Header ─── */
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.section-subtitle {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ─── Live Indicator dot ─── */
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 1.8s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ─── Progress Bar ─── */
+.progress-bar {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--primary);
+  transition: width 0.5s ease;
+}
+
+/* ─── Fraud Score Ring Colors ─── */
+.fraud-safe    { color: var(--success); }
+.fraud-medium  { color: var(--warning); }
+.fraud-high    { color: var(--danger); }

@@ -243,13 +243,11 @@
 
 .form-divider span {
   background-color: #fff;
-  padding: 0 20px;
-  color: #aaa;
-  font-size: 13px;
+  padding: 0 15px;
+  color: #999;
+  font-size: 14px;
   position: relative;
   z-index: 2;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .social-login-grid {
@@ -260,19 +258,28 @@
 
 .social-button-item {
   width: 100%;
-  padding: 13px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   background-color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   font-size: 15px;
-  font-weight: 700;
-  color: #444;
+  font-weight: 600;
+  color: #111;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.btn-facebook {
+  background-color: #f3f4f6;
+  border-color: #f3f4f6;
+}
+
+.btn-facebook:hover {
+  background-color: #e5e7eb;
 }
 
 .social-button-item:hover {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import prisma from '../config/prisma';
+import prisma from '../config/prisma.js';
 
 // GET /api/user/profile
 export const getProfile = async (req: Request, res: Response) => {

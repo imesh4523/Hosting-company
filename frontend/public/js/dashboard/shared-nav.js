@@ -17,7 +17,7 @@ const SHARED_NAV_HTML = (activePage = '') => `
 <nav class="main-nav">
     <div class="nav-left">
         <a href="/dashboard" class="logo">
-            <span class="logo-u">U</span><span class="logo-h">H</span><span class="logo-name">Ultahost</span>
+            <span class="logo-u">U</span><span class="logo-h">H</span><span class="logo-name">hostingcompany</span>
         </a>
         <div class="nav-menu">
             <a href="/dashboard" class="${activePage === 'dashboard' ? 'active' : ''}"><i class="fas fa-th"></i> Dashboard</a>

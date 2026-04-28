@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
-import { DigitalOceanService } from '../services/digitalocean.service';
+import prisma from '../config/prisma.js';
+import { DigitalOceanService } from '../services/digitalocean.service.js';
 
 export const deployVPS = async (req: Request, res: Response) => {
   try {

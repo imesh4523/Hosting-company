@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const routeMap = {
         'action=details': '/dashboard/account/details',
         'account/users': '/dashboard/account/users',
-        'account/paymentmethods': '/dashboard/billing',
+        'account/paymentmethods': '/dashboard/account/paymentmethods',
         'action=contacts': '/dashboard/account/contacts',
         'account/contacts': '/dashboard/account/contacts',
         'action=security': '/dashboard/account/security',
@@ -23,12 +23,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         'submitticket.php': '/dashboard/support',
         'supporttickets.php': '/dashboard/support',
-        'announcements': '/dashboard/support',
-        'serverstatus.php': '/dashboard/support',
-        'download': '/dashboard/support',
+        'announcements': '/dashboard/announcements',
+        'serverstatus.php': '/dashboard/serverstatus',
+        'download': '/dashboard/downloads',
+        'knowledgebase': '/dashboard/kb',
         
         'cart.php': '/dashboard/cart',
         'store': '/dashboard/services',
+        'domainchecker.php': '/dashboard/domains',
         
         'logout.php': '/login',
         'login': '/login',
@@ -55,11 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // If it's an ultahost link that we didn't explicitly map, catch it and send to dashboard
+            // If it's an hostingcompany link that we didn't explicitly map, catch it and send to dashboard
             // so we don't accidentally navigate to the real site
-            if (href.includes('bill.ultahost.com')) {
+            if (href.includes('bill.localhost:3000')) {
                 e.preventDefault();
-                console.log('Intercepted ultahost link:', href);
+                console.log('Intercepted hostingcompany link:', href);
                 if (window.parent && window.parent !== window) {
                     window.parent.location.href = '/dashboard';
                 } else {

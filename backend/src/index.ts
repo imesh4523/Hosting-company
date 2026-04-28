@@ -3,26 +3,34 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import prisma from './config/prisma';
-import authRoutes from './routes/auth.routes';
-import vpsRoutes from './routes/vps.routes';
-import userRoutes from './routes/user.routes';
+import prisma from './config/prisma.js';
+import authRoutes from './routes/auth.routes.js';
+import vpsRoutes from './routes/vps.routes.js';
+import userRoutes from './routes/user.routes.js';
+import aiRoutes from './routes/ai.routes.js';
+import adminServerRoutes from './routes/admin.servers.route.js';
+import adminMigrationRoutes from './routes/admin.migrations.route.js';
+import { SuspensionDetector } from './services/suspension.service.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 5000; // Hardcoded to avoid conflict with Next.js using process.env.PORT
 
 // Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/vps', vpsRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/xhr.php', aiRoutes);
+app.use('/api/admin/servers',    adminServerRoutes);
+app.use('/api/admin/migrations', adminMigrationRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'VPS Reseller Platform API is running' });
@@ -40,4 +48,13 @@ app.get('/health', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+
+  // ─── Suspension Monitor (every 60s) ────────────────────────────────────
+  const detector = new SuspensionDetector();
+  setInterval(() => {
+    detector.monitorAllAccounts().catch(e => console.error('[Monitor]', e.message));
+  }, 60 * 1000);
+  // Run immediately on startup
+  detector.monitorAllAccounts().catch(() => {});
+  console.log('[Monitor] Suspension detector active — checking every 60s');
 });

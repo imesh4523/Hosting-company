@@ -1,74 +1,266 @@
-'use client';
+"use client";
+import Sidebar from "@/components/Sidebar";
+import { useState, useEffect } from "react";
 
-import Sidebar from '@/components/Sidebar';
-import { Key, Plus, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+type DOAccount = {
+  id: string;
+  name: string;
+  apiKey: string;
+  status: string;
+  limit: number;
+  usage: number;
+  createdAt: string;
+};
+
+// DigitalOcean official logo SVG
+const DOLogo = () => (
+  <svg width="22" height="22" viewBox="0 0 209 209" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M104.5 0C46.8 0 0 46.8 0 104.5c0 57.7 46.8 104.5 104.5 104.5 57.7 0 104.5-46.8 104.5-104.5C209 46.8 162.2 0 104.5 0z" fill="#0080FF"/>
+    <path d="M104.5 174.7V145c-22 0-40.5-18.5-40.5-40.5S82.5 64 104.5 64c22 0 40.5 18.5 40.5 40.5h29.4c0-38.6-31.3-69.9-69.9-69.9S34.6 65.9 34.6 104.5s31.3 69.9 69.9 69.9v.3z" fill="white"/>
+    <path d="M104.5 145v29.7H74.8V145h29.7zM74.8 174.7v-23h-23v23h23zM51.8 151.7v-17h-17v17h17z" fill="white"/>
+  </svg>
+);
 
 export default function AccountsPage() {
+  const [accounts, setAccounts] = useState<DOAccount[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newAccount, setNewAccount] = useState({ name: "", apiKey: "" });
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<{ ok: boolean; message: string; dropletCount?: number } | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/accounts")
+      .then(r => r.json())
+      .then(d => { setAccounts(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  async function verifyKey() {
+    if (!newAccount.apiKey.trim()) return;
+    setVerifying(true);
+    setVerifyResult(null);
+    try {
+      const res = await fetch("/api/do/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey: newAccount.apiKey }),
+      });
+      const data = await res.json();
+      setVerifyResult(data);
+    } catch {
+      setVerifyResult({ ok: false, message: "Network error" });
+    }
+    setVerifying(false);
+  }
+
+  async function addAccount() {
+    if (!newAccount.name || !newAccount.apiKey || !verifyResult?.ok) return;
+    setSaving(true);
+    await fetch("/api/accounts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newAccount),
+    });
+    setSaving(false);
+    setShowAdd(false);
+    setNewAccount({ name: "", apiKey: "" });
+    setVerifyResult(null);
+    fetch("/api/accounts").then(r => r.json()).then(setAccounts);
+  }
+
+  function maskKey(key: string) {
+    if (key.length < 8) return "••••••••";
+    return key.slice(0, 6) + "••••••••••••" + key.slice(-4);
+  }
+
+  function usagePct(usage: number, limit: number) {
+    return limit === 0 ? 0 : Math.min((usage / limit) * 100, 100);
+  }
+
   return (
-    <div className="flex min-h-screen bg-[#020617] text-slate-100 font-sans">
+    <div style={{ display: "flex", minHeight: "100vh", background: "#F8F9FA" }}>
       <Sidebar />
-      
-      <main className="flex-1 p-8 lg:p-12 overflow-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+
+      <main style={{ flex: 1, padding: "28px 32px" }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
           <div>
-            <h1 className="text-4xl font-black mb-2 tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-              DigitalOcean Access Keys
-            </h1>
-            <p className="text-slate-400 font-medium">Manage and monitor multiple infrastructure accounts.</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <DOLogo />
+              <h1 className="section-title">DigitalOcean Accounts</h1>
+            </div>
+            <p className="section-subtitle" style={{ marginLeft: "32px" }}>Manage API keys and droplet quotas</p>
           </div>
-          
-          <button className="flex items-center gap-2 px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs transition-all shadow-xl shadow-blue-600/20">
-            <Plus size={18} />
-            Add New Account
+          <button className="btn-primary" onClick={() => setShowAdd(true)}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add DO Account
           </button>
-        </header>
+        </div>
 
-        <div className="grid gap-6">
-          {[
-            { name: 'Primary Production', key: 'dop_v1_************************', status: 'Active', health: 100, usage: '12/50', lastSync: '2 mins ago' },
-            { name: 'Secondary Backup', key: 'dop_v1_************************', status: 'Active', health: 98, usage: '0/10', lastSync: '15 mins ago' },
-            { name: 'Asia-Pacific Gateway', key: 'dop_v1_************************', status: 'Suspended', health: 0, usage: '4/20', lastSync: '1 hour ago' },
-          ].map((acc) => (
-            <div key={acc.name} className="bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 group hover:border-blue-500/30 transition-all duration-500">
-              <div className="flex items-center gap-6 w-full md:w-auto">
-                <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center ${acc.status === 'Active' ? 'bg-blue-500/10 text-blue-400' : 'bg-red-500/10 text-red-400'}`}>
-                  <Key size={28} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-black text-white group-hover:text-blue-400 transition-colors">{acc.name}</h3>
-                  <p className="text-xs font-mono text-slate-500 mt-1">{acc.key}</p>
-                </div>
-              </div>
+        {/* Account Cards */}
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "60px", color: "#9CA3AF" }}>Loading accounts…</div>
+        ) : accounts.length === 0 ? (
+          <div className="card" style={{ padding: "60px", textAlign: "center" }}>
+            <DOLogo />
+            <div style={{ marginTop: "16px", fontSize: "16px", fontWeight: 600, color: "#111827" }}>No Accounts Added</div>
+            <div style={{ fontSize: "13.5px", color: "#9CA3AF", marginTop: "6px" }}>Connect a DigitalOcean account to start provisioning droplets.</div>
+            <button className="btn-primary" style={{ marginTop: "20px" }} onClick={() => setShowAdd(true)}>Add Your First Account</button>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "18px" }}>
+            {accounts.map(acc => {
+              const pct = usagePct(acc.usage, acc.limit);
+              const pctColor = pct > 80 ? "#EF4444" : pct > 60 ? "#F59E0B" : "#5145FF";
+              return (
+                <div key={acc.id} className="card card-hover" style={{ padding: "22px" }}>
+                  {/* Card header */}
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "18px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "11px" }}>
+                      <div style={{ width: "42px", height: "42px", background: "#E8F4FF", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <DOLogo />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "15px", fontWeight: 600, color: "#111827" }}>{acc.name}</div>
+                        <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "2px", fontFamily: "monospace" }}>{maskKey(acc.apiKey)}</div>
+                      </div>
+                    </div>
+                    <span className={`badge ${acc.status === "active" ? "badge-success" : "badge-danger"}`}>
+                      {acc.status.charAt(0).toUpperCase() + acc.status.slice(1)}
+                    </span>
+                  </div>
 
-              <div className="flex flex-wrap items-center gap-8 w-full md:w-auto justify-between md:justify-end">
-                <div className="text-center md:text-left">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Status</p>
-                  <div className="flex items-center gap-2">
-                    {acc.status === 'Active' ? <CheckCircle2 size={14} className="text-green-500" /> : <AlertCircle size={14} className="text-red-500" />}
-                    <span className={`text-sm font-bold ${acc.status === 'Active' ? 'text-green-400' : 'text-red-400'}`}>{acc.status}</span>
+                  {/* Droplet usage */}
+                  <div style={{ marginBottom: "14px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                      <span style={{ fontSize: "12.5px", color: "#6B7280" }}>Droplet Usage</span>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>
+                        {acc.usage} / {acc.limit} droplets
+                      </span>
+                    </div>
+                    <div style={{ height: "6px", background: "#F3F4F6", borderRadius: "99px", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${pct}%`, background: pctColor, borderRadius: "99px", transition: "width 0.5s ease" }} />
+                    </div>
+                    <div style={{ textAlign: "right", fontSize: "11px", color: "#9CA3AF", marginTop: "4px" }}>{pct.toFixed(0)}% utilised</div>
+                  </div>
+
+                  {/* Footer */}
+                  <div style={{ borderTop: "1px solid #F3F4F6", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "12px", color: "#9CA3AF" }}>Added {new Date(acc.createdAt).toLocaleDateString()}</span>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button className="btn-outline" style={{ padding: "5px 12px", fontSize: "12px" }}>View Droplets</button>
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
 
-                <div className="text-center md:text-left">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Integrity</p>
-                  <span className="text-sm font-bold text-white">{acc.health}%</span>
+      {/* ── Add Account Modal ── */}
+      {showAdd && (
+        <div className="modal-overlay" onClick={() => setShowAdd(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "22px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "36px", height: "36px", background: "#E8F4FF", borderRadius: "9px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <DOLogo />
                 </div>
-
-                <div className="text-center md:text-left">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Usage</p>
-                  <span className="text-sm font-bold text-white">{acc.usage}</span>
+                <div>
+                  <div style={{ fontSize: "17px", fontWeight: 700, color: "#111827" }}>Connect DigitalOcean</div>
+                  <div style={{ fontSize: "12px", color: "#9CA3AF" }}>Add an API key to manage droplets</div>
                 </div>
+              </div>
+              <button onClick={() => setShowAdd(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: "22px", lineHeight: 1 }}>×</button>
+            </div>
 
-                <div className="flex gap-2">
-                  <button className="p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 text-slate-400 transition-all">
-                    <Trash2 size={18} className="hover:text-red-400" />
+            <div style={{ display: "grid", gap: "14px" }}>
+              <div>
+                <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151", display: "block", marginBottom: "6px" }}>Account Name</label>
+                <input
+                  className="input-field"
+                  placeholder="e.g. Production SG"
+                  value={newAccount.name}
+                  onChange={e => setNewAccount({ ...newAccount, name: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151", display: "block", marginBottom: "6px" }}>DigitalOcean API Key</label>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input
+                    className="input-field"
+                    placeholder="dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    value={newAccount.apiKey}
+                    onChange={e => {
+                      setNewAccount({ ...newAccount, apiKey: e.target.value });
+                      setVerifyResult(null);
+                    }}
+                    style={{ fontFamily: "monospace", fontSize: "13px" }}
+                  />
+                  <button
+                    className="btn-outline"
+                    style={{ whiteSpace: "nowrap", flexShrink: 0 }}
+                    onClick={verifyKey}
+                    disabled={verifying || !newAccount.apiKey.trim()}
+                  >
+                    {verifying ? "…" : "Verify"}
                   </button>
                 </div>
               </div>
+
+              {/* Verify result */}
+              {verifyResult && (
+                <div style={{
+                  padding: "12px 14px", borderRadius: "9px",
+                  background: verifyResult.ok ? "#ECFDF5" : "#FEF2F2",
+                  border: `1px solid ${verifyResult.ok ? "#A7F3D0" : "#FECACA"}`,
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                    <span style={{ fontSize: "16px" }}>{verifyResult.ok ? "✅" : "❌"}</span>
+                    <div>
+                      <div style={{ fontSize: "13.5px", fontWeight: 600, color: verifyResult.ok ? "#059669" : "#DC2626" }}>
+                        {verifyResult.ok ? "API Key Verified!" : "Verification Failed"}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#6B7280", marginTop: "1px" }}>{verifyResult.message}</div>
+                      {verifyResult.dropletCount !== undefined && (
+                        <div style={{ fontSize: "12px", color: "#6B7280" }}>Active droplets: <strong>{verifyResult.dropletCount}</strong></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div style={{
+                background: "#F8F9FA", padding: "12px 14px", borderRadius: "8px",
+                fontSize: "12.5px", color: "#6B7280", lineHeight: 1.5,
+              }}>
+                💡 Generate your API key at{" "}
+                <a href="https://cloud.digitalocean.com/account/api/tokens" target="_blank" rel="noreferrer" style={{ color: "#5145FF", textDecoration: "none" }}>
+                  cloud.digitalocean.com → API → Generate New Token
+                </a>
+              </div>
             </div>
-          ))}
+
+            <div style={{ display: "flex", gap: "10px", marginTop: "22px" }}>
+              <button className="btn-outline" style={{ flex: 1 }} onClick={() => setShowAdd(false)}>Cancel</button>
+              <button
+                className="btn-primary"
+                style={{ flex: 1, opacity: (!verifyResult?.ok || saving) ? 0.5 : 1 }}
+                onClick={addAccount}
+                disabled={!verifyResult?.ok || saving || !newAccount.name}
+              >
+                {saving ? "Adding…" : "Add Account"}
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
+      )}
     </div>
   );
 }

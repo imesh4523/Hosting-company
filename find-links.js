@@ -1,9 +1,13 @@
 const fs = require('fs');
-const html = fs.readFileSync('./frontend/public/dashboard-static.html', 'utf8');
-const linkRegex = /<a[^>]+href="([^">]+)"/g;
+const html = fs.readFileSync('c:/Users/azureuser/Desktop/Hosting site/frontend/public/dashboard-static.html', 'utf8');
+const regex = /href="([^"]+)"/g;
 let match;
 const links = new Set();
-while ((match = linkRegex.exec(html)) !== null) {
-  links.add(match[1]);
+while ((match = regex.exec(html)) !== null) {
+    const url = match[1];
+    if (url.startsWith('#') || url.startsWith('javascript:') || url.startsWith('tel:') || url.startsWith('mailto:')) continue;
+    links.add(url);
 }
-console.log(Array.from(links).filter(l => l.includes('clientarea') || l.includes('.php')).slice(0, 15).join('\n'));
+
+console.log('--- ALL LINKS ---');
+Array.from(links).sort().forEach(l => console.log(l));

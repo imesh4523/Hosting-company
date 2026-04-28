@@ -1,73 +1,157 @@
-'use client';
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Key, Server, Users, DollarSign, Settings, LogOut } from 'lucide-react';
-
-const menuItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
-  { name: 'DO Accounts', icon: Key, href: '/accounts' },
-  { name: 'Global VPS', icon: Server, href: '/vps' },
-  { name: 'Recovery', icon: RefreshCcw, href: '/recovery' },
-  { name: 'Customers', icon: Users, href: '/customers' },
-  { name: 'Revenue', icon: DollarSign, href: '/revenue' },
-  { name: 'Settings', icon: Settings, href: '/settings' },
+// ─── Nav items with actual frontend icons ─────────────────────────────────────
+const navItems = [
+  { label: "Dashboard",     href: "/",            icon: "/icons/chat.svg",           isSvg: true  },
+  { label: "Analytics",     href: "/analytics",   icon: "/icons/ssl-2x.webp",        isSvg: false },
+  { label: "Servers",       href: "/servers",     icon: "/icons/dedicated-2x.webp",  isSvg: false },
+  { label: "Global VPS",    href: "/vps",         icon: "/icons/vds-2x.webp",        isSvg: false },
+  { label: "Hosting Plans", href: "/plans",       icon: "/icons/vps-2x.webp",        isSvg: false },
+  { label: "DO Accounts",   href: "/accounts",    icon: "/icons/domain-2x.webp",     isSvg: false },
+  { label: "Recovery",      href: "/recovery",    icon: "/icons/transfer-2x.webp",   isSvg: false },
+  { label: "Migrations",    href: "/migrations",  icon: "/icons/transfer-2x.webp",   isSvg: false },
+  { label: "Account Health",href: "/migrations/accounts", icon: "/icons/domain-2x.webp", isSvg: false },
+  { label: "Customers",     href: "/customers",   icon: "/icons/shared-2x.webp",     isSvg: false },
+  { label: "Billing",       href: "/billing",     icon: "/icons/wordpress-2x.webp",  isSvg: false },
+  { label: "Support",       href: "/support",     icon: "/icons/ticket.svg",          isSvg: true  },
+  { label: "Affiliates",    href: "/affiliates",  icon: "/icons/reseller.svg",        isSvg: true  },
+  { label: "Alerts",        href: "/alerts",      icon: "/icons/email.svg",           isSvg: true  },
+  { label: "Fraud Center",  href: "/fraud",       icon: "/icons/domain-ssl.svg",      isSvg: true  },
+  { label: "Audit Log",     href: "/audit",       icon: "/icons/knowledge.svg",       isSvg: true  },
+  { label: "Settings",      href: "/settings",    icon: "/icons/uptime.svg",          isSvg: true  },
 ];
+
+// ─── Smart icon renderer ───────────────────────────────────────────────────────
+// SVGs from frontend have their own built-in white/light rounded background (40x40)
+// WEBPs are artwork-only — need a styled container
+function SidebarIcon({ src, alt, isSvg, isActive }: { src: string; alt: string; isSvg: boolean; isActive: boolean }) {
+  if (isSvg) {
+    // SVG already has rx=8 rounded white background built in — show at full 36px
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={alt}
+        width={34}
+        height={34}
+        style={{ display: "block", flexShrink: 0, borderRadius: "8px" }}
+      />
+    );
+  }
+
+  // WEBP — artwork only, needs container
+  return (
+    <div style={{
+      width: "32px",
+      height: "32px",
+      borderRadius: "8px",
+      background: isActive ? "rgba(69,123,255,0.08)" : "#F3F4F6",
+      border: "1px solid rgba(0,0,0,0.04)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+      overflow: "hidden",
+      transition: "background 0.15s ease",
+    }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} width={22} height={22} style={{ objectFit: "contain" }} />
+    </div>
+  );
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-72 bg-[#020617] text-white min-h-screen hidden lg:block border-r border-white/5 relative">
-      {/* Sidebar background glow */}
-      <div className="absolute top-0 left-0 w-full h-64 bg-blue-600/5 blur-[80px] -z-10"></div>
+    <aside style={{
+      width: "220px",
+      minHeight: "100vh",
+      background: "#fff",
+      borderRight: "1px solid #F3F4F6",
+      display: "flex",
+      flexDirection: "column",
+      flexShrink: 0,
+    }}>
 
-      <div className="p-8">
-        <Link href="/" className="flex items-center gap-3 mb-12">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black shadow-lg shadow-blue-500/20">
-            U
-          </div>
-          <span className="text-2xl font-black tracking-tighter uppercase">
-            Ulta<span className="text-blue-500">Core</span>
+      {/* ── Logo ── */}
+      <div style={{ padding: "20px 18px 14px", borderBottom: "1px solid #F3F4F6" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+          <div style={{
+            width: "34px", height: "34px",
+            background: "linear-gradient(135deg, #5145FF 0%, #7C6FFF 100%)",
+            borderRadius: "9px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontWeight: 800, fontSize: "15px",
+            boxShadow: "0 4px 12px rgba(81,69,255,0.30)",
+            flexShrink: 0,
+          }}>U</div>
+          <span style={{ fontSize: "15px", fontWeight: 800, color: "#111827", letterSpacing: "-0.3px" }}>
+            Ulta<span style={{ color: "#457BFF" }}>Core</span>
           </span>
-        </Link>
-        
-        <nav className="space-y-2">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center gap-4 px-5 py-4 rounded-2xl font-bold transition-all duration-300 group ${
-                  isActive 
-                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' 
-                    : 'text-slate-500 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <item.icon size={20} className={isActive ? 'text-white' : 'text-slate-600 group-hover:text-blue-400'} />
-                <span className="text-sm tracking-wide">{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
+        </div>
       </div>
-      
-      <div className="absolute bottom-8 left-8 right-8">
-        <div className="p-6 rounded-[2rem] bg-white/5 border border-white/5 backdrop-blur-xl">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center text-blue-400 font-black border border-blue-500/20">
-              AD
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-sm font-black truncate tracking-tight text-white">System Admin</p>
-              <p className="text-[10px] text-slate-500 font-bold truncate tracking-widest uppercase">Root Access</p>
-            </div>
+
+      {/* ── Navigation ── */}
+      <nav style={{ flex: 1, padding: "10px 10px", overflowY: "auto" }}>
+        {navItems.map(({ label, href, icon, isSvg }) => {
+          const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+          return (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "6px 10px",
+                borderRadius: "9px",
+                marginBottom: "2px",
+                textDecoration: "none",
+                background: isActive ? "rgba(69,123,255,0.07)" : "transparent",
+                transition: "background 0.15s ease",
+              }}
+              onMouseEnter={e => {
+                if (!isActive) (e.currentTarget as HTMLElement).style.background = "#F9FAFB";
+              }}
+              onMouseLeave={e => {
+                if (!isActive) (e.currentTarget as HTMLElement).style.background = "transparent";
+              }}
+            >
+              <SidebarIcon src={icon} alt={label} isSvg={isSvg} isActive={isActive} />
+
+              <span style={{
+                fontSize: "13px",
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? "#457BFF" : "#374151",
+                transition: "color 0.15s ease",
+              }}>
+                {label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* ── Admin user card ── */}
+      <div style={{ padding: "12px 10px", borderTop: "1px solid #F3F4F6" }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: "9px",
+          padding: "8px 10px", borderRadius: "9px", background: "#F9FAFB",
+        }}>
+          <div style={{
+            width: "30px", height: "30px", borderRadius: "50%",
+            background: "linear-gradient(135deg, #5145FF, #7C6FFF)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "white", fontSize: "11px", fontWeight: 700, flexShrink: 0,
+          }}>A</div>
+          <div style={{ overflow: "hidden", flex: 1 }}>
+            <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Admin</div>
+            <div style={{ fontSize: "10.5px", color: "#9CA3AF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Super Administrator</div>
           </div>
-          <button className="w-full py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group">
-            <LogOut size={14} className="group-hover:-translate-x-1 transition-transform" />
-            Logout
-          </button>
         </div>
       </div>
     </aside>
