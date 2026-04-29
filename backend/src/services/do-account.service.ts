@@ -20,22 +20,22 @@ export class DOAccountService {
    * Checks the health and limits of all registered accounts
    */
   static async syncAccountHealth() {
-    const accounts = await prisma.dOAccount.findMany({ where: { status: 'active' } });
+    const accounts = await prisma.cloudAccount.findMany({ where: { provider: 'digitalocean', status: 'active' } });
     
     for (const account of accounts) {
       try {
-        const info = await this.validateKey(account.apiKey);
-        await prisma.dOAccount.update({
+        const info = await this.validateKey((account.credentials as any).apiKey);
+        await prisma.cloudAccount.update({
           where: { id: account.id },
           data: {
-            dropletLimit: info.droplet_limit,
+            vmLimit: info.droplet_limit,
             status: info.status === 'active' ? 'active' : 'suspended',
             lastChecked: new Date()
           }
         });
       } catch (error) {
         // Mark as suspended if API call fails (likely key revoked or account suspended)
-        await prisma.dOAccount.update({
+        await prisma.cloudAccount.update({
           where: { id: account.id },
           data: { status: 'suspended', suspendReason: 'API Validation Failed' }
         });
@@ -48,9 +48,9 @@ export class DOAccountService {
    * Returns the best account to provision a new VPS (Least Loaded)
    */
   static async getBestAccount() {
-    const account = await prisma.dOAccount.findFirst({
-      where: { status: 'active' },
-      orderBy: { dropletCount: 'asc' }
+    const account = await prisma.cloudAccount.findFirst({
+      where: { provider: 'digitalocean', status: 'active' },
+      orderBy: { vmCount: 'asc' }
     });
     
     if (!account) throw new Error('No active DigitalOcean accounts available.');

@@ -85,7 +85,7 @@ export const getAppStatus = async (req: Request, res: Response) => {
   try {
     const { appId } = req.params;
     const app = await prisma.deployedApp.findUnique({
-      where: { id: appId },
+      where: { id: appId as string },
       include: { account: true, deployments: true }
     });
 
@@ -104,11 +104,11 @@ export const getAppStatus = async (req: Request, res: Response) => {
 
     if (status !== app.status) {
       await prisma.deployedApp.update({
-        where: { id: appId },
+        where: { id: appId as string },
         data: { 
           status,
           doUrl: doApp.live_url,
-          deployedAt: status === 'running' ? new DateTime() : undefined
+          deployedAt: status === 'running' ? new Date() : undefined
         }
       });
 
@@ -116,7 +116,7 @@ export const getAppStatus = async (req: Request, res: Response) => {
       if (status === 'running' && !app.customSubdomain) {
         const fullUrl = await subdomainService.createSubdomain(app.repoUrl.split('/').pop()!, app.userId, doApp.live_url, app.id);
         await prisma.deployedApp.update({
-          where: { id: appId },
+          where: { id: appId as string },
           data: { customSubdomain: fullUrl }
         });
       }
@@ -132,14 +132,14 @@ export const getLogs = async (req: Request, res: Response) => {
   try {
     const { appId, deploymentId } = req.params;
     const app = await prisma.deployedApp.findUnique({
-      where: { id: appId },
+      where: { id: appId as string },
       include: { account: true }
     });
 
     if (!app) return res.status(404).json({ message: 'App not found' });
 
     const doService = new DOAppPlatformService(app.account.apiKey);
-    const logs = await doService.getDeploymentLogs(app.doAppId, deploymentId);
+    const logs = await doService.getDeploymentLogs(app.doAppId, deploymentId as string);
     
     res.json({ logs });
   } catch (error: any) {
@@ -198,7 +198,7 @@ export const getGitHubBranches = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'GitHub token not found' });
     }
     const github = new GitHubService(user.githubToken);
-    const branches = await github.listBranches(owner, repo);
+    const branches = await github.listBranches(owner as string, repo as string);
     res.json(branches);
   } catch (error: any) {
     res.status(500).json({ message: error.message });

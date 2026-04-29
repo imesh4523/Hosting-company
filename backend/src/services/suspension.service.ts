@@ -11,7 +11,7 @@ export class SuspensionDetector {
 
   // ─── Main monitor loop ────────────────────────────────────────────────────
   async monitorAllAccounts() {
-    let accounts: { id: string; name: string; apiKey: string; status: string; dropletCount: number }[] = [];
+    let accounts: any[] = [];
     try {
       accounts = await prisma.cloudAccount.findMany({ where: { status: { not: "disabled" } } });
     } catch { return; } // DB offline
@@ -19,9 +19,12 @@ export class SuspensionDetector {
     await Promise.allSettled(accounts.map(a => this.checkAccount(a)));
   }
 
-  async checkAccount(account: { id: string; name: string; apiKey: string; status: string; dropletCount: number }) {
+  async checkAccount(account: any) {
     try {
-      const client = getDOClient(account.apiKey);
+      const creds = account.credentials as { apiKey?: string };
+      if (!creds?.apiKey) return;
+      
+      const client = getDOClient(creds.apiKey);
       await client.getAccount(); // Will throw 401/403 if suspended
 
       // Account is healthy
@@ -53,7 +56,7 @@ export class SuspensionDetector {
     } catch { return; }
 
     await Promise.allSettled(droplets.map(async (d) => {
-      if (!d.ipAddress) return;
+      if (!d.ip) return;
 
       const alive = await this.ping(d.ip);
 
@@ -78,21 +81,22 @@ export class SuspensionDetector {
     }));
   }
 
-  private async handleAccountSuspension(account: { id: string; name: string; dropletCount: number }, reason: string) {
+  private async handleAccountSuspension(account: any, reason: string) {
     if ((await prisma.cloudAccount.findUnique({ where: { id: account.id } }))?.status === "suspended") return;
 
     // 1. Mark suspended
     await prisma.cloudAccount.update({
       where: { id: account.id },
-      data: { status: "suspended", suspendedAt: new Date(), suspendReason: reason },
+      data: { status: "suspended", suspendReason: reason },
     });
 
     // 2. Log
     await tracking.logEvent({ vmId: "system", userId: "system", event: "account_suspended", fromAccountId: account.id, reason, triggeredBy: "auto" }).catch(() => {});
 
     // 3. Alert admin immediately
+    const dropletCount = account.vmCount || 0;
     await notify.telegramAdmin(
-      `🚨 *DO Account SUSPENDED!*\nAccount: ${account.name}\nReason: ${reason}\nDroplets affected: ${account.dropletCount}\n⚡ Auto-migration STARTING NOW`
+      `🚨 *DO Account SUSPENDED!*\nAccount: ${account.name}\nReason: ${reason}\nDroplets affected: ${dropletCount}\n⚡ Auto-migration STARTING NOW`
     );
 
     // 4. Queue migration for all active droplets

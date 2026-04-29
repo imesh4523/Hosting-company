@@ -13,7 +13,7 @@ router.get("/", async (_req: Request, res: Response) => {
       prisma.migration.findMany({
         include: {
           user:       { select: { id: true, name: true, email: true } },
-          vps:        { select: { name: true, ipAddress: true } },
+          vm:         { select: { name: true, ip: true } },
           fromAccount:{ select: { id: true, name: true } },
           toAccount:  { select: { id: true, name: true } },
           steps:      { orderBy: { step: "asc" } },
@@ -34,7 +34,7 @@ router.get("/:id", async (req: Request, res: Response) => {
       where: { id: req.params.id as string },
       include: {
         user:        { select: { id: true, name: true, email: true } },
-        vps:         true,
+        vm:          true,
         fromAccount: true,
         toAccount:   true,
         steps:       { orderBy: { step: "asc" } },
@@ -61,13 +61,13 @@ router.post("/trigger", async (req: Request, res: Response) => {
 // ─── GET /api/admin/migrations/accounts/health ─────────────────────────────
 router.get("/accounts/health", async (_req: Request, res: Response) => {
   try {
-    const accounts = await prisma.dOAccount.findMany({
+    const accounts = await prisma.cloudAccount.findMany({
       include: {
-        droplets: {
+        vms: {
           where:  { status: "active" },
-          select: { id: true, name: true, ipAddress: true, status: true },
+          select: { id: true, name: true, ip: true, status: true },
         },
-        _count: { select: { droplets: true, migrations: true, migrationsTo: true } },
+        _count: { select: { vms: true, migrations: true, migrationsTo: true } },
       },
       orderBy: { createdAt: "asc" },
     });
@@ -86,7 +86,7 @@ router.get("/user/:userId/journey", async (req: Request, res: Response) => {
 // ─── GET /api/admin/tracking/vps/:vpsId ────────────────────────────────────
 router.get("/vps/:vpsId/timeline", async (req: Request, res: Response) => {
   try {
-    const timeline = await tracking.getDropletTimeline(req.params.vpsId as string);
+    const timeline = await tracking.getVMTimeline(req.params.vpsId as string);
     res.json(timeline);
   } catch (err) { res.status(500).json({ error: (err as Error).message }); }
 });
@@ -118,9 +118,7 @@ router.get("/accounts/:id/history", async (req: Request, res: Response) => {
 // ─── POST /api/admin/migrations/accounts/:id/set-primary ───────────────────
 router.post("/accounts/:id/set-primary", async (req: Request, res: Response) => {
   try {
-    await prisma.dOAccount.updateMany({ data: { isPrimaryFailover: false } });
-    const acc = await prisma.dOAccount.update({ where: { id: req.params.id as string }, data: { isPrimaryFailover: true } });
-    res.json({ account: acc });
+    res.status(501).json({ error: "Not implemented" });
   } catch (err) { res.status(500).json({ error: (err as Error).message }); }
 });
 

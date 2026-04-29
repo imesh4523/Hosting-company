@@ -103,7 +103,7 @@ export class FrameworkDetector {
           icon: '🐳',
           buildCommand: null,
           runCommand: null,
-          port: portMatch ? parseInt(portMatch[1]) : 8080,
+          port: portMatch && portMatch[1] ? parseInt(portMatch[1] as string, 10) : 8080,
           dockerfile: true
         };
       }
@@ -158,8 +158,8 @@ export class FrameworkDetector {
   private parseGithubUrl(url: string) {
     const regex = /github\.com\/([^/]+)\/([^/.]+)/;
     const match = url.match(regex);
-    if (!match) throw new Error('Invalid GitHub URL');
-    return { owner: match[1], repo: match[2] };
+    if (!match || !match[1] || !match[2]) throw new Error('Invalid GitHub URL');
+    return { owner: match[1]!, repo: match[2]! };
   }
 
   private async getFileContent(owner: string, repo: string, path: string): Promise<string> {

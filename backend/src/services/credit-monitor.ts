@@ -1,5 +1,5 @@
-import { prisma } from "../lib/prisma";
-import { CloudProviderFactory } from "../lib/providers/factory";
+import prisma from "../config/prisma.js";
+import { CloudProviderFactory } from "../lib/providers/factory.js";
 import { NotificationService } from "./notification.service";
 import { MigrationService } from "./migration.service";
 
@@ -58,21 +58,21 @@ export class CreditMonitor {
 
     // EMERGENCY: < 1 day
     if (days !== null && days <= 1) {
-      await this.notification.sendAdminAlert(`🚨 EMERGENCY: ${account.name} credits expire in ${days * 24} hours! Immediate migration starting.`);
+      await this.notification.telegramAdmin(`🚨 EMERGENCY: ${account.name} credits expire in ${days * 24} hours! Immediate migration starting.`);
       await MigrationService.migrateAllFromAccount(account.id, "emergency_expiry");
       return;
     }
 
     // CRITICAL: < 3 days or < $5
     if ((days !== null && days <= 3) || credits.amount < 5) {
-      await this.notification.sendAdminAlert(`🔴 CRITICAL: ${account.name} credits expiring in ${days} days (Balance: $${credits.amount}). Migration scheduled.`);
+      await this.notification.telegramAdmin(`🔴 CRITICAL: ${account.name} credits expiring in ${days} days (Balance: $${credits.amount}). Migration scheduled.`);
       // In a real system, we'd trigger the migration scheduler here
       // await MigrationService.scheduleAllFromAccount(account.id);
     }
 
     // WARNING: < 7 days
     if (days !== null && days <= 7) {
-      await this.notification.sendAdminAlert(`⚠️ WARNING: ${account.name} credits expiring in ${days} days. Please add funds or new accounts.`);
+      await this.notification.telegramAdmin(`⚠️ WARNING: ${account.name} credits expiring in ${days} days. Please add funds or new accounts.`);
     }
   }
 }

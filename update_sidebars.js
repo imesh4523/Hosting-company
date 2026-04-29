@@ -31,17 +31,29 @@ files.forEach(file => {
     const filePath = path.join(dir, file);
     let content = fs.readFileSync(filePath, 'utf8');
     
-    // If it already has it, replace it to update links
-    if (content.includes('id="Primary_Navbar-App_Deploy"')) {
-        console.log(`Updating links in ${file}...`);
-        content = content.replace(/<li menuitemname="App Deploy"[\s\S]*?<\/li>/, menuItem);
-        fs.writeFileSync(filePath, content);
-    } else if (content.includes('id="Primary_Navbar-Website_&amp;_Security"')) {
-        console.log(`Adding to ${file}...`);
-        content = content.replace(/<\/li>\s*<li menuitemname="Support"/, `</li>${menuItem}\n                    <li menuitemname="Support"`);
-        if (!content.includes('id="Primary_Navbar-App_Deploy"')) {
-             content = content.replace(/(id="Primary_Navbar-Website_&amp;_Security">[\s\S]*?<\/li>)/, `$1${menuItem}`);
-        }
+    // 1. Clean up any existing broken App Deploy blocks
+    content = content.replace(/<li menuitemname="App Deploy"[\s\S]*?<\/li>/g, '');
+    // Also remove the stray list items that were accidentally injected
+    content = content.replace(/<li menuitemname="Deploy New App" id="Primary_Navbar-App_Deploy-Deploy_New"[\s\S]*?<\/li>/g, '');
+    content = content.replace(/<li menuitemname="My Apps" id="Primary_Navbar-App_Deploy-My_Apps"[\s\S]*?<\/li>/g, '');
+    
+    // 2. Inject fresh and neat App Deploy section after Website & Security
+    const anchor = 'id="Primary_Navbar-Website_&amp;_Security"';
+    if (content.includes(anchor)) {
+        console.log(`Injecting neat sidebar to ${file}...`);
+        
+        // Find the end of the Website & Security </li>
+        const parts = content.split(anchor);
+        const secondPart = parts[1];
+        const closingLiIndex = secondPart.indexOf('</li>') + 5;
+        
+        const before = parts[0] + anchor + secondPart.substring(0, closingLiIndex);
+        const after = secondPart.substring(closingLiIndex);
+        
+        content = before + "\n" + menuItem + after;
+        
         fs.writeFileSync(filePath, content);
     }
 });
+
+console.log("Sidebar cleanup and injection complete.");

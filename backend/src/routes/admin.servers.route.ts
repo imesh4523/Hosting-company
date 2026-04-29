@@ -37,7 +37,7 @@ function proxmoxFor(server: { apiUrl: string; apiUser?: string | null; apiKey?: 
 router.get("/", async (_req: Request, res: Response) => {
   try {
     const servers = await prisma.server.findMany({
-      include: { _count: { select: { vps: true } } },
+      include: { _count: { select: { vms: true } } },
       orderBy: { createdAt: "asc" },
     });
 
@@ -74,7 +74,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     const server = await prisma.server.findUnique({
       where: { id: req.params.id as string },
       include: {
-        vps: {
+        vms: {
           include: { user: { select: { id: true, name: true, email: true } } },
         },
       },
@@ -226,13 +226,13 @@ router.post("/:id/disable", async (req: Request, res: Response) => {
   // action: "keep" | "migrate" | "suspend"
   try {
     if (action === "suspend") {
-      await prisma.vPS.updateMany({
+      await prisma.vM.updateMany({
         where: { serverId: req.params.id as string },
-        data:  { status: "suspended" as const },
+        data:  { status: "suspended" },
       });
     } else if (action === "migrate" && targetServerId) {
       // Move all VPS to target server
-      await prisma.vPS.updateMany({
+      await prisma.vM.updateMany({
         where: { serverId: req.params.id as string },
         data:  { serverId: String(targetServerId) },
       });

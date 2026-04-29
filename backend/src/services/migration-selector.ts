@@ -28,7 +28,7 @@ export class SmartMigrationSelector {
     scored.sort((a, b) => b.score - a.score);
 
     if (scored.length === 0) throw new Error("No target accounts available");
-    return scored[0].account;
+    return scored[0]!.account;
   }
 
   private static async scoreAccount(account: any, vm: any): Promise<number> {
