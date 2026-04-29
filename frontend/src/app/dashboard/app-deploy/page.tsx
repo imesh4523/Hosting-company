@@ -63,6 +63,7 @@ export default function AppDeployPage() {
   
   const [isDeploying, setIsDeploying] = useState(false);
   const [isTokenSaved, setIsTokenSaved] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   // Config state
   const [config, setConfig] = useState({
@@ -396,7 +397,7 @@ export default function AppDeployPage() {
                                    <div>
                                       <span className="text-xs font-bold text-[#818a91] block uppercase">{item.name}</span>
                                       <span className="text-sm font-medium flex items-center gap-2 mt-1">
-                                         {item.icon} {item.value}
+                                         {(item as any).icon} {item.value}
                                       </span>
                                    </div>
                                    <button className="text-[#0069ff] text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
