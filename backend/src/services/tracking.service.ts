@@ -47,7 +47,7 @@ export class TrackingService {
       include: {
         vms: {
           where: { status: { in: ["active", "provisioning"] } },
-          include: { account: true, server: true },
+          include: { account: true, server: true, plan: true },
           take: 1,
         },
       },
@@ -71,7 +71,7 @@ export class TrackingService {
         account:   currentVM.account?.name,
         server:    currentVM.server?.name,
         status:    currentVM.status,
-        plan:      currentVM.plan,
+        plan:      currentVM.plan?.name,
         createdAt: currentVM.createdAt,
       } : null,
       history: history.map((h: any) => ({

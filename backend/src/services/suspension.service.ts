@@ -13,7 +13,7 @@ export class SuspensionDetector {
   async monitorAllAccounts() {
     let accounts: { id: string; name: string; apiKey: string; status: string; dropletCount: number }[] = [];
     try {
-      accounts = await prisma.dOAccount.findMany({ where: { status: { not: "disabled" } } });
+      accounts = await prisma.cloudAccount.findMany({ where: { status: { not: "disabled" } } });
     } catch { return; } // DB offline
 
     await Promise.allSettled(accounts.map(a => this.checkAccount(a)));
@@ -26,9 +26,9 @@ export class SuspensionDetector {
 
       // Account is healthy
       if (account.status === "suspended") {
-        await prisma.dOAccount.update({ where: { id: account.id }, data: { status: "active" } });
+        await prisma.cloudAccount.update({ where: { id: account.id }, data: { status: "active" } });
       }
-      await prisma.dOAccount.update({ where: { id: account.id }, data: { lastChecked: new Date() } });
+      await prisma.cloudAccount.update({ where: { id: account.id }, data: { lastChecked: new Date() } });
 
     } catch (err) {
       const e = err as { response?: { status?: number }; message: string };
@@ -47,21 +47,21 @@ export class SuspensionDetector {
   }
 
   private async checkDroplets(accountId: string) {
-    let droplets: { id: string; ipAddress: string | null; userId: string; doAccountId: string }[] = [];
+    let droplets: { id: string; ip: string | null; userId: string; cloudAccountId: string }[] = [];
     try {
-      droplets = await prisma.vPS.findMany({ where: { doAccountId: accountId, status: "active" } });
+      droplets = await prisma.vM.findMany({ where: { cloudAccountId: accountId, status: "active" } }) as any;
     } catch { return; }
 
     await Promise.allSettled(droplets.map(async (d) => {
       if (!d.ipAddress) return;
 
-      const alive = await this.ping(d.ipAddress);
+      const alive = await this.ping(d.ip);
 
       if (!alive) {
         const now = Date.now();
         if (!this.downSince.has(d.id)) {
           this.downSince.set(d.id, now);
-          await tracking.logEvent({ vpsId: d.id, userId: d.userId, event: "vps_unreachable", fromAccountId: accountId, reason: "ping failed", triggeredBy: "auto" });
+          await tracking.logEvent({ vmId: d.id, userId: d.userId, event: "vps_unreachable", fromAccountId: accountId, reason: "ping failed", triggeredBy: "auto" });
         }
 
         const downMs = now - (this.downSince.get(d.id) ?? now);
@@ -79,16 +79,16 @@ export class SuspensionDetector {
   }
 
   private async handleAccountSuspension(account: { id: string; name: string; dropletCount: number }, reason: string) {
-    if ((await prisma.dOAccount.findUnique({ where: { id: account.id } }))?.status === "suspended") return;
+    if ((await prisma.cloudAccount.findUnique({ where: { id: account.id } }))?.status === "suspended") return;
 
     // 1. Mark suspended
-    await prisma.dOAccount.update({
+    await prisma.cloudAccount.update({
       where: { id: account.id },
       data: { status: "suspended", suspendedAt: new Date(), suspendReason: reason },
     });
 
     // 2. Log
-    await tracking.logEvent({ vpsId: "system", userId: "system", event: "account_suspended", fromAccountId: account.id, reason, triggeredBy: "auto" }).catch(() => {});
+    await tracking.logEvent({ vmId: "system", userId: "system", event: "account_suspended", fromAccountId: account.id, reason, triggeredBy: "auto" }).catch(() => {});
 
     // 3. Alert admin immediately
     await notify.telegramAdmin(
@@ -96,7 +96,7 @@ export class SuspensionDetector {
     );
 
     // 4. Queue migration for all active droplets
-    const droplets = await prisma.vPS.findMany({ where: { doAccountId: account.id, status: "active" } });
+    const droplets = await prisma.vM.findMany({ where: { cloudAccountId: account.id, status: "active" } });
     const { MigrationService } = await import("./migration.service.js");
     const ms = new MigrationService();
 

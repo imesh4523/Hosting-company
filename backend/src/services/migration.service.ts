@@ -125,7 +125,7 @@ export class MigrationService {
         const newVM = await toProvider.createVM({
           name: vm.name,
           region: targetAccount.region,
-          plan: vm.plan || "s-1vcpu-2gb",
+          plan: vm.planId || "s-1vcpu-2gb",
           image: ctx.snapshotId!
         });
 
@@ -142,7 +142,7 @@ export class MigrationService {
             name:        vm.name,
             ip:          ctx.newIp,
             status:      "active",
-            plan:        vm.plan,
+            planId:      vm.planId,
             region:      targetAccount.region,
             provider:    targetAccount.provider,
             username:    vm.username,
