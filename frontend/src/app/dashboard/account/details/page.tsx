@@ -1,21 +1,16 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 
-export default function AccountDetailsPage() {
-  const router = useRouter();
+export default function Page() {
+  const [html, setHtml] = useState('');
+  
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) { router.replace('/login'); return; }
+    // Fetch the full page: sidebar + this page's content combined
+    fetch('/api/fragment?name=fullpage&page=security')
+      .then(r => r.text())
+      .then(content => setHtml(content))
+      .catch(() => setHtml('<div style="padding:40px;color:red">Failed to load content.</div>'));
   }, []);
 
-  return (
-    <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
-      <iframe
-        src="/account-details-static.html"
-        style={{ width: '100%', height: '100%', border: 'none' }}
-        title="Account Details"
-      />
-    </div>
-  );
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }

@@ -1,0 +1,122 @@
+{
+  "children": [
+    {
+      "tag": "div",
+      "class": "app-nav app-nav-default"
+    },
+    {
+      "tag": "script",
+      "id": ""
+    },
+    {
+      "tag": "script",
+      "id": ""
+    },
+    {
+      "tag": "noscript"
+    },
+    {
+      "tag": "script",
+      "id": ""
+    },
+    {
+      "tag": "script",
+      "id": ""
+    },
+    {
+      "tag": "script",
+      "id": ""
+    },
+    {
+      "tag": "noscript"
+    },
+    {
+      "tag": "div",
+      "class": "app-main "
+    },
+    {
+      "tag": "div",
+      "id": "fullpage-overlay",
+      "class": "hidden"
+    },
+    {
+      "tag": "div",
+      "id": "modalAjax",
+      "class": "modal system-modal fade"
+    },
+    {
+      "tag": "form",
+      "id": "frmGeneratePassword",
+      "class": "form-horizontal"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "style"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "div",
+      "class": "overlay"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "script",
+      "id": "_aw_script_0"
+    },
+    {
+      "tag": "script",
+      "id": "_aw_script_1"
+    },
+    {
+      "tag": "img"
+    },
+    {
+      "tag": "div",
+      "id": "batBeacon842420501036"
+    },
+    {
+      "tag": "iframe",
+      "id": "_hjSafeContext_78932923"
+    },
+    {
+      "tag": "iframe"
+    },
+    {
+      "tag": "iframe"
+    },
+    {
+      "tag": "script"
+    },
+    {
+      "tag": "iframe",
+      "id": "tidio-chat-code"
+    },
+    {
+      "tag": "div",
+      "id": "tidio-chat",
+      "class": "needsclick"
+    }
+  ],
+  "bodyClasses": "lagom lagom-layout-left lagom-modern page-clientareahome page-user-logged"
+}

@@ -1,63 +1,20 @@
 'use client';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-import React, { useEffect, useRef, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-
-// Map of action params → Next.js routes
-const ACTION_ROUTES: Record<string, string> = {
-  details: '/dashboard/account/details',
-  security: '/dashboard/account/security',
-  emails: '/dashboard/account/emails',
-  contacts: '/dashboard/account/contacts',
-  masspay: '/dashboard/billing',
-  addfunds: '/dashboard/billing',
-  quotes: '/dashboard/billing',
-};
-
-function DashboardContent() {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+export default function DashboardPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [html, setHtml] = useState('');
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) { router.replace('/login'); return; }
 
-    // Handle action query params (e.g. /dashboard?action=details)
-    const action = searchParams.get('action');
-    if (action && ACTION_ROUTES[action]) {
-      router.replace(ACTION_ROUTES[action]);
-      return;
-    }
+    fetch('/api/fragment?name=fullpage&page=main')
+      .then(r => r.text())
+      .then(content => setHtml(content))
+      .catch(() => setHtml('<div style="padding:40px;color:red">Failed to load dashboard.</div>'));
+  }, []);
 
-    // Handle paste for HTML injection (dev tool)
-    const handlePaste = async (e: ClipboardEvent) => {
-      const text = e.clipboardData?.getData('text');
-      if (text && text.includes('<html')) {
-        console.log('Detected HTML paste, saving...');
-        await fetch('/api/save-html', { method: 'POST', body: text });
-      }
-    };
-    window.addEventListener('paste', handlePaste);
-    return () => window.removeEventListener('paste', handlePaste);
-  }, [searchParams]);
-
-  return (
-    <div style={{ width: '100%', height: '100vh', overflow: 'hidden', background: '#fdfdfd' }}>
-      <iframe
-        ref={iframeRef}
-        src="/dashboard-static.html"
-        style={{ width: '100%', height: '100%', border: 'none' }}
-        title="Customer Dashboard"
-      />
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <Suspense fallback={<div>Loading Dashboard...</div>}>
-      <DashboardContent />
-    </Suspense>
-  );
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }

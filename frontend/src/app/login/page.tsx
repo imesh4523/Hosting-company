@@ -20,19 +20,20 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(searchParams.get('error') ? 'Authentication failed. Please try again.' : '');
   const [rememberMe, setRememberMe] = useState(false);
-  const [methods, setMethods] = useState<AuthMethods>({ email: true, google: false, facebook: false, github: false });
+  const [methods, setMethods] = useState<AuthMethods>({ email: true, google: true, facebook: true, github: true });
 
   useEffect(() => {
-    fetch('/api/auth/methods')
-      .then(res => res.json())
-      .then(data => {
-        if (data && typeof data.email !== 'undefined') {
-          setMethods(data);
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch auth methods:', err);
-      });
+    // Force OAuth buttons to show for UI consistency with Ultahost
+    // fetch('/api/auth/methods')
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     if (data && typeof data.email !== 'undefined') {
+    //       setMethods(data);
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.error('Failed to fetch auth methods:', err);
+    //   });
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {

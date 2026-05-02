@@ -1,0 +1,915 @@
+
+                                <script>
+var translations = {
+    "Boost your search rankings": "Boost your search rankings",
+    "with a RapidSSL™ Certificate": "with a RapidSSL™ Certificate",
+    "Activate HTTPS and the lock icon": "Activate HTTPS and the lock icon",
+    "Encrypt sensitive data": "Encrypt sensitive data",
+    "Protect user privacy": "Protect user privacy",
+    "Secure online transactions": "Secure online transactions",
+    "Generate Password": "Generate Password",
+    "Enter a name for this card (Optional)": "Enter a name for this card (Optional)",
+    "We would like to send you occasional news, information and special offers by email. To join our mailing list, simply tick the box below. You can unsubscribe at any time.": "We would like to send you occasional news, information and special offers by email. To join our mailing list, simply tick the box below. You can unsubscribe at any time.",
+    "Receive Emails": "Receive Emails",
+    "Copyright © 2024 UltaHost. All Rights Reserved.": "Copyright © 2024 UltaHost. All Rights Reserved.",
+    "Last Chance": "Last Chance",
+    "Gateway Charge": "Gateway Charge",
+    "VAT Number": "VAT Number",
+    "Products": "Products",
+    "Website Backup": "Website Backup",
+    "SEO Tools": "SEO Tools",
+    "Website Security": "Website Security",
+    "Calculated": "Calculated",
+    "Provision": "Provision",
+    "Name": "Name",
+    "Protect your site with SSL": "Protect your site with SSL",
+    "Add SSL to your web hosting to give visitors confidence that your website is safe and secure and help build trust.": "Add SSL to your web hosting to give visitors confidence that your website is safe and secure and help build trust.",
+    "Learn more...": "Learn more...",
+    "SpamExperts Email Security": "SpamExperts Email Security",
+    "Add professional email security and archiving to your domain to protect and secure your email against attacks and malware.": "Add professional email security and archiving to your domain to protect and secure your email against attacks and malware.",
+    "SiteLock Website Security": "SiteLock Website Security",
+    "SiteLock provides a range of features designed to protect both your website and your business’ reputation.": "SiteLock provides a range of features designed to protect both your website and your business' reputation.",
+    "CodeGuard Backup": "CodeGuard Backup",
+    "The fastest, most reliable website backup service, which tracks all of your changes daily.": "The fastest, most reliable website backup service, which tracks all of your changes daily.",
+    "Marketgoo SEO Tools": "Marketgoo SEO Tools",
+    "Improve your site's traffic and grow your business with do-it-yourself SEO Tools from marketgoo.": "Improve your site's traffic and grow your business with do-it-yourself SEO Tools from marketgoo.",
+    "ISPmanager Licenses": "ISPmanager Licenses",
+    "cPanel Licenses": "cPanel Licenses",
+    "Plesk Licenses": "Plesk Licenses",
+    "No Control Panel": "No Control Panel",
+    "Join our mailing list": "Join our mailing list",
+    "Password Length": "Password Length",
+    "Generated Password": "Generated Password",
+    "Generate new password": "Generate new password",
+    "Copy to clipboard and Insert": "Copy to clipboard and Insert",
+    "Copy": "Copy",
+    "Close": "Close",
+    "Server Location": "Server Location",
+    "Operating System": "Operating System",
+    "Control Panel": "Control Panel",
+    "cPanel": "cPanel",
+    "ISPmanager": "ISPmanager",
+    "Plesk": "Plesk",
+    "Additional Disks Space": "Additional Disks Space",
+    "Additional IPv4 Addresses": "Additional IPv4 Addresses",
+    "Select Script": "Select Script",
+    "Type of Service": "Type of Service",
+    "New Installation": "New Installation",
+    "Linux Shared Hosting": "Linux Shared Hosting",
+    "Windows Shared Hosting": "Windows Shared Hosting",
+    "Linux VPS Hosting": "Linux VPS Hosting",
+    "Linux VDS Hosting": "Linux VDS Hosting",
+    "Windows VPS Hosting": "Windows VPS Hosting",
+    "Windows VDS Hosting": "Windows VDS Hosting",
+    "MacOS VPS Hosting": "MacOS VPS Hosting",
+    "MacOS VDS Hosting": "MacOS VDS Hosting",
+    "Dedicated Servers": "Dedicated Servers",
+    "WordPress Hosting": "WordPress Hosting",
+    "Email Hosting": "Email Hosting",
+    "Server Support Services": "Server Support Services",
+    "Other Products": "Other Products",
+    "Plesk Panel Licence": "Plesk Panel Licence",
+    "Server Optimization": "Server Optimization",
+    "Radio Hosting": "Radio Hosting",
+    "Android Emulator VPS": "Android Emulator VPS",
+    "Windows Reseller Hosting": "Windows Reseller Hosting",
+    "Internet Radio Reseller": "Internet Radio Reseller",
+    "Cloud Email": "Cloud Email",
+    "macOS VDS Hosting": "macOS VDS Hosting",
+    "Shared Hosting": "Shared Hosting",
+    "Wordpress Hosting": "Wordpress Hosting",
+    "VPS Hosting": "VPS Hosting",
+    "VDS Hosting": "VDS Hosting",
+    "macOS VPS Hosting": "macOS VPS Hosting",
+    "Reseller Hosting": "Reseller Hosting",
+    "Linux Reseller Hosting": "Linux Reseller Hosting",
+    "Popular Hosting": "Popular Hosting",
+    "CyberPanel Hosting": "CyberPanel Hosting",
+    "Plesk Hosting": "Plesk Hosting",
+    "Game Servers": "Game Servers",
+    "Website & Security": "Website & Security",
+    "SSL Certificates": "SSL Certificates",
+    "Website Builder": "Website Builder",
+    "(required fields are marked with *)": "(required fields are marked with *)",
+    "Where did you hear about us?": "Where did you hear about us?",
+    "Resolution Center": "Resolution Center",
+    "Dashboard": "Dashboard",
+    "Forgot": "Forgot?",   
+    "Not a member yet?": "Not a member yet? ", 
+    "Accesses for old hosting (cPanel, SSH, FTP, etc...) ": "Accesses for old hosting (cPanel, SSH, FTP, etc...)",
+    "These are your assigned Ultahost nameservers: ns1.ultahost.com ns2.ultahost.com ns3.ultahost.com ns4.ultahost.com": "These are your assigned Ultahost nameservers: ns1.ultahost.com ns2.ultahost.com ns3.ultahost.com ns4.ultahost.com"      
+};
+
+function replaceText() {
+    // Function to replace text in a text node
+    function replaceTextInNode(node, key, value) {
+        // If the text contains the key, replace it with the value
+        if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes(key)) {
+            node.nodeValue = node.nodeValue.replace(new RegExp(key, 'g'), value);
+        }
+    }
+
+    // Iterate over each key-value pair in the translations object
+    for (let key in translations) {
+        if (translations.hasOwnProperty(key)) {
+            // Get all elements in the body
+            let elements = document.body.getElementsByTagName("*");
+
+            // Loop through all elements
+            for (let i = 0; i < elements.length; i++) {
+                let element = elements[i];
+
+                // Loop through the child nodes of the element
+                for (let j = 0; j < element.childNodes.length; j++) {
+                    let childNode = element.childNodes[j];
+                    if (translations[key].length > 0) {
+                        replaceTextInNode(childNode, key, translations[key]);
+                    }
+                }
+            }
+        }
+    }
+
+    // Call replaceText again after 2 seconds
+    //setTimeout(replaceText, 2000);
+}
+</script>
+
+
+
+ 
+    <div class="site site-marketgoo">
+        <div class="site-banner banner banner-sides banner-default">
+            <div class="container">
+                <div class="banner-content">
+                    <h1 class="banner-title">Improve your Site's traffic and <em>Grow your Business</em> with marketgoo</h1>
+                    <div class="banner-actions">
+                        <a href="#" class="btn btn-lg btn-primary" onclick="smoothScroll('#pricing');return false">Get Started</a>
+                        <a href="#" class="btn btn-lg btn-primary-outline" onclick="smoothScroll('#overview');return false">Learn more</a>
+                    </div>
+                </div>
+                <div class="banner-background">
+                    <div class="banner-graphic">
+                                    <svg class="svg-seo promo-slider-icon svg-marketgoo svg-marketgoo-left" viewBox="0 0 376 324">
+	<path d="M26.1501 224.848L61.4612 245.532L41.9027 256.93L6.55255 236.234L26.1501 224.848Z" fill="url(#svg-marketgoo-gradient-2)" fill-opacity="0.1"></path>
+	<g class="svg-phone">
+		<path class="svg-phone-border" d="M63,40.3v2.2L104.4,162c0,0,2.1,1.4,3.2,2.1c5.5,3.1,10.4-0.8,10.4-7.1V74.1c0-7.6-1.1-13.5-7.3-16.9c-9.4-5.1-27.9-16.1-38.4-22.3C68.7,32.9,63,34.2,63,40.3z"></path>
+		<path class="svg-phone-bg" d="M63,42.9v89.3c0,5.2,0.4,9.2,4.7,11.7c9.1,5.3,25.9,15.2,36.9,21.4c5.6,3.1,10.4-0.8,10.4-7V76.6c0-7.5-1.1-13.3-7.3-16.6c-9.5-5.1-25.9-14.5-36.5-20.6C64.8,35.6,63,36.9,63,42.9z"></path>
+		<path class="svg-phone-button" d="M90.7,152.6c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-8.7-5.1c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L90.7,152.6z"></path>
+		<path class="svg-phone-button" d="M90.7,59.1c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5L82,52c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L90.7,59.1z"></path>
+		<path class="svg-phone-button" d="M94.5,58.8c0.6,0.1,1,0.7,1,1.3c0.1,0.5-0.3,1-0.8,1c-0.1,0-0.1,0-0.2,0c-0.6-0.1-1-0.7-1-1.3c-0.1-0.5,0.3-1,0.8-1C94.4,58.7,94.4,58.7,94.5,58.8z"></path>
+	</g>
+	<path class="svg-graphs-bg" d="M0-1.6v46.4l51.8,30.9V28L0-1.6z"></path>
+	<path class="svg-graphs-text-bg" d="M0,58.2v46.4l40.5,24.2l11.3,17.5V87.8L0,58.2z"></path>
+	<path class="svg-graphs-text" d="M40.2,96.9c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-15.6-9.2c-0.2-0.2-0.5-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L40.2,96.9zM29.8,96.9c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5L10.7,83.6c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L29.8,96.9z M19.4,84.7c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-8.7-5.1c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L19.4,84.7z M10.7,91.8c-0.5-0.3-0.9-0.9-0.9-1.5c-0.1-0.3,0.1-0.6,0.4-0.7c0.2,0,0.4,0,0.5,0.1l3.5,2c0.5,0.3,0.9,0.9,0.9,1.5c0.1,0.3-0.1,0.6-0.4,0.6c-0.2,0-0.4,0-0.5-0.1L10.7,91.8z M19.4,96.9c-0.5-0.3-0.9-0.9-0.9-1.5c-0.1-0.3,0.1-0.6,0.4-0.6c0.2,0,0.4,0,0.5,0.1l20.8,12.2c0.5,0.3,0.9,0.9,0.9,1.5c0.1,0.3-0.1,0.6-0.4,0.7c-0.2,0-0.4,0-0.5-0.1L19.4,96.9z M40.2,115.2c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-3.5-2c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L40.2,115.2z M31.5,110.1c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5L10.7,95.9c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L31.5,110.1z"></path>
+	<path class="svg-phone-elements" d="M107.1,75.5L68.9,53.1c-0.2-0.2-0.5-0.2-0.7,0C68,53.3,68,53.5,68,53.6v8c0,0.6,0.4,1.2,0.9,1.5l38.2,22.4c0.2,0.2,0.5,0.2,0.7,0c0.1-0.1,0.2-0.3,0.1-0.5v-8C108,76.4,107.6,75.8,107.1,75.5z M107.1,89.7L68.9,67.3c-0.2-0.2-0.5-0.2-0.7,0C68,67.5,68,67.6,68,67.8v21.4c0,0.6,0.4,1.2,0.9,1.5l38.2,22.4c0.2,0.2,0.5,0.2,0.7,0c0.1-0.1,0.2-0.3,0.1-0.5V91.2C108,90.6,107.6,90,107.1,89.7z M86.1,112.5l-17.2-9.9c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5v19c0,0.6,0.4,1.2,0.9,1.5l17.2,9.9c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5v-19C87,113.4,86.6,112.8,86.1,112.5z M107.1,124.7L90.9,115c-0.2-0.2-0.5-0.2-0.7,0c-0.1,0.1-0.2,0.3-0.1,0.5v18.7c0,0.6,0.4,1.2,0.9,1.5l16.2,9.7c0.2,0.2,0.5,0.2,0.7,0c0.1-0.1,0.2-0.3,0.1-0.5v-18.7C108,125.6,107.6,125,107.1,124.7zM85.7,108.3c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-17.1-9.9c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L85.7,108.3z M77.3,134.4c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-8.7-5.1c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L77.3,134.4z M108.5,121.8c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-17.1-9.9c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L108.5,121.8z M98.8,145.9c0.2,0.2,0.6,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-8.7-5.1c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L98.8,145.9z"></path>
+	<path class="svg-graphs-elements" d="M14,36.9c3.1,1.8,5.7,0.3,5.7-3.3s-2.5-8.1-5.7-9.9v-2.8c4.5,2.6,8.1,9,8.1,14.2s-3.6,7.4-8.1,4.7"></path>
+	<path class="svg-graphs-elements-1" d="M12.7,23.1c-2.5-0.8-4.4,0.8-4.4,3.9c0,3.7,2.5,8.1,5.7,9.9c0.4,0.3,0.9,0.5,1.4,0.6c0.8,0.2,1.8,0.4,2.2,1.2c0.4,1,0.2,2.3-1.4,1.9c-0.8-0.2-1.5-0.5-2.2-0.9c-4.5-2.6-8.1-9-8.1-14.2c0-4.8,3-6.9,6.9-5.3c0.5,0.2,1,0.6,1.3,1C14.5,21.7,14.3,23.6,12.7,23.1z"></path>
+	<path class="svg-graphs-elements-2" d="M32.3,34"></path>
+	<path class="svg-graphs-elements" d="M34.1,33.6c4.5,2.6,8.1,9,8.1,14.2s-3.6,7.4-8.1,4.7s-8.1-9-8.1-14.2S29.7,31,34.1,33.6zM34.1,49.7c3.1,1.8,5.7,0.3,5.7-3.3c0-3.7-2.5-8.1-5.7-9.9c-3.1-1.8-5.7-0.3-5.7,3.3C28.5,43.4,31,47.9,34.1,49.7z"></path>
+	<path class="svg-graphs-elements-1" d="M33.2,36c-2.7-1-4.7,0.5-4.7,3.8c0,3.7,2.5,8.1,5.7,9.9c3.1,1.8,5.7,0.3,5.7-3.3c0-1.1-0.2-2.2-0.6-3.2c-0.7-2,1.5-1.8,1.9-0.7c0.7,1.7,1,3.5,1.1,5.4c0,5.2-3.6,7.4-8.1,4.7s-8.1-9-8.1-14.2c0-5,3.3-7.1,7.4-5.1c1.2,0.6,1.8,1.6,1.5,2.1C34.5,36.2,34.2,36.4,33.2,36z"></path>
+	<g class="svg-cup-flower">
+		<path class="svg-cup-body" d="M35,230h0.3c0,0-1.9,4.6-4.9,6.3c-6.6,3.8-17.2,3.8-23.8,0c-3-1.7-4.6-4-4.9-5.3H1v-26l0,0c0.3-2.2,1.9-4.4,4.9-6.1c6.6-3.7,17.4-3.7,24.1,0c3,1.7,4.7,3.9,4.9,6.1H35V230z"></path>
+		<path class="svg-cup-top" d="M6,198.3c6.6-3.8,17.4-3.8,24.1,0s6.6,10,0,13.8s-17.4,3.8-24,0C-0.7,208.3-0.7,202.1,6,198.3z"></path>
+		<path class="svg-cup-inside" d="M8.1,199.7c5.5-3,14.3-3,19.8,0s5.5,7.9,0,10.9s-14.3,3-19.8,0C2.7,207.7,2.7,202.8,8.1,199.7z"></path>
+		<path class="svg-flower-leaf" d="M10.8,202.9c0,0-12.1-7.2-8.7-13.5c4.1-7.7,4.3-6.1,0-15.5c-2.9-6.4,0.8-13,5.4-15.5c8.2-4.5,3.8,2.1,2.3,8c-1.5,6.1,3.5,5.6,3.8,13.5c0.3,8.2,4.4,8,3.9,13C17.2,197.3,14.6,201,10.8,202.9z"></path>
+		<path class="svg-flower-leaf-1" d="M18.7,204.3c0,0-5.1-13.1,1.3-16c8-3.6,2.2-5.1,8.5-13.3c4.8-6.1,10.4-4.4,12.4-9.1c2.5-5.9,6.5,9,0.7,11.4c-7,3-4.9,4.6-9.1,11.3s0.9,8.2-2.6,12C27.2,203.8,22.9,205.2,18.7,204.3z"></path>
+		<path class="svg-flower-leaf-2" d="M17.5,208.9c-6.9,0-9.5-9.9-7.4-19.5c2-9,9-8.9,9.4-16.8c0.5-10.6,16.6,9.6,9.3,14.7c-7.1,5,2.5,8.8-1.2,13.5C25.8,203,27.1,208.9,17.5,208.9z"></path>
+	</g>
+</svg>
+<svg class="svg-seo promo-slider-icon svg-marketgoo svg-marketgoo-center" viewBox="0 0 376 324">
+	<defs>
+		<linearGradient id="svg-marketgoo-gradient-1" x1="222.784" y1="288.259" x2="245.25" y2="327.436" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#ECECEC"></stop>
+			<stop offset="0.0001"></stop>
+			<stop offset="0.548739" stop-opacity="0"></stop>
+		</linearGradient>
+		<linearGradient id="svg-marketgoo-gradient-2" x1="10.0273" y1="238.224" x2="32.2203" y2="277.465" gradientUnits="userSpaceOnUse">
+			<stop></stop>
+			<stop offset="0.671875" stop-opacity="0"></stop>
+		</linearGradient>
+		<linearGradient id="svg-marketgoo-gradient-3" x1="109.288" y1="222.051" x2="133.936" y2="267.883" gradientUnits="userSpaceOnUse">
+			<stop></stop>
+			<stop offset="0.548621" stop-opacity="0"></stop>
+		</linearGradient>
+		<linearGradient id="svg-marketgoo-gradient-4" x1="166.79" y1="255.64" x2="193.282" y2="299.189" gradientUnits="userSpaceOnUse">
+			<stop></stop>
+			<stop offset="0.646243" stop-opacity="0"></stop>
+		</linearGradient>
+		<linearGradient id="svg-marketgoo-gradient-5" x1="147.366" y1="310.276" x2="158.915" y2="330.088" gradientUnits="userSpaceOnUse">
+			<stop></stop>
+			<stop offset="0.702967" stop-opacity="0"></stop>
+		</linearGradient>
+		<linearGradient id="svg-marketgoo-gradient-6" x1="80.1166" y1="297.953" x2="106.608" y2="344.698" gradientUnits="userSpaceOnUse">
+			<stop></stop>
+			<stop offset="0.534341" stop-opacity="0"></stop>
+		</linearGradient>
+	</defs>
+	<path d="M252.289 273.134L278.147 288.265L250.242 304.541L224.41 289.445L252.289 273.134Z" fill="url(#svg-marketgoo-gradient-1)" fill-opacity="0.1"></path>
+	<path d="M142.294 208.89L170.208 225.316L142.411 241.605L114.445 225.17L142.294 208.89Z" fill="url(#svg-marketgoo-gradient-3)" fill-opacity="0.1"></path>
+	<path d="M196.987 240.884L226.314 258.041L198.429 274.338L169.043 257.192L196.987 240.884Z" fill="url(#svg-marketgoo-gradient-4)" fill-opacity="0.1"></path>
+	<path d="M153 304.367L178.43 319.226L170.7 323.87L145.133 308.929L153 304.367Z" fill="url(#svg-marketgoo-gradient-5)" fill-opacity="0.1"></path>
+	<path d="M131.327 263.19L161.577 280.874L105.58 313.514L75.3584 295.891L131.327 263.19Z" fill="url(#svg-marketgoo-gradient-6)" fill-opacity="0.1"></path>
+	<g class="svg-bars">
+		<g class="svg-bar-1">
+			<path class="svg-bar-top" d="M86.8,172.3l28.3-16.5l28.3,16.5L115,188.7L86.8,172.3z"></path>
+			<path class="svg-bar-front" d="M87,172.2l28,16.2v37.1l-28-16.2V172.2z"></path>
+			<path class="svg-bar-side" d="M115,188.4l28-16.2v37.1l-28,16.2V188.4L115,188.4z"></path>
+		</g>
+		<g class="svg-bar-2">
+			<path class="svg-bar-top" d="M141.9,140.7l28.3-16.5l28.3,16.5l-28.3,16.5L141.9,140.7z"></path>
+			<path class="svg-bar-front" d="M142,140.8l28,16.2v100.5l-28-16.2V140.8z"></path>
+			<path class="svg-bar-side" d="M170,156.4l28-16.2v100.4l-28,16.2V156.4z"></path>
+		</g>
+		<g class="svg-bar-3">
+			<path class="svg-bar-top" d="M197.1,107.5l28-16.3l28,16.3l-28,16.3L197.1,107.5z"></path>
+			<path class="svg-bar-front" d="M197,107.2l28,16.2v166.4l-28-16.2V107.2z"></path>
+			<path class="svg-bar-side" d="M225,123.4l28-16.2v166.4l-28,16.2V123.4z"></path>
+		</g>
+	</g>
+	<g class="svg-search">
+		<path class="svg-search-borders" d="M159,306.2c0.1,1.1-0.5,2.2-1.6,2.7c-1.4,0.8-2.6,1.6-3.8,2.4s-2.8,0.8-4.1,0.1c-5.4-3.2-19.6-11.9-24.1-14.7c-15.9,6.7-38.3,5.9-52.6-2.3c-15.9-9.2-15.8-24,0-33.2c15.9-9.2,41.6-9.2,57.4,0c14.6,8.4,15.7,21.6,3.6,30.8l25.1,11.3v2.9L159,306.2L159,306.2z"></path>
+		<path class="svg-search-top" d="M158.2,304.6c-1.5,1.1-3.6,2.5-5,3.5c-0.9,0.3-1.8,0.3-2.7,0c-5.5-3.2-20.1-12.3-24.8-15.2c-15.9,6.6-38.3,5.8-52.6-2.3c-15.9-9-15.9-23.7,0-32.8s41.6-9.1,57.4,0c14.6,8.3,15.7,21.4,3.5,30.5c4.7,2.7,17.8,10.3,23.4,13.6C159.6,303.2,159.2,303.9,158.2,304.6z M125.2,259.9c-13.1-7.5-34.3-7.5-47.4,0c-13.1,7.6-13.1,19.8,0,27.4s34.3,7.5,47.4,0S138.3,267.5,125.2,259.9L125.2,259.9z"></path>
+		<path class="svg-search-bg" d="M78.2,260.2c12.7-7.4,33.4-7.4,46.1,0c12.7,7.3,12.7,19.3,0,26.6c-12.7,7.4-33.4,7.4-46.1,0S65.4,267.5,78.2,260.2z"></path>
+		<path style="fill: #000; opacity: 0.16;" d="M124.3,261.2c-12.7-7.3-33.4-7.3-46.1,0c-5.9,3.4-9.1,7.8-9.5,12.3c-0.5-5.2,2.7-10.4,9.5-14.3c12.7-7.4,33.4-7.4,46.1,0c6.8,3.9,10,9.2,9.5,14.3C133.4,269,130.2,264.6,124.3,261.2z"></path>
+		<path class="svg-search-text" d="M89.8,270.5c-0.4,0-0.8-0.2-1.2-0.4c-0.5-0.2-0.8-0.5-1-1c0.1-0.4,0.4-0.8,0.8-0.9l-2.4-1.4c-0.6,0.3-1,0.7-1.2,1.3c-0.2,0.5-0.1,1.1,0.3,1.5c0.5,0.6,1.1,1.2,1.8,1.5c1,0.6,2.2,1,3.4,1.1c1.1,0.1,2.1-0.1,3-0.6c1.1-0.6,1.4-1.4,0.9-2.4c-0.3-0.5-0.6-1-1-1.4c-0.4-0.3-0.6-0.7-0.8-1.2c-0.1-0.3,0-0.5,0.3-0.6c0.3-0.2,0.7-0.2,1.1-0.2c0.5,0,0.9,0.2,1.3,0.4c0.3,0.1,0.6,0.4,0.7,0.8c0,0.3-0.2,0.6-0.6,0.8l2.4,1.4c0.5-0.3,0.9-0.7,1.1-1.2s0.1-1-0.2-1.4c-0.4-0.6-0.9-1-1.5-1.3c-0.7-0.4-1.5-0.7-2.3-0.9c-0.8-0.2-1.6-0.3-2.3-0.2c-0.7,0-1.3,0.2-1.9,0.6c-1.1,0.6-1.3,1.5-0.7,2.6c0.3,0.4,0.6,0.9,0.9,1.2c0.3,0.3,0.5,0.7,0.7,1.1c0,0.3-0.2,0.6-0.5,0.7C90.5,270.5,90.1,270.6,89.8,270.5z M104.5,274.4l-3.8-2.2l2.1-1.2l4.5,2.6l1.8-1.1l-6.9-4l-9.9,5.7l6.9,4l1.8-1.1l-4.5-2.6l2.4-1.4l3.8,2.2L104.5,274.4z M114.1,280.8c0.8-0.4,1.5-1,2-1.8c0.4-0.6,0.4-1.3,0.2-1.9c-0.4-0.7-0.9-1.3-1.7-1.6c-0.9-0.5-1.9-0.8-2.9-1c-1.1-0.2-2.2-0.1-3.3,0.1c-1.1,0.2-2.1,0.6-3.1,1.2l-0.6,0.3c-0.8,0.4-1.4,1-1.9,1.8c-0.4,0.6-0.4,1.2-0.1,1.8c0.4,0.7,1,1.3,1.7,1.6c0.9,0.5,1.9,0.8,2.9,1c1.1,0.1,2.2,0.1,3.3-0.1c1.1-0.2,2.1-0.6,3.1-1.2L114.1,280.8z M111.2,279.7c-0.8,0.5-1.8,0.8-2.7,1c-0.7,0.1-1.5,0-2.2-0.4c-0.6-0.4-0.9-0.8-0.7-1.3c0.4-0.7,1-1.2,1.8-1.6l0.7-0.4c1.9-1,3.4-1.2,4.6-0.5c0.6,0.4,0.8,0.8,0.7,1.3c-0.4,0.7-1,1.3-1.8,1.6L111.2,279.7z"></path>
+	</g>
+</svg>
+<svg class="promo-slider-icon svg-marketgoo svg-marketgoo-right" viewBox="0 0 376 324">
+	<path class="svg-browser-body" d="M261.1,150.5v106.3l115,67.3v-107L261.1,150.5z"></path>
+	<path class="svg-browser-top" d="M261.1,149.2v11.4l115,67.3v-12.1L261.1,149.2z"></path>
+	<path class="svg-browser-top-1" d="M268,159.2c0,1.1-0.8,1.6-1.7,1c-1-0.7-1.7-1.8-1.7-3c0-1.1,0.8-1.6,1.7-1C267.3,156.9,267.9,158,268,159.2z M275,163.2c0,1.1-0.8,1.6-1.7,1c-1-0.7-1.7-1.8-1.7-3c0-1.1,0.8-1.6,1.7-1C274.3,160.9,274.9,162,275,163.2z M282,167.2c0,1.1-0.8,1.6-1.7,1c-1-0.7-1.7-1.8-1.7-3c0-1.1,0.8-1.6,1.7-1C281.3,164.9,281.9,166,282,167.2L282,167.2z"></path>
+	<g class="svg-browser-search">
+		<path class="svg-browser-search-bg" d="M280.8,184.4l77,44.8c4.2,2.4,7.5,7.7,7.5,11.9s-3.4,5.6-7.5,3.2l-77-44.8c-4.2-2.4-7.5-7.7-7.5-11.9C273.2,183.5,276.6,182,280.8,184.4z"></path>
+		<path class="svg-browser-search-icon-bg" d="M358.8,231.3c3.1,2,5.1,5.5,5.3,9.2c0,3.4-2.4,4.8-5.3,3.1c-3.1-2-5.1-5.5-5.3-9.2C353.5,230.9,355.8,229.6,358.8,231.3z"></path>
+		<path class="svg-browser-search-icon" d="M361.8,241.8l-1.3-2.2c0.4-0.4,0.6-1,0.6-1.7c-0.1-1.7-1-3.2-2.4-4.1l0,0c-0.8-0.4-1.5-0.5-2.1-0.1c-0.6,0.3-0.9,1-0.9,2c0.1,1.7,1,3.2,2.4,4.1c0.4,0.2,0.8,0.4,1.2,0.4l1.4,2.4L361.8,241.8z M357,235.5c0-0.4,0.1-0.7,0.3-0.8c0.1,0,0.1,0,0.2,0c0.2,0,0.4,0.1,0.6,0.2c1,0.7,1.7,1.8,1.7,3c0,0.4-0.1,0.7-0.3,0.8c-0.2,0.1-0.5,0-0.8-0.1C357.7,237.8,357,236.7,357,235.5z"></path>
+	</g>
+	<g class="svg-browser-content-bottom">
+		<path class="content-bottom-circle" d="M283.1,253.5c-1.2,0-2.6-0.4-3.9-1.2c-4.6-2.7-8.4-9.3-8.4-14.7c0-2.8,1-4.9,2.7-5.9s4-0.8,6.4,0.6l0,0c4.6,2.7,8.4,9.3,8.4,14.7c0,2.8-1,4.9-2.7,5.9C284.8,253.3,284,253.5,283.1,253.5z M275.9,232.4c-0.6,0-1.2,0.1-1.8,0.4c-1.3,0.8-2,2.4-2,4.7c0,5,3.5,11.1,7.7,13.5c1.9,1.1,3.7,1.3,5,0.6c1.3-0.8,2-2.4,2-4.7c0-5-3.5-11.1-7.7-13.5C278,232.8,276.9,232.4,275.9,232.4z"></path>
+		<path class="content-bottom-num" d="M281.5,246.4l-4-2.3v-0.9l1.9-1.2c0.3-0.2,0.4-0.3,0.6-0.5c0.1-0.2,0.2-0.4,0.2-0.6c0-0.3-0.1-0.6-0.2-0.8s-0.3-0.4-0.6-0.6c-0.3-0.2-0.5-0.2-0.6,0c-0.2,0.1-0.2,0.3-0.2,0.7l-1.2-0.7c0-0.4,0.1-0.7,0.3-1c0.2-0.2,0.4-0.4,0.7-0.4s0.7,0.1,1,0.3c0.6,0.3,1.1,0.8,1.4,1.3s0.5,1.1,0.5,1.7c0,0.3-0.1,0.6-0.2,0.9c-0.1,0.3-0.4,0.5-0.8,0.8l-1.3,0.8l2.5,1.4L281.5,246.4L281.5,246.4z"></path>
+		<path class="content-bottom-right" d="M358.1,288c0.2,0.2,0.5,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-63.4-36c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L358.1,288z M358.5,280.3l-63.7-36.4c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5l63.7,36.4 M358.5,282.3c0.5,0.3,0.9,0.1,0.9-0.5s-0.4-1.2-0.9-1.5 M321.1,273.2c0.2,0.2,0.5,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5L294.7,256c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L321.1,273.2z"></path>
+	</g>
+	<g class="svg-browser-content-top">
+		<path class="content-top-circle" d="M279.9,206.7c-2.4-1.4-4.7-1.6-6.4-0.6c-1.8,1-2.7,3.1-2.7,5.9c0,5.4,3.8,12,8.5,14.7c1.4,0.8,2.7,1.2,4,1.2c0.9,0,1.7-0.2,2.5-0.6c1.8-1,2.7-3.1,2.7-5.9C288.4,216,284.6,209.4,279.9,206.7z"></path>
+		<path class="content-top-num" d="M280.3,220.2l-1.2-0.7v-5.1l-1.4-0.3V213l2.4,0.4l0.1,0.1v6.7H280.3z"></path>
+		<path class="content-top-right" d="M358.1,263.1c0.2,0.2,0.5,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-63.4-36c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L358.1,263.1z M358.5,255.4L294.8,219c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5l63.7,36.4 M358.5,257.4c0.5,0.3,0.9,0.1,0.9-0.5s-0.4-1.2-0.9-1.5 M321.1,248.3c0.2,0.2,0.5,0.2,0.8,0c0.1-0.1,0.2-0.3,0.1-0.5c0-0.6-0.4-1.2-0.9-1.5l-26.3-15.2c-0.2-0.2-0.6-0.2-0.8,0c-0.1,0.1-0.2,0.3-0.1,0.5c0,0.6,0.4,1.2,0.9,1.5L321.1,248.3z"></path>
+	</g>
+	<g class="svg-smartphone">
+		<path class="svg-smartphone-border" d="M302.1,299.2c0,0,0,2.1,0,2.7c0,0.8-0.6,1.7-1.8,2.3L267.5,323c-2.1,1.2-5.4,1.4-7.2,0.3l-16.8-9.6c-0.7-0.3-1.2-1.1-1.2-1.9s0-2.6,0-2.6L302.1,299.2z"></path>
+		<path class="svg-smartphone-front" d="M284.1,288.4l16.8,9.6c1.9,1.1,1.6,2.9-0.5,4.1l-32.8,18.8c-2.1,1.2-5.4,1.4-7.2,0.3l-16.8-9.6c-1.8-1.1-1.6-2.9,0.5-4.1l32.8-18.8C279,287.5,282.2,287.4,284.1,288.4z"></path>
+		<path class="svg-smartphone-screen" d="M281.5,291.1l14.8,8.5c1.6,0.9,1.4,2.6-0.5,3.7l-26.3,15.3c-1.9,1.1-4.8,1.2-6.4,0.3l-14.8-8.5c-1.6-0.9-1.4-2.6,0.5-3.7l26.3-15.3C277,290.3,279.8,290.2,281.5,291.1z"></path>
+		<path class="svg-smartphone-icon-bg" d="M271.2,298.5c0,0-1.7,0.8-4,2c-1.4,0.7-1.3,2.7-1.3,4.7c0,1.1,0.3,2.3,0.7,3.4c1.8,0.4,3.6,0.6,5.4,0.7c2.1-0.1,3.6,0,4.7-0.7c1.8-1.1,5.4-3.4,5.4-3.4l-3.4-5.4L271.2,298.5z"></path>
+		<path class="svg-smartphone-icon" d="M275.9,305.2h-5.4c-0.4,0-0.7-0.3-0.7-0.7v-2c0-0.4,0.3-0.7,0.7-0.7s0.7,0.3,0.7,0.7v1.3h4.7c0.4,0,0.7,0.3,0.7,0.7S276.3,305.2,275.9,305.2z"></path>
+	</g>
+</svg>
+                        </div>
+                    <div class="banner-shape">
+                                    <svg viewBox="0 0 1967 662" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path class="st1 promo-shape-right" d="M916 531.5V0H1765L918 533L916 531.5Z"></path>
+    <path class="st1 promo-shape-left" d="M916 0V533L0 0H918Z"></path>
+    <path d="M1154 662L918 533L1765 0L1967 94L1154 662Z" fill="url(#promo-shape-gradient-shadow)" fill-opacity="0.1"></path>
+    <defs>
+        <linearGradient id="promo-shape-gradient-shadow" x1="923" y1="534.001" x2="1020" y2="665.001" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#2B2D2F"></stop>
+            <stop offset="1" stop-color="#1B1D1F" stop-opacity="0"></stop>
+        </linearGradient>
+    </defs>
+</svg>                        </div>
+                </div>
+            </div>
+        </div>
+        <div class="site-section section-steps" id="overview">
+            <div class="container">
+                <div class="section-content">
+                    <div class="features features-steps row row-eq-height">
+                        <div class="col-md">
+                            <div class="feature feature-lg feature-boxed ">
+                                <div class="feature-number feature-number-circled">1</div>
+                                <div class="feature-content">
+                                    <h4 class="feature-title">Sign Up and get instant SEO Report</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="feature feature-lg feature-boxed ">
+                                <div class="feature-number feature-number-circled">2</div>
+                                <div class="feature-content">
+                                    <h4 class="feature-title">Get your easy SEO plan</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="feature feature-lg feature-boxed ">
+                                <div class="feature-number feature-number-circled">3</div>
+                                <div class="feature-content">
+                                    <h4 class="feature-title">Follow the simple step-by-step instructions</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="site-section section-video">
+            <div class="container">
+                <div class="section-content">
+                    <div class="embed-responsive">                 
+                        <iframe src="https://player.vimeo.com/video/394484913" class="embed-responsive-item" allow="autoplay; fullscreen" allowfullscreen=""></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>     
+        <div class="site-section">
+            <div class="container">
+                <div class="section-sides">
+                    <div class="section-graphic">
+                        <div class="browser browser-md">
+                            <img class="w-100" src="/templates/lagom2/assets/img/store/marketgoo/start-improving.gif" alt="Start Improving">
+                        </div> 
+                    </div>
+                    <div class="section-content">
+                        <h2 class="section-title">Start Improving</h2>
+                        <p class="section-desc">Put your SEO plan into action (with no experts needed) and get a monthly progress report</p>
+                    </div>
+                </div>
+            </div>
+        </div>   
+        <div class="site-section">
+            <div class="container">
+                <div class="section-sides"> 
+                    <div class="section-graphic order-last">
+                        <div class="browser browser-md">
+                            <img class="w-100" src="/templates/lagom2/assets/img/store/marketgoo/track.gif" alt="Track &amp; Monitor">
+                        </div> 
+                    </div>   
+                    <div class="section-content order-first">
+                        <h2 class="section-title">Track &amp; Monitor</h2>
+                        <p class="section-desc">See how your competitors rank for the keywords you're focusing on, and track their site's popularity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="site-section section-primary" id="pricing">
+            <div class="container">
+                <h2 class="section-title">
+                    Features &amp; Pricing
+                </h2>
+                <div class="section-content">                     
+                    <div class="packages row row-eq-height row-eq-height-sm">
+                                                                                    <div class="col-lg-4">
+                                    <div class="package">
+                                        <div class="package-header">
+                                            <h4 class="package-title">Lite</h4>                                    
+                                            <div class="package-price"> 
+                                                <div class="price monthly">
+                                                                                                                <div class="price-amount">
+                                $4.99 USD
+                        </div>
+                                                                                                            </div>
+                                            </div>
+                                        </div>
+                                        <div class="package-body">
+                                            <ul class="package-features">
+                                                                                                    <li>
+                                                        <span>Search engine submission</span> 
+                                                                                                            </li>
+                                                                                                    <li>
+                                                        <span>Connect Google Analytics</span> 
+                                                                                                            </li>
+                                                                                                    <li>
+                                                        <span>Download SEO report as PDF</span> 
+                                                                                                            </li>
+                                                                                                    <li>
+                                                        <span>Pages scanned</span> 
+                                                         - <b>Up to 50</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Competitor tracking</span> 
+                                                         - <b>Up to 2</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Keyword tracking &amp; optimization</span> 
+                                                         - <b>Up to 5</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Updated report &amp; plan</span> 
+                                                         - <b>Weekly</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Custom SEO Plan</span> 
+                                                         - <b>Limited</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Monthly progress report</span> 
+                                                                                                            </li>
+                                                                                            </ul>
+                                            <div class="package-actions">
+                                                <form action="/cart/order" method="post">
+<input type="hidden" name="token" value="7f8dba7a9bace49a74bdb609ab91dbac7d88f0ca">
+                                                    <input type="hidden" name="pid" value="95">
+                                                    <button type="submit" class="btn btn-lg btn-primary-faded btn-block btn-signup">
+                                                        Signup Now
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </div>
+                                                            <div class="col-lg-4">
+                                    <div class="package">
+                                        <div class="package-header">
+                                            <h4 class="package-title">Pro</h4>                                    
+                                            <div class="package-price"> 
+                                                <div class="price monthly">
+                                                                                                                <div class="price-amount">
+                                $14.99 USD
+                        </div>
+                                                                                                            </div>
+                                            </div>
+                                        </div>
+                                        <div class="package-body">
+                                            <ul class="package-features">
+                                                                                                    <li>
+                                                        <span>Search engine submission</span> 
+                                                                                                            </li>
+                                                                                                    <li>
+                                                        <span>Connect Google Analytics</span> 
+                                                                                                            </li>
+                                                                                                    <li>
+                                                        <span>Download SEO report as PDF</span> 
+                                                                                                            </li>
+                                                                                                    <li>
+                                                        <span>Pages scanned</span> 
+                                                         - <b>Up to 1000</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Competitor tracking</span> 
+                                                         - <b>Up to 4</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Keyword tracking &amp; optimization</span> 
+                                                         - <b>Up to 20</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Updated report &amp; plan</span> 
+                                                         - <b>Daily</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Custom SEO Plan</span> 
+                                                         - <b><span>Complete</span> with step-by-step guide</b>                                                    </li>
+                                                                                                    <li>
+                                                        <span>Monthly progress report</span> 
+                                                                                                            </li>
+                                                                                            </ul>
+                                            <div class="package-actions">
+                                                <form action="/cart/order" method="post">
+<input type="hidden" name="token" value="7f8dba7a9bace49a74bdb609ab91dbac7d88f0ca">
+                                                    <input type="hidden" name="pid" value="96">
+                                                    <button type="submit" class="btn btn-lg btn-primary-faded btn-block btn-signup">
+                                                        Signup Now
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </div>
+                                                        
+                    </div>
+                </div>
+            </div>
+        </div>
+                <div class="site-section">
+            <div class="section-content">
+                <div class="container">
+                    <h2 class="section-title">Our Customers Say</h2>
+                    <p class="section-subtitle">Learn why we are trusted by over 35,000 clients worldwides</p>
+                    <div class="slider testimonials" data-testimonial-slider="">
+                        <div class="content-slider content-slider-initialized content-slider-horizontal" data-slider-container="">
+                            <div class="content-slider-wrapper" data-slider-wrapper="" style="transition-duration: 0ms; transform: translate3d(-1456px, 0px, 0px);"><div class="content-slider-item testimonials-item swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="0">
+                                        <div class="testimonials-desc">
+                                            <p>marketgoo made the complicated simple for me. I never knew where to start with SEO until I started using this service. Literally, I more than doubled my traffic when I started using this.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-1.jpg" alt="Heather Figi">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Heather Figi</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2018/08/30/review-music-for-violinists/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div><div class="content-slider-item testimonials-item swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="1">
+                                        <div class="testimonials-desc">
+                                            <p>Without marketgoo I would never have been able to have my website on the first page of google for all the keywords that are linked to my business, its ease of use and the customer service when I’ve needed help has been first class.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-2.jpg" alt="Ian Glass">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Ian Glass</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2019/10/29/review-ian-glass-fitness/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div><div class="content-slider-item testimonials-item swiper-slide-duplicate" data-swiper-slide-index="2">
+                                        <div class="testimonials-desc">
+                                            <p>Such a simple reliable platform! It’s helped me see where we stand next to our local competitors. Its part of our day to day. The best feature is the keyword tool.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-3.jpg" alt="Simon Saleh">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Simon Saleh</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2019/09/09/review-wanderlust-ironworks/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div><div class="content-slider-item testimonials-item swiper-slide-duplicate content-slider-item-prev" data-swiper-slide-index="3">
+                                        <div class="testimonials-desc">
+                                            <p>marketgoo reports give me everything I need to know for my site’s SEO. I am constantly fine tuning my site to work towards a higher rating. I read various marketgoo reports then immediately work out how to implement recommendations.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-4.jpg" alt="Svein Koningen">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Svein Koningen</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2018/06/24/marketgoo-review-koningen-art/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                    <div class="content-slider-item testimonials-item content-slider-item-active" data-swiper-slide-index="0">
+                                        <div class="testimonials-desc">
+                                            <p>marketgoo made the complicated simple for me. I never knew where to start with SEO until I started using this service. Literally, I more than doubled my traffic when I started using this.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-1.jpg" alt="Heather Figi">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Heather Figi</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2018/08/30/review-music-for-violinists/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                    <div class="content-slider-item testimonials-item content-slider-item-next" data-swiper-slide-index="1">
+                                        <div class="testimonials-desc">
+                                            <p>Without marketgoo I would never have been able to have my website on the first page of google for all the keywords that are linked to my business, its ease of use and the customer service when I’ve needed help has been first class.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-2.jpg" alt="Ian Glass">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Ian Glass</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2019/10/29/review-ian-glass-fitness/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                    <div class="content-slider-item testimonials-item" data-swiper-slide-index="2">
+                                        <div class="testimonials-desc">
+                                            <p>Such a simple reliable platform! It’s helped me see where we stand next to our local competitors. Its part of our day to day. The best feature is the keyword tool.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-3.jpg" alt="Simon Saleh">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Simon Saleh</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2019/09/09/review-wanderlust-ironworks/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                    <div class="content-slider-item testimonials-item swiper-slide-duplicate-prev" data-swiper-slide-index="3">
+                                        <div class="testimonials-desc">
+                                            <p>marketgoo reports give me everything I need to know for my site’s SEO. I am constantly fine tuning my site to work towards a higher rating. I read various marketgoo reports then immediately work out how to implement recommendations.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-4.jpg" alt="Svein Koningen">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Svein Koningen</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2018/06/24/marketgoo-review-koningen-art/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                            <div class="content-slider-item testimonials-item swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="0">
+                                        <div class="testimonials-desc">
+                                            <p>marketgoo made the complicated simple for me. I never knew where to start with SEO until I started using this service. Literally, I more than doubled my traffic when I started using this.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-1.jpg" alt="Heather Figi">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Heather Figi</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2018/08/30/review-music-for-violinists/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div><div class="content-slider-item testimonials-item swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="1">
+                                        <div class="testimonials-desc">
+                                            <p>Without marketgoo I would never have been able to have my website on the first page of google for all the keywords that are linked to my business, its ease of use and the customer service when I’ve needed help has been first class.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-2.jpg" alt="Ian Glass">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Ian Glass</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2019/10/29/review-ian-glass-fitness/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div><div class="content-slider-item testimonials-item swiper-slide-duplicate" data-swiper-slide-index="2">
+                                        <div class="testimonials-desc">
+                                            <p>Such a simple reliable platform! It’s helped me see where we stand next to our local competitors. Its part of our day to day. The best feature is the keyword tool.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-3.jpg" alt="Simon Saleh">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Simon Saleh</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2019/09/09/review-wanderlust-ironworks/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div><div class="content-slider-item testimonials-item swiper-slide-duplicate" data-swiper-slide-index="3">
+                                        <div class="testimonials-desc">
+                                            <p>marketgoo reports give me everything I need to know for my site’s SEO. I am constantly fine tuning my site to work towards a higher rating. I read various marketgoo reports then immediately work out how to implement recommendations.</p>
+                                        </div>
+                                        <div class="testimonials-details">
+                                            <div class="testimonials-avatar">
+                                                <img src="/assets/img/marketconnect/marketgoo/user-testimonial-4.jpg" alt="Svein Koningen">
+                                                <span>”</span>
+                                            </div>
+                                            <div class="testimonials-author">
+                                                <span>Svein Koningen</span><br>
+                                                <a href="https://www.marketgoo.com/blog-post/2018/06/24/marketgoo-review-koningen-art/" target="_blank">Read the case study</a>
+                                            </div>
+                                        </div>
+                                    </div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+        <div class="site-section">
+            <div class="container">
+                <h2 class="section-title">FAQs and Support</h2>
+                <div class="section-content m-w-lg m-a">
+                <div class="panel-group panel-group-condensed panel-faq panel-faq" id="accordion">
+                    <div class="panel panel-default panel-accordion panel-faq is-open">
+                            <div class="panel-heading" data-toggle="collapse" data-target="#faq1" aria-expanded="true">
+                                <h4 class="panel-title"><i class="lm lm-plus"></i>Should I choose Lite or Pro?</h4>
+                            </div>
+                            <div id="faq1" class="panel-collapse collapse show" aria-expanded="true" style="" data-parent="#accordion">
+                                <div class="panel-body">
+                                    <p>See a Video comparison of the Plans</p>
+                                    <a href="https://vimeo.com/whmcs/marketgoo-lite-vs-pro" target="_blank">
+                                        <img style="min-width: 50%" src="/assets/img/marketconnect/marketgoo/video-comparison.png">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default panel-accordion panel-faq">
+                            <div class="panel-heading" data-toggle="collapse" data-target="#faq2" aria-expanded="true">
+                                <h4 class="panel-title"><i class="lm lm-plus"></i>Does marketgoo make the recommended changes or do I?</h4>
+                            </div>
+                            <div id="faq2" class="panel-collapse collapse" aria-expanded="true" style="" data-parent="#accordion">
+                                <div class="panel-body">
+                                    <p>marketgoo is a Do-it-Yourself tool, so while we help you with analysing your site and giving recommendations, along with tasks and instructions for your to optimize your site, we don't make these changes for you.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default panel-accordion panel-faq">
+                            <div class="panel-heading" data-toggle="collapse" data-target="#faq3" aria-expanded="true">
+                                <h4 class="panel-title"><i class="lm lm-plus"></i>Why do I need SEO?</h4>
+                            </div>
+                            <div id="faq3" class="panel-collapse collapse" aria-expanded="true" style="" data-parent="#accordion">
+                                <div class="panel-body">
+                                    <p>You work on your SEO in order to improve your site's rankings in search results. This leads to attracting more traffic - and ideally, to convert that traffic into customers and leads.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+
+
+
+
+
+                
+    
+
+    
+
+
+
+    
+    
+
+
+
+
+                        
+    
+            <div class="main-footer">
+                        <div class="footer-bottom">
+                <div class="container">
+                    <div class="footer-copyright">Copyright © 2026 UltaHost. All Rights Reserved.</div>
+                                            <ul class="footer-nav footer-nav-h">
+                                                            <li class="dropdown dropup" data-language-select="">
+                                    <a data-toggle="dropdown" href="">
+                                                                                                                            <span class="language-flag english"></span><span>English</span>
+                                                                                                                            <b class="ls ls-caret"></b>
+                                                                            </a>
+                                                                                <div class="dropdown-menu dropdown-language-search  dropdown-menu-right">
+                                                <input type="hidden" data-language-select-value="" value="English">
+        <input type="hidden" data-language-select-backlink="" value="/index.php?rp=%2Fstore%2Fmarketgoo&amp;">
+        <input type="hidden" data-language-select-lang="" value="Select">
+        <div class="dropdown-header input-group align-center">
+            <i class="input-group-icon lm lm-search"></i>
+            <input class="form-control" placeholder="Search..." type="text" data-language-select-search="">
+        </div>
+        <div class="nav-divider"></div>
+        <div class="dropdown-menu-items has-scroll" data-language-select-list="">
+                    <div class="dropdown-menu-item " data-value="arabic" data-language="العربية">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=arabic">
+                    <span class="language-flag arabic"></span>
+                    <span class="language-text">العربية</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="azerbaijani" data-language="Azerbaijani">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=azerbaijani">
+                    <span class="language-flag azerbaijani"></span>
+                    <span class="language-text">Azerbaijani</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="catalan" data-language="Català">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=catalan">
+                    <span class="language-flag catalan"></span>
+                    <span class="language-text">Català</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="chinese" data-language="中文">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=chinese">
+                    <span class="language-flag chinese"></span>
+                    <span class="language-text">中文</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="croatian" data-language="Hrvatski">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=croatian">
+                    <span class="language-flag croatian"></span>
+                    <span class="language-text">Hrvatski</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="czech" data-language="Čeština">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=czech">
+                    <span class="language-flag czech"></span>
+                    <span class="language-text">Čeština</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="danish" data-language="Dansk">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=danish">
+                    <span class="language-flag danish"></span>
+                    <span class="language-text">Dansk</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="dutch" data-language="Nederlands">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=dutch">
+                    <span class="language-flag dutch"></span>
+                    <span class="language-text">Nederlands</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item active" data-value="english" data-language="English">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=english">
+                    <span class="language-flag english"></span>
+                    <span class="language-text">English</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="estonian" data-language="Estonian">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=estonian">
+                    <span class="language-flag estonian"></span>
+                    <span class="language-text">Estonian</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="farsi" data-language="Persian">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=farsi">
+                    <span class="language-flag farsi"></span>
+                    <span class="language-text">Persian</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="french" data-language="Français">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=french">
+                    <span class="language-flag french"></span>
+                    <span class="language-text">Français</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="german" data-language="Deutsch">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=german">
+                    <span class="language-flag german"></span>
+                    <span class="language-text">Deutsch</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="hebrew" data-language="עברית">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=hebrew">
+                    <span class="language-flag hebrew"></span>
+                    <span class="language-text">עברית</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="hungarian" data-language="Magyar">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=hungarian">
+                    <span class="language-flag hungarian"></span>
+                    <span class="language-text">Magyar</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="italian" data-language="Italiano">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=italian">
+                    <span class="language-flag italian"></span>
+                    <span class="language-text">Italiano</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="macedonian" data-language="Macedonian">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=macedonian">
+                    <span class="language-flag macedonian"></span>
+                    <span class="language-text">Macedonian</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="norwegian" data-language="Norwegian">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=norwegian">
+                    <span class="language-flag norwegian"></span>
+                    <span class="language-text">Norwegian</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="portuguese-br" data-language="Português">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=portuguese-br">
+                    <span class="language-flag portuguese-br"></span>
+                    <span class="language-text">Português</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="portuguese-pt" data-language="Português">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=portuguese-pt">
+                    <span class="language-flag portuguese-pt"></span>
+                    <span class="language-text">Português</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="romanian" data-language="Română">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=romanian">
+                    <span class="language-flag romanian"></span>
+                    <span class="language-text">Română</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="russian" data-language="Русский">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=russian">
+                    <span class="language-flag russian"></span>
+                    <span class="language-text">Русский</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="spanish" data-language="Español">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=spanish">
+                    <span class="language-flag spanish"></span>
+                    <span class="language-text">Español</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="swedish" data-language="Svenska">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=swedish">
+                    <span class="language-flag swedish"></span>
+                    <span class="language-text">Svenska</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="turkish" data-language="Türkçe">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=turkish">
+                    <span class="language-flag turkish"></span>
+                    <span class="language-text">Türkçe</span>
+                </a>
+            </div>
+                    <div class="dropdown-menu-item " data-value="ukranian" data-language="Українська">
+                                                                    <a href="/index.php?rp=%2Fstore%2Fmarketgoo&amp;language=ukranian">
+                    <span class="language-flag ukranian"></span>
+                    <span class="language-text">Українська</span>
+                </a>
+            </div>
+                </div>
+        <div class="dropdown-menu-item dropdown-menu-no-data">
+            <span class="text-info text-large">
+                No Records Found
+            </span>
+        </div>                  
+    </div>
+                                                                                                        </li>
+                                                            <li>
+                                    <a href="#">
+                                                                                    <i class="lm lm-go-top"></i>
+                                                                                                                                                            </a>
+                                                                                                        </li>
+                                                    </ul>
+                                    </div>
+            </div>
+        </div>
+    

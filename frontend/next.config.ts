@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       { source: '/login', destination: '/login.html' },
       { source: '/register', destination: '/register.html' },
       { source: '/register.php', destination: '/register' },
+      { source: '/vds-hosting', destination: '/vds-hosting.html' },
+      { source: '/gaming-hosting', destination: '/gaming-hosting.html' },
+      { source: '/bluestacks-android-vps', destination: '/bluestacks-android-vps.html' },
+      { source: '/crm-hosting', destination: '/crm-hosting.html' },
+      { source: '/social-network-hosting', destination: '/social-network-hosting.html' },
       { source: '/login.php', destination: '/login' },
       {
         source: '/xhr.php',
@@ -26,14 +31,40 @@ const nextConfig: NextConfig = {
         source: '/dashboard/templates/:path*',
         destination: 'https://bill.ultahost.com/templates/:path*',
       },
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*',
-      },
-      {
-        source: '/dashboard/assets/:path*',
-        destination: 'https://bill.ultahost.com/assets/:path*',
-      }
+      // Broken links from audit - fix all 10
+      // 1. Logout route → backend
+      { source: '/api/auth/logout', destination: 'http://localhost:5000/api/auth/logout' },
+      // 2. cart.php → redirect to ultahost.com
+      { source: '/cart.php', destination: 'https://ultahost.com/cart' },
+      { source: '/cart/:path*', destination: 'https://ultahost.com/cart' },
+      // 3. store/* → redirect to ultahost.com
+      { source: '/store/:slug*', destination: 'https://ultahost.com/:slug*' },
+      // 4. domainchecker.php → ultahost domains
+      { source: '/domainchecker.php', destination: 'https://ultahost.com/domains' },
+      // 5. index.php portal home → dashboard
+      { source: '/index.php', destination: '/dashboard' },
+      // 6. account/paymentmethods → dashboard route
+      { source: '/account/paymentmethods', destination: '/dashboard/account/paymentmethods' },
+      // 7. ultahost-assets/index.php → ultahost.com store
+      { source: '/ultahost-assets/index.php', destination: 'https://ultahost.com/store' },
+      // 8. billing/masspay with extra query → still works
+      { source: '/dashboard/billing/masspay', destination: '/dashboard/billing/masspay' },
+      // Support PHP files
+      { source: '/submitticket.php', destination: '/dashboard/tickets/new' },
+      { source: '/supporttickets.php', destination: '/dashboard/tickets' },
+      { source: '/affiliates.php', destination: '/dashboard/affiliates' },
+      { source: '/knowledgebase.php', destination: '/dashboard/kb' },
+      { source: '/announcements.php', destination: '/dashboard/announcements' },
+      { source: '/serverstatus.php', destination: '/dashboard/serverstatus' },
+      { source: '/downloads.php', destination: '/dashboard/downloads' },
+      { source: '/clientarea.php', has: [{ type: 'query', key: 'action', value: 'addfunds' }], destination: '/dashboard/billing/addfunds' },
+      { source: '/clientarea.php', has: [{ type: 'query', key: 'action', value: 'invoices' }], destination: '/dashboard/billing/invoices' },
+      { source: '/clientarea.php', has: [{ type: 'query', key: 'action', value: 'quotes' }], destination: '/dashboard/billing/quotes' },
+      { source: '/clientarea.php', has: [{ type: 'query', key: 'action', value: 'services' }], destination: '/dashboard/services' },
+      { source: '/clientarea.php', has: [{ type: 'query', key: 'action', value: 'domains' }], destination: '/dashboard/domains' },
+      { source: '/clientarea.php', destination: '/dashboard' },
+      { source: '/api/:path*', destination: 'http://localhost:5000/api/:path*' },
+      { source: '/dashboard/assets/:path*', destination: 'https://bill.ultahost.com/assets/:path*' },
     ];
   },
 };
