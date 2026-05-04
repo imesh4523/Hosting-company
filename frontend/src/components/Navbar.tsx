@@ -7,8 +7,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 premium-gradient rounded-xl flex items-center justify-center text-white font-bold text-xl">U</div>
-              <span className="text-2xl font-bold text-slate-900">Ulta<span className="text-primary">host</span></span>
+              <img src="/custom-logo.png" alt="ultahost" style={{ height: '36px', display: 'block' }} />
             </Link>
             
             <div className="hidden md:flex items-center gap-6">
@@ -22,7 +21,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             <button className="hidden lg:flex items-center gap-2 px-6 py-2.5 rounded-full border border-primary/20 text-primary font-semibold hover:bg-primary/5 transition-all">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              Chat with UltaAI
+              Chat with <img src="/youuhost-ai.png" alt="youuhostAI" style={{ height: '18px', verticalAlign: 'middle' }} />
             </button>
             <Link href="/login" className="px-6 py-2.5 rounded-full bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20">
               Client Area

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+export const dynamic = 'force-dynamic';
+
 const FRAGMENTS_DIR = path.join(process.cwd(), '..', 'backend', 'fragments');
 
 const fragmentMap: Record<string, string> = {
@@ -137,7 +139,7 @@ function fixLinks(html: string): string {
   html = html.replace(/href="\/store\/marketgoo"/g,           'href="/dashboard/security/seo"');
   html = html.replace(/href="\/store\/sitelock"/g,            'href="/dashboard/security/malware"');
   html = html.replace(/href="\/clientarea\/ssl-certificates\/manage"/g, 'href="/dashboard/security/manage-ssl"');
-  html = html.replace(/href="\/store\/([^"]+)"/g,            'href="https://ultahost.com/$1"');
+  html = html.replace(/href="\/store\/([^"]+)"/g,            'href="/store/$1"');
   html = html.replace(/href="\/ultahost-assets\/index\.php[^"]*"/g, 'href="https://ultahost.com/store"');
 
   // ── 11. Masspay extra params ──────────────────────────────────────────────
@@ -257,10 +259,18 @@ function fixLinks(html: string): string {
         font-size: 14px;
       }
       .hdcProSide .collapse {
-        display: none;
+        display: none !important;
+        height: 0 !important;
+        overflow: hidden !important;
       }
-      .hdcProSide .collapse.show, .hdcProSide .collapse.in {
+      .hdcProSide .collapse.show,
+      .hdcProSide .collapse.in {
         display: block !important;
+        height: auto !important;
+        max-height: 2000px !important;
+        overflow: visible !important;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       .hdcProSide ul.collapse {
         padding-left: 0;
@@ -271,25 +281,38 @@ function fixLinks(html: string): string {
         list-style: none;
       }
       .hdcProSide ul.collapse li a {
-        display: block;
-        padding: 10px 20px 10px 55px;
+        display: flex;
+        align-items: center;
+        padding: 8px 10px 8px 40px;
         color: #6c757d;
-        font-size: 14px;
+        font-size: 13px;
         text-decoration: none;
         transition: all 0.2s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .hdcProSide ul.collapse li a:hover {
         color: #4a6cf7;
         background: #f0f2f5;
       }
-      .hdcProSide ul.collapse li a i {
-        background: none !important;
-        color: inherit !important;
-        width: auto !important;
+      .hdcProSide ul.collapse li a i,
+      .hdcProSide ul.collapse > li > a > i {
+        background: transparent !important;
+        background-color: transparent !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        width: 16px !important;
         height: auto !important;
+        min-width: 16px !important;
         line-height: normal !important;
-        margin-right: 8px !important;
-        font-size: 12px !important;
+        margin-right: 6px !important;
+        padding: 0 !important;
+        font-size: 13px !important;
+        color: #6c757d !important;
+        display: inline-block !important;
+        text-align: center !important;
+        flex-shrink: 0 !important;
       }
       /* Ensure chevrons are visible if present */
       .hdcProSide .list-group-item[data-toggle="collapse"]::after {
@@ -358,6 +381,7 @@ export async function GET(request: NextRequest) {
   // ── fullpage: sidebar + page content ─────────────────────────────────────
   if (name === 'fullpage') {
     const pageName = searchParams.get('page') || 'main';
+    const slug = searchParams.get('slug');
     const navPath = path.join(FRAGMENTS_DIR, 'nav.html');
     const pageFile = fragmentMap[pageName];
 
@@ -372,7 +396,159 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: `Page file '${pageFile}' not found` }, { status: 404 });
     }
     const navHtml = fs.readFileSync(navPath, 'utf8');
-    const pageHtml = fs.readFileSync(pageFilePath, 'utf8');
+    let pageHtml = fs.readFileSync(pageFilePath, 'utf8');
+
+    // Look for a local store page
+    if (slug && pageName === 'services' && pageFile === 'services.html') {
+      // Try exact slug first, then fall back to linux variant for generic category slugs
+      const fallbackMap: Record<string, string> = {
+        'vps-hosting':         'linux-vps-hosting',
+        'vds-hosting':         'linux-vds-hosting',
+        'dedicated-hosting':   'dedicated-hosting',
+        'reseller-hosting':    'linux-reseller-hosting',
+        'game-servers':        'minecraft-game-server',
+      };
+      const lookupSlug = slug || '';
+      const exactPath = path.join(FRAGMENTS_DIR, `store-${lookupSlug}.html`);
+      const fallbackSlug = fallbackMap[lookupSlug];
+      const fallbackPath = fallbackSlug ? path.join(FRAGMENTS_DIR, `store-${fallbackSlug}.html`) : null;
+
+      if (fs.existsSync(exactPath)) {
+        pageHtml = fs.readFileSync(exactPath, 'utf8');
+      } else if (fallbackPath && fs.existsSync(fallbackPath)) {
+        pageHtml = fs.readFileSync(fallbackPath, 'utf8');
+      }
+    }
+
+    // Look for a local cart configuration page
+    if (pageName === 'cart_configure' && slug && searchParams.get('subSlug')) {
+      const subSlug = searchParams.get('subSlug');
+      const cartHtmlPath = path.join(FRAGMENTS_DIR, `cart-configure-${subSlug}.html`);
+      if (fs.existsSync(cartHtmlPath)) {
+        pageHtml = fs.readFileSync(cartHtmlPath, 'utf8');
+      }
+    }
+
+    if (pageName === 'cart_checkout') {
+      let product = searchParams.get('product');
+      let price = searchParams.get('price') || '20.50';
+      const isEmpty = searchParams.get('empty') === '1' || !product;
+      
+      if (!product) product = 'MacOS VPS Hosting'; // Fallback name just in case it's used elsewhere
+      
+      if (isEmpty) price = '0.00';
+      const gatewayCharge = isEmpty ? '0.00' : '0.62';
+      const total = isEmpty ? '0.00' : (parseFloat(price) + 0.62).toFixed(2);
+      
+      pageHtml = `
+      <div class="main-header">
+          <div class="container">
+              <h1 class="main-header-title" style="font-size:36px; font-weight:bold; margin-bottom:30px;">Review & Checkout</h1>
+          </div>
+      </div>
+      <div class="main-body">
+          <div class="container">
+              <div class="main-content">
+                  <div class="row">
+                      <div class="col-md-8">
+                          ${isEmpty ? `
+                          <div class="panel panel-default text-center" style="border-radius:10px; border:1px solid #eee; padding:50px 20px; margin-bottom:30px;">
+                              <i class="fas fa-shopping-cart" style="font-size:64px; color:#ddd; margin-bottom:20px;"></i>
+                              <h2 style="font-size:24px; font-weight:bold; color:#333; margin-top:0; margin-bottom:10px;">Your Cart is Empty</h2>
+                              <p style="color:#666; font-size:16px; margin-bottom:30px;">You have no items in your shopping cart.</p>
+                              <a href="/store/vps-hosting" class="btn btn-primary btn-lg" style="background:#555bff; border:none; border-radius:25px; padding:12px 30px; font-weight:bold;">Return to Store</a>
+                          </div>
+                          ` : `
+                          <div class="panel panel-default" style="border-radius:10px; border:1px solid #eee; padding:0; overflow:hidden; margin-bottom:30px;">
+                              <table class="table" style="margin:0;">
+                                  <thead style="background:#f8f9fa;">
+                                      <tr>
+                                          <th style="padding:15px 20px; font-weight:normal; color:#666; border-bottom:1px solid #eee;">Product/Options</th>
+                                          <th style="padding:15px 20px; font-weight:normal; color:#666; border-bottom:1px solid #eee; text-align:right;">Price/Cycle</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr>
+                                          <td style="padding:25px 20px; border-bottom:1px solid #eee;">
+                                              <strong style="font-size:16px; display:block; margin-bottom:5px;">${product}</strong>
+                                              <a href="#" style="color:#555bff; font-size:14px; text-decoration:none;">srv560484038.host</a>
+                                              
+                                              <div style="margin-top:15px; font-size:13px; color:#666; line-height:1.8;">
+                                                  Server Location: <strong style="color:#333;">Frankfurt, Germany</strong><br/>
+                                                  Guest OS Version: <strong style="color:#333;">Ventura</strong><br/>
+                                                  Additional Disk: <strong style="color:#333;">0 x $0.11USD</strong><br/>
+                                                  Additional IPv4 Addresses: <strong style="color:#333;">0 x $5.00USD</strong><br/>
+                                                  Additional CPU: <strong style="color:#333;">0 x $10.00USD</strong><br/>
+                                                  Guest OS Family: <strong style="color:#333;">macOS</strong>
+                                              </div>
+                                          </td>
+                                          <td style="padding:25px 20px; border-bottom:1px solid #eee; text-align:right;">
+                                              <div style="display:inline-block; border:1px solid #ddd; border-radius:20px; padding:8px 15px; font-weight:bold;">$${price}USD/mo ▼</div>
+                                              <div style="margin-top:15px; color:#999; font-size:18px;">
+                                                  <a href="/store/vps-hosting" style="color:inherit; text-decoration:none;"><i class="fas fa-pencil-alt" style="margin-right:15px; cursor:pointer;"></i></a>
+                                                  <a href="/store/checkout?empty=1" style="color:inherit; text-decoration:none;"><i class="fas fa-trash" style="cursor:pointer;"></i></a>
+                                              </div>
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                              </table>
+                              <div style="padding:15px 20px; background:#fff; display:flex; justify-content:space-between; align-items:center;">
+                                  <a href="/store/vps-hosting" class="btn btn-default" style="border-radius:20px; padding:8px 20px; border:1px solid #ddd; color:#333; text-decoration:none; font-weight:500;">← Continue Shopping</a>
+                                  <a href="/store/checkout?empty=1" class="btn btn-default" style="border-radius:20px; padding:8px 20px; border:1px solid #ddd; color:#333; text-decoration:none; font-weight:500;"><i class="fas fa-trash"></i> Empty Cart</a>
+                              </div>
+                          </div>
+                          
+                          <h3 style="margin-top:30px; font-size:22px; font-weight:normal; margin-bottom:20px;">Promotion</h3>
+                          <div style="background:#555bff; border-radius:10px; padding:25px; display:flex; gap:15px; align-items:center;">
+                              <div style="flex:1; background:white; border-radius:5px; display:flex; align-items:center; padding:0 15px;">
+                                  <i class="fas fa-tag" style="color:#555bff; margin-right:10px;"></i>
+                                  <input type="text" placeholder="Enter promo code if you have one" style="border:none; outline:none; width:100%; padding:15px 0;">
+                              </div>
+                              <button style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:5px; padding:15px 25px; font-weight:bold; cursor:pointer;">Validate Code</button>
+                          </div>
+                          `}
+                      </div>
+                      
+                      <div class="col-md-4">
+                          <div class="panel panel-default" style="background:#fafbfc; border:1px solid #eee; border-radius:10px; padding:30px; position:sticky; top:20px;">
+                              <h3 style="margin-top:0; font-size:24px; margin-bottom:30px; font-weight:normal;">Order Summary</h3>
+                              <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#666; font-size:14px;">
+                                  <span>Subtotal</span>
+                                  <span>$${price}USD</span>
+                              </div>
+                              <hr style="border-top:1px solid #eaeaea; margin:15px 0;">
+                              <div style="margin-bottom:15px; color:#666; font-size:14px;">Totals</div>
+                              <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#666; font-size:14px;">
+                                  <span>Monthly</span>
+                                  <span>$${price}USD</span>
+                              </div>
+                              <hr style="border-top:1px solid #eaeaea; margin:15px 0;">
+                              <div style="display:flex; justify-content:space-between; margin-bottom:30px; color:#666; font-size:14px;">
+                                  <span>Gateway Charge</span>
+                                  <span>$${gatewayCharge}USD</span>
+                              </div>
+                              <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:flex-end;">
+                                  <span style="color:#666; font-size:14px; padding-bottom:5px;">Total Due Today</span>
+                                  <strong style="font-size:32px; color:#111;">$${total} <span style="font-size:16px;">USD</span></strong>
+                              </div>
+                              ${isEmpty ? `
+                              <button disabled class="btn btn-block" style="background:#ccc; border:none; border-radius:8px; padding:15px; font-weight:bold; font-size:16px; margin-top:20px; width:100%; color:white; cursor:not-allowed;">
+                                  ➔ Checkout
+                              </button>
+                              ` : `
+                              <a href="/login" class="btn btn-primary btn-block" style="background:#555bff; border:none; border-radius:8px; padding:15px; font-weight:bold; font-size:16px; margin-top:20px; display:flex; justify-content:center; align-items:center; text-decoration:none; color:white;">
+                                  ➔ Checkout
+                              </a>
+                              `}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      `;
+    }
+
     const combined = buildFullPage(navHtml, pageHtml);
     return new NextResponse(combined, { headers: { 'Content-Type': 'text/html' } });
   }

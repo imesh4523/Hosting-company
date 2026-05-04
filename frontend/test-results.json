@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Services",
+    "hrefFound": "/dashboard/services",
+    "finalUrl": "http://localhost:3000/dashboard/services",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "contentStatus": "Loaded successfully",
+    "errors": [
+      "None"
+    ]
+  },
+  {
+    "name": "My Invoices",
+    "hrefFound": "/dashboard/billing/invoices",
+    "finalUrl": "http://localhost:3000/dashboard/billing/invoices",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "contentStatus": "Loaded successfully",
+    "errors": [
+      "None"
+    ]
+  },
+  {
+    "name": "My Quotes",
+    "hrefFound": "/dashboard/billing/quotes",
+    "finalUrl": "http://localhost:3000/dashboard/billing/quotes",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "contentStatus": "Loaded successfully",
+    "errors": [
+      "None"
+    ]
+  },
+  {
+    "name": "Mass Payment",
+    "hrefFound": "/dashboard/billing/masspay",
+    "finalUrl": "http://localhost:3000/dashboard/billing/masspay",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "contentStatus": "Loaded successfully",
+    "errors": [
+      "None"
+    ]
+  },
+  {
+    "name": "Manage Credit Card",
+    "hrefFound": "/dashboard/account/paymentmethods",
+    "finalUrl": "http://localhost:3000/dashboard/account/paymentmethods",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "contentStatus": "Loaded successfully",
+    "errors": [
+      "None"
+    ]
+  },
+  {
+    "name": "Add Funds",
+    "hrefFound": "/dashboard/billing/addfunds",
+    "finalUrl": "http://localhost:3000/dashboard/billing/addfunds",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "contentStatus": "Loaded successfully",
+    "errors": [
+      "None"
+    ]
+  },
+  {
+    "name": "Website & Security",
+    "selector": "a[href*=\"/dashboard/website-security\"]",
+    "href": "Not Found in DOM",
+    "status": "Failed",
+    "finalUrl": "N/A",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "errors": [
+      "Link element not found"
+    ]
+  },
+  {
+    "name": "Support",
+    "selector": "a[href*=\"/dashboard/support\"]",
+    "href": "Not Found in DOM",
+    "status": "Failed",
+    "finalUrl": "N/A",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "errors": [
+      "Link element not found"
+    ]
+  },
+  {
+    "name": "Affiliates",
+    "selector": "a[href*=\"/dashboard/affiliates\"]",
+    "href": "Not Found in DOM",
+    "status": "Failed",
+    "finalUrl": "N/A",
+    "hasHash": false,
+    "redirectsToOriginal": false,
+    "errors": [
+      "Link element not found"
+    ]
+  }
+]

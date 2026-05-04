@@ -5,6 +5,8 @@ import LoadingScreen from './LoadingScreen';
 
 interface FragmentPageProps {
   fragmentName: string;
+  slug?: string;
+  subSlug?: string;
 }
 
 // Map paths that come raw from fragment HTML to their correct /dashboard/* equivalents
@@ -30,10 +32,11 @@ function isInternalLink(href: string): boolean {
   if (href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return false;
   if (href.startsWith('/dashboard') || href.startsWith('/login') || href.startsWith('/register')) return true;
   if (href.startsWith('/account') || href.startsWith('/user')) return true;
+  if (href.startsWith('/store/')) return true;  // Store sub-pages
   return false;
 }
 
-export default function FragmentPage({ fragmentName }: FragmentPageProps) {
+export default function FragmentPage({ fragmentName, slug, subSlug }: FragmentPageProps) {
   const router = useRouter();
   const [html, setHtml] = useState('');
   const [loaded, setLoaded] = useState(false);
@@ -41,7 +44,15 @@ export default function FragmentPage({ fragmentName }: FragmentPageProps) {
   // Load HTML fragment
   useEffect(() => {
     setLoaded(false);
-    fetch(`/api/fragment?name=fullpage&page=${fragmentName}`)
+    const query = new URLSearchParams({ name: 'fullpage', page: fragmentName, t: String(Date.now()) });
+    if (slug) query.append('slug', slug);
+    if (subSlug) query.append('subSlug', subSlug);
+    
+    // Pass any additional query parameters (like product and price for checkout)
+    const currentParams = new URLSearchParams(window.location.search);
+    currentParams.forEach((val, key) => query.append(key, val));
+
+    fetch(`/api/fragment?${query.toString()}`, { cache: 'no-store' })
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.text();
@@ -54,7 +65,7 @@ export default function FragmentPage({ fragmentName }: FragmentPageProps) {
         setHtml(`<div style="padding:40px;color:red;font-family:sans-serif">Failed to load content. (${err.message})</div>`);
         setLoaded(true);
       });
-  }, [fragmentName]);
+  }, [fragmentName, slug]);
 
   // Click interceptor — runs whenever html changes (so new DOM nodes are covered)
   const handleClick = useCallback((e: MouseEvent) => {
@@ -63,6 +74,16 @@ export default function FragmentPage({ fragmentName }: FragmentPageProps) {
     if (!anchor) return;
 
     const href = anchor.getAttribute('href');
+
+    // 🔍 DEBUG — open Chrome DevTools Console to see this
+    console.log('[CLICK]', {
+      targetTag:   (e.target as HTMLElement).tagName,
+      targetText:  (e.target as HTMLElement).innerText?.slice(0, 40),
+      anchorText:  anchor.innerText?.slice(0, 40),
+      href,
+      isInternal:  isInternalLink(href || ''),
+    });
+
     if (!href || href === '#' || href === '') return;
 
     // Let logout go through naturally
@@ -74,6 +95,7 @@ export default function FragmentPage({ fragmentName }: FragmentPageProps) {
     if (isInternalLink(href)) {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();  // prevent other capture listeners interfering
 
       // Strip hash
       let cleanHref = href.split('#')[0];
@@ -84,6 +106,8 @@ export default function FragmentPage({ fragmentName }: FragmentPageProps) {
       const finalHref = remapped || cleanHref;
 
       if (finalHref && finalHref !== window.location.pathname) {
+        // Fallback to native browser navigation to absolutely guarantee the page updates
+        // This completely avoids any Next.js client caching or state synchronization bugs.
         window.location.href = finalHref;
       }
     }

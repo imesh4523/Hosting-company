@@ -78,6 +78,9 @@ function LoginContent() {
   return (
     <main className="login-section">
       <div className="login-form-card">
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <img src="/custom-logo.png" alt="ultahost" style={{ height: '45px', margin: '0 auto' }} />
+        </div>
         <h2 className="form-title">Secure Client Login</h2>
 
         {error && (
@@ -173,7 +176,7 @@ function LoginContent() {
         )}
 
         <div style={{ textAlign: 'center', marginTop: '30px', fontSize: '14px', color: '#666' }}>
-          New to UltraHost?{' '}
+          New to <img src="/custom-logo.png" alt="ultahost" style={{ height: '14px', verticalAlign: 'middle', display: 'inline-block' }} /> ?{' '}
           <Link href="/register" style={{ color: '#3B82F6', fontWeight: 600, textDecoration: 'none' }}>
             Create Account
           </Link>
