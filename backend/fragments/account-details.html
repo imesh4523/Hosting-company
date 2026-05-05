@@ -2021,13 +2021,13 @@ function showToast(type, msg) {
 
 async function loadProfile() {
     const token = getToken();
-    if (!token) { window.top.location.href = '/login'; return; }
+    /* auth removed */
 
     try {
         const res = await fetch(`${API_BASE}/api/user/profile`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!res.ok) { window.top.location.href = '/login'; return; }
+        /* auth removed */
         const data = await res.json();
 
         document.getElementById('firstName').value = data.firstName || '';

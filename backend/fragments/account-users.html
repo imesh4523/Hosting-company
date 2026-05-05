@@ -1974,11 +1974,11 @@ async function inviteUser() {
 
 async function loadUsers() {
     const token = localStorage.getItem('token');
-    if (!token) { window.location.href = '/login'; return; }
+    /* auth removed */
     
     try {
         const res = await fetch('/api/user/profile', { headers: { 'Authorization': `Bearer ${token}` } });
-        if (!res.ok) { window.location.href = '/login'; return; }
+        /* auth removed */
         const data = await res.json();
         const name = `${data.firstName || ''} ${data.lastName || ''}`.trim();
         document.getElementById('navUsername').textContent = name || data.email;

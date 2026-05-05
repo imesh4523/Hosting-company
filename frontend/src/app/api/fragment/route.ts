@@ -20,9 +20,10 @@ const fragmentMap: Record<string, string> = {
   'domains': 'domains.html',
   'vps': 'services.html',
   // Support
+  'support': 'support.html',
   'tickets': 'tickets.html',
-  'support': 'tickets.html',
   'knowledgebase': 'knowledgebase.html',
+  'kb': 'knowledgebase.html',
   // Other main nav
   'affiliates': 'affiliates.html',
   'announcements': 'announcements.html',
@@ -30,7 +31,7 @@ const fragmentMap: Record<string, string> = {
   'downloads': 'downloads.html',
   // Security sub-pages
   'security': 'security.html',
-  'account_security': 'security.html',
+  'account_security': 'account-security.html',
   'ssl_certificates': 'ssl-certificates.html',
   'website_backup': 'website-backup.html',
   'seo_tools': 'seo-tools.html',
@@ -45,25 +46,23 @@ const fragmentMap: Record<string, string> = {
   // User pages
   'user_profile': 'account-details.html',
   'user_password': 'user-password.html',
-  // Support
-  'support': 'support.html',
-  'knowledgebase': 'knowledgebase.html',
-  // Network status
-  'serverstatus': 'network-status.html',
-  'announcements': 'announcements.html',
   // Cart
+  'cart': 'cart-checkout.html',
   'cart_configure': 'cart-configure.html',
   'cart_checkout': 'cart-checkout.html',
   // Tools
   'dns_manager': 'dns-manager.html',
+  'dns': 'dns-manager.html',
   'resolution_center': 'resolution-center.html',
+  'resolution': 'resolution-center.html',
   // Nav
   'nav': 'nav.html',
-  // Store / affiliated / website-security → show announcements as placeholder
+  // Store
   'store': 'announcements.html',
   'affiliated': 'affiliates.html',
   'website_security_page': 'website-security.html',
 };
+
 
 // Country name → ISO2 code for flagcdn.com
 const FLAG_MAP: Record<string, string> = {
