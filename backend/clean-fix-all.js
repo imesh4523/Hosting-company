@@ -21,7 +21,7 @@ let frag = fs.readFileSync(outputPath, 'utf8');
 
 // Remove absolute URLs that were incorrectly added before
 frag = frag.replace(/http:\/\/localhost:3000/g, '');
-frag = frag.replace(/https:\/\/bill\.ultahost\.com/g, '');
+frag = frag.replace(/https:\/\/bill\.youuhost\.com/g, '');
 
 // Fix protocol-relative URLs like //dashboard -> /dashboard
 frag = frag.replace(/href="\/\/dashboard/g, 'href="/dashboard');
@@ -57,7 +57,7 @@ const phpMappings = [
 ];
 phpMappings.forEach(([from, to]) => { frag = frag.replace(from, to); });
 
-// Fix store links -> redirect to ultahost.com store
+// Fix store links -> redirect to youuhost.com store
 const storeLinks = [
     'ssl-certificaties', 'codeguard', 'marketgoo', 'sitelock', 'ultasecurity',
     'shared-hosting', 'windows-shared-hosting', 'linux-vps-hosting', 'linux-vds-hosting',
@@ -67,12 +67,12 @@ const storeLinks = [
 ];
 storeLinks.forEach(slug => {
     const typoFixed = slug.replace('ssl-certificaties', 'ssl-certificates');
-    frag = frag.replace(new RegExp(`href="/store/${slug}"`, 'g'), `href="https://ultahost.com/${typoFixed}"`);
+    frag = frag.replace(new RegExp(`href="/store/${slug}"`, 'g'), `href="https://youuhost.com/${typoFixed}"`);
 });
 
-// Fix cart.php links -> redirect to ultahost.com
-frag = frag.replace(/href="cart\.php[^"]*"/g, 'href="https://ultahost.com/cart"');
-frag = frag.replace(/href="\/cart[^"]*"/g, 'href="https://ultahost.com/cart"');
+// Fix cart.php links -> redirect to youuhost.com
+frag = frag.replace(/href="cart\.php[^"]*"/g, 'href="https://youuhost.com/cart"');
+frag = frag.replace(/href="\/cart[^"]*"/g, 'href="https://youuhost.com/cart"');
 
 // Fix index.php module links
 frag = frag.replace(/href="index\.php\?m=DNSManager3"/g, 'href="/dashboard/domains/dns"');
@@ -82,7 +82,7 @@ frag = frag.replace(/href="index\.php\?m=([^"]+)"/g, 'href="/dashboard/modules/$
 frag = frag.replace(/href="\/account\/paymentmethods"/g, 'href="/dashboard/account/paymentmethods"');
 
 // Fix /clientarea/ssl-certificates/manage
-frag = frag.replace(/href="\/clientarea\/ssl-certificates\/manage"/g, 'href="https://ultahost.com/ssl-certificates"');
+frag = frag.replace(/href="\/clientarea\/ssl-certificates\/manage"/g, 'href="https://youuhost.com/ssl-certificates"');
 
 // Fix logout
 frag = frag.replace(/href="\/logout\.php"/g, 'href="/api/auth/logout"');

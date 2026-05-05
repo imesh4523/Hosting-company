@@ -1,11 +1,11 @@
-# UltaHost VPS Reseller Platform
+# youuhost VPS Reseller Platform
 
 A production-ready VPS Reseller platform built with Next.js 14, Node.js, and DigitalOcean API.
 
 ## 🚀 Key Features
 
 - **Multi-Account DO Management**: Load balance VPS creation across multiple DigitalOcean accounts.
-- **Premium UI/UX**: UltaHost-inspired design with dark/light modes and glassmorphism.
+- **Premium UI/UX**: youuhost-inspired design with dark/light modes and glassmorphism.
 - **Automated Failover**: Heartbeat monitor that auto-replaces failed VPS instances.
 - **Fraud Detection**: Score-based system using IPQualityScore and FingerprintJS.
 - **Real-time Metrics**: Live CPU, RAM, and Disk usage monitoring.

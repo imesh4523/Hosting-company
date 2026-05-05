@@ -19,13 +19,13 @@ function download(url, dest) {
             }
             response.pipe(file);
             file.on('finish', () => { file.close(); console.log(`Downloaded: ${url}`); resolve(); });
-        }).on('error', (err) => { fs.unlink(dest, () => {}); reject(err); });
+        }).on('error', (err) => { fs.unlink(dest, () => { }); reject(err); });
         req.setTimeout(15000, () => { req.destroy(); reject(new Error('Timeout')); });
     });
 }
 
-const base = 'https://bill.ultahost.com';
-const localBase = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\frontend\\public\\ultahost-assets';
+const base = 'https://bill.youuhost.com';
+const localBase = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\frontend\\public\\youuhost-assets';
 
 const assets = [
     '/templates/lagom2/assets/fonts/lagom-medium-icons.woff',

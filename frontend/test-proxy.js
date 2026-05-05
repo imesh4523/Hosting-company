@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-fetch('https://bill.ultahost.com/store/macos-vds-hosting')
+fetch('https://bill.youuhost.com/store/macos-vds-hosting')
   .then(r => r.text())
   .then(html => {
     fs.writeFileSync('proxy-test.html', html);

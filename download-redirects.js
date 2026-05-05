@@ -53,8 +53,8 @@ function processFiles() {
         const dest = path.join(publicDir, p);
         const dir = path.dirname(dest);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-        
-        const url = 'https://ultahost.com' + p;
+
+        const url = 'https://youuhost.com' + p;
         downloadFile(url, dest).then(() => {
             console.log(`Downloaded ${current}/${missingArr.length}: ${p}`);
             next();
@@ -63,7 +63,7 @@ function processFiles() {
             next();
         });
     }
-    
+
     // 5 concurrent downloads
     for (let i = 0; i < 5; i++) next();
 }

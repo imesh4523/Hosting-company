@@ -7,27 +7,27 @@ import path from 'path';
         const browserURL = 'http://127.0.0.1:9222';
         const browser = await puppeteer.connect({ browserURL });
         const pages = await browser.pages();
-        
+
         let targetPage = null;
         for (const p of pages) {
-            if (p.url().includes('bill.ultahost.com')) {
+            if (p.url().includes('bill.youuhost.com')) {
                 targetPage = p;
                 break;
             }
         }
-        
+
         if (!targetPage) {
-            console.log('Could not find Ultahost page. Please make sure it is open in Chrome.');
+            console.log('Could not find youuhost page. Please make sure it is open in Chrome.');
             await browser.disconnect();
             return;
         }
 
         const securityPages = [
-            { name: 'ssl-certificates', url: 'https://bill.ultahost.com/index.php?rp=/store/ssl-certificates' },
-            { name: 'website-backup', url: 'https://bill.ultahost.com/index.php?rp=/store/codeguard' },
-            { name: 'seo-tools', url: 'https://bill.ultahost.com/index.php?rp=/store/marketgoo' },
-            { name: 'website-security', url: 'https://bill.ultahost.com/index.php?rp=/store/sitelock' },
-            { name: 'manage-ssl', url: 'https://bill.ultahost.com/index.php?rp=/clientarea/ssl-certificates/manage' }
+            { name: 'ssl-certificates', url: 'https://bill.youuhost.com/index.php?rp=/store/ssl-certificates' },
+            { name: 'website-backup', url: 'https://bill.youuhost.com/index.php?rp=/store/codeguard' },
+            { name: 'seo-tools', url: 'https://bill.youuhost.com/index.php?rp=/store/marketgoo' },
+            { name: 'website-security', url: 'https://bill.youuhost.com/index.php?rp=/store/sitelock' },
+            { name: 'manage-ssl', url: 'https://bill.youuhost.com/index.php?rp=/clientarea/ssl-certificates/manage' }
         ];
 
         const outputDir = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\backend\\fragments';

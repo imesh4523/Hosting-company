@@ -15,7 +15,7 @@ const linksToTest = [
 (async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  
+
   await page.evaluateOnNewDocument(() => {
     localStorage.setItem('token', 'fake-token-123');
   });
@@ -30,7 +30,7 @@ const linksToTest = [
     let errors = [];
 
     await page.goto('http://localhost:3000/dashboard', { waitUntil: 'networkidle2' });
-    
+
     page.removeAllListeners('console');
     page.on('console', msg => {
       if (msg.type() === 'error') errors.push(msg.text());
@@ -53,12 +53,12 @@ const linksToTest = [
       await page.evaluate((sel) => {
         document.querySelector(sel).click();
       }, link.selector);
-      
+
       await new Promise(r => setTimeout(r, 2000)); // Wait for Next.js navigation
 
       finalUrl = page.url();
-      redirectsToOriginal = finalUrl.includes('ultahost.com');
-      
+      redirectsToOriginal = finalUrl.includes('youuhost.com');
+
       const title = await page.title();
       pageContent = title.includes('404') ? '404 Page Not Found' : 'Loaded successfully';
 
@@ -78,7 +78,7 @@ const linksToTest = [
         hrefFound: 'Error',
         finalUrl: page.url(),
         hasHash: false,
-        redirectsToOriginal: page.url().includes('ultahost.com'),
+        redirectsToOriginal: page.url().includes('youuhost.com'),
         contentStatus: 'Crashed/Timeout',
         errors: [e.message]
       });

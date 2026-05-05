@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  CheckCircle2, 
-  Search, 
-  ArrowRight, 
-  Server, 
-  Zap, 
-  RefreshCw, 
-  Circle, 
-  Shield, 
-  Code2, 
-  Terminal, 
+import {
+  CheckCircle2,
+  Search,
+  ArrowRight,
+  Server,
+  Zap,
+  RefreshCw,
+  Circle,
+  Shield,
+  Code2,
+  Terminal,
   Check,
   ChevronRight,
   ExternalLink,
@@ -84,8 +84,8 @@ const AutoDeployCard = () => {
       transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
     >
       <div className="relative rounded-2xl p-[1.5px] overflow-hidden group shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)]">
-        <div 
-          className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)] animate-spin opacity-80" 
+        <div
+          className="absolute inset-[-100%] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)] animate-spin opacity-80"
           style={{ animationDuration: '4s' }}
         ></div>
         <div className="relative bg-white/95 backdrop-blur-xl rounded-[15px] p-5 h-full">
@@ -110,7 +110,7 @@ const AutoDeployCard = () => {
               <span className="text-indigo-600">{progress}%</span>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-              <motion.div 
+              <motion.div
                 className="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 h-full rounded-full"
                 animate={{ width: `${progress}%` }}
                 transition={{ type: "spring", bounce: 0, duration: 0.2 }}
@@ -141,10 +141,10 @@ const AutoDeployCard = () => {
 // Component: Live Deploy Stats
 const LiveDeployStatsCard = () => {
   const [deploys, setDeploys] = useState([
-    { id: 1, name: 'UltaCore', branch: 'main', status: 'success', time: '2s ago', icon: <Zap size={14}/>, color: 'text-amber-500' },
-    { id: 2, name: 'GitHub', branch: 'push detected', status: 'deploying', time: 'starting...', icon: <GithubIcon size={14}/>, color: 'text-slate-900' },
-    { id: 3, name: 'Frontend', branch: 'production', status: 'success', time: '45s ago', icon: <Code2 size={14}/>, color: 'text-blue-500' },
-    { id: 4, name: 'API Server', branch: 'main', status: 'success', time: '2m ago', icon: <Server size={14}/>, color: 'text-purple-500' },
+    { id: 1, name: 'UltaCore', branch: 'main', status: 'success', time: '2s ago', icon: <Zap size={14} />, color: 'text-amber-500' },
+    { id: 2, name: 'GitHub', branch: 'push detected', status: 'deploying', time: 'starting...', icon: <GithubIcon size={14} />, color: 'text-slate-900' },
+    { id: 3, name: 'Frontend', branch: 'production', status: 'success', time: '45s ago', icon: <Code2 size={14} />, color: 'text-blue-500' },
+    { id: 4, name: 'API Server', branch: 'main', status: 'success', time: '2m ago', icon: <Server size={14} />, color: 'text-purple-500' },
   ]);
 
   useEffect(() => {
@@ -156,14 +156,14 @@ const LiveDeployStatsCard = () => {
           branch: ['main', 'production', 'staging'][Math.floor(Math.random() * 3)],
           status: 'success',
           time: 'just now',
-          icon: [<Shield size={14}/>, <Terminal size={14}/>, <Code2 size={14}/>, <Server size={14}/>][Math.floor(Math.random() * 4)],
+          icon: [<Shield size={14} />, <Terminal size={14} />, <Code2 size={14} />, <Server size={14} />][Math.floor(Math.random() * 4)],
           color: ['text-indigo-500', 'text-cyan-500', 'text-pink-500', 'text-green-500'][Math.floor(Math.random() * 4)]
         };
         const updated = current.map((d, i) => {
           if (i === 1) return { ...d, status: 'success', time: '12s ago' };
           return d;
         });
-        return [{...newDeploy, status: 'deploying', time: 'starting...', icon: <GithubIcon size={14}/>, color: 'text-slate-900' }, updated[0], updated[2]];
+        return [{ ...newDeploy, status: 'deploying', time: 'starting...', icon: <GithubIcon size={14} />, color: 'text-slate-900' }, updated[0], updated[2]];
       });
     }, 5000);
     return () => clearInterval(interval);
@@ -232,8 +232,8 @@ const SocialProofCard = () => (
     <div className="bg-white/90 backdrop-blur-md border border-white/60 shadow-xl rounded-2xl p-4 flex flex-col gap-2">
       <div className="flex -space-x-2.5">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className={`w-8 h-8 rounded-full border-2 border-white bg-gradient-to-br from-indigo-${(i+1)*200} to-purple-${(i+1)*200} flex items-center justify-center text-[10px] font-bold text-white`}>
-            {String.fromCharCode(65+i)}
+          <div key={i} className={`w-8 h-8 rounded-full border-2 border-white bg-gradient-to-br from-indigo-${(i + 1) * 200} to-purple-${(i + 1) * 200} flex items-center justify-center text-[10px] font-bold text-white`}>
+            {String.fromCharCode(65 + i)}
           </div>
         ))}
         <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-900 flex items-center justify-center text-[8px] font-bold text-white">
@@ -254,20 +254,20 @@ const SocialProofCard = () => (
 export default function GitHubDeployDashboard() {
   const [repoUrl, setRepoUrl] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
-  const [detectedFramework, setDetectedFramework] = useState<{name: string, icon: any} | null>(null);
+  const [detectedFramework, setDetectedFramework] = useState<{ name: string, icon: any } | null>(null);
 
   const handleDetect = (e: React.FormEvent) => {
     e.preventDefault();
     if (!repoUrl) return;
     setIsDetecting(true);
     setDetectedFramework(null);
-    
+
     setTimeout(() => {
       const frameworks = [
-        { name: 'Next.js', icon: <Code2 size={24}/> },
-        { name: 'React', icon: <Circle size={24}/> },
-        { name: 'Node.js', icon: <Terminal size={24}/> },
-        { name: 'Vue.js', icon: <Code2 size={24}/> }
+        { name: 'Next.js', icon: <Code2 size={24} /> },
+        { name: 'React', icon: <Circle size={24} /> },
+        { name: 'Node.js', icon: <Terminal size={24} /> },
+        { name: 'Vue.js', icon: <Code2 size={24} /> }
       ];
       setDetectedFramework(frameworks[Math.floor(Math.random() * frameworks.length)]);
       setIsDetecting(false);
@@ -277,7 +277,7 @@ export default function GitHubDeployDashboard() {
   return (
     <div className="min-h-screen bg-[#FDFDFF] text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
       <LiveIndicatorBanner />
-      
+
       {/* Navigation Header */}
       <nav className="max-w-7xl mx-auto px-8 py-6 flex items-center justify-between relative z-50 border-b border-slate-100/60">
         <Link href="/dashboard" className="flex items-center gap-3 group transition-all">
@@ -296,7 +296,7 @@ export default function GitHubDeployDashboard() {
           <Link href="#" className="hover:text-indigo-600 transition-colors">Addons</Link>
         </div>
         <div className="flex items-center gap-4">
-          <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors"><Search size={20}/></button>
+          <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors"><Search size={20} /></button>
           <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-indigo-600 shadow-sm">R</div>
         </div>
       </nav>
@@ -304,14 +304,14 @@ export default function GitHubDeployDashboard() {
       <main className="max-w-7xl mx-auto px-8">
         {/* Hero Section */}
         <section className="relative pt-16 pb-24 flex flex-col lg:flex-row items-center gap-16 overflow-hidden lg:overflow-visible">
-          
+
           {/* Background Elements */}
           <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-100/40 rounded-full blur-[120px] -z-10 animate-pulse" />
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-100/40 rounded-full blur-[120px] -z-10" />
 
           {/* Left Side */}
           <div className="flex-1 space-y-8 z-10">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 bg-white border border-slate-100 px-4 py-1.5 rounded-full shadow-sm"
@@ -321,7 +321,7 @@ export default function GitHubDeployDashboard() {
             </motion.div>
 
             <div className="space-y-6">
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
@@ -331,7 +331,7 @@ export default function GitHubDeployDashboard() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Without Limits</span>
               </motion.h1>
 
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -341,7 +341,7 @@ export default function GitHubDeployDashboard() {
               </motion.p>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -349,13 +349,13 @@ export default function GitHubDeployDashboard() {
             >
               {['Auto Deploy', 'Zero Downtime', 'Instant Rollback', 'Multi-Cloud'].map((feat) => (
                 <div key={feat} className="flex items-center gap-3">
-                  <div className="bg-green-100 p-1 rounded-full"><Check size={14} className="text-green-600" strokeWidth={3}/></div>
+                  <div className="bg-green-100 p-1 rounded-full"><Check size={14} className="text-green-600" strokeWidth={3} /></div>
                   <span className="text-sm font-bold text-slate-700">{feat}</span>
                 </div>
               ))}
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -384,7 +384,7 @@ export default function GitHubDeployDashboard() {
 
           {/* Right Side - Interactive Graphics */}
           <div className="flex-1 relative w-full max-w-lg aspect-square">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1 }}
@@ -403,7 +403,7 @@ export default function GitHubDeployDashboard() {
                   <span className="text-indigo-400">$</span>
                   <span className="text-slate-100">git push origin main</span>
                 </div>
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1 }}
@@ -448,18 +448,18 @@ export default function GitHubDeployDashboard() {
                   <div className="pl-6 pr-4 text-slate-400">
                     <GithubIcon size={24} />
                   </div>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={repoUrl}
                     onChange={(e) => setRepoUrl(e.target.value)}
                     placeholder="https://github.com/username/repository"
                     className="flex-1 bg-transparent border-none focus:ring-0 font-mono text-sm text-slate-700 placeholder:text-slate-300 outline-none"
                   />
-                  <button 
+                  <button
                     disabled={isDetecting || !repoUrl}
                     className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-lg shadow-indigo-200"
                   >
-                    {isDetecting ? <RefreshCw className="animate-spin" size={20}/> : <Zap size={20}/>}
+                    {isDetecting ? <RefreshCw className="animate-spin" size={20} /> : <Zap size={20} />}
                     {isDetecting ? 'Detecting...' : 'Quick Deploy'}
                   </button>
                 </div>
@@ -467,7 +467,7 @@ export default function GitHubDeployDashboard() {
 
               <AnimatePresence>
                 {detectedFramework && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     className="mt-10 p-6 bg-white border border-indigo-100 rounded-3xl flex items-center justify-between shadow-lg"
@@ -482,7 +482,7 @@ export default function GitHubDeployDashboard() {
                       </div>
                     </div>
                     <button className="bg-green-500 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 hover:bg-green-600 transition-all">
-                      Confirm & Go Live <ArrowRight size={20}/>
+                      Confirm & Go Live <ArrowRight size={20} />
                     </button>
                   </motion.div>
                 )}
@@ -518,13 +518,13 @@ export default function GitHubDeployDashboard() {
 
           <div className="grid md:grid-cols-3 gap-12 relative">
             <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 z-0" />
-            
+
             {[
               { step: 1, title: 'Connect GitHub', desc: 'Link your repo in 1 click. We auto-detect your stack.', icon: <GithubIcon size={32} /> },
               { step: 2, title: 'Push Code', desc: 'Run `git push origin main`. We listen for hooks.', icon: <Terminal size={32} /> },
               { step: 3, title: 'Live!', desc: 'Global edge deployment in under 30 seconds.', icon: <ExternalLink size={32} /> }
             ].map((item, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -548,7 +548,7 @@ export default function GitHubDeployDashboard() {
 
       <footer className="bg-slate-50 border-t border-slate-100 py-12">
         <div className="max-w-7xl mx-auto px-8 flex justify-between items-center text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-          <p>© 2026 ULTAHOST AUTOMATION. ALL RIGHTS RESERVED.</p>
+          <p>© 2026 youuhost AUTOMATION. ALL RIGHTS RESERVED.</p>
           <div className="flex gap-8">
             <Link href="#" className="hover:text-indigo-600">Privacy</Link>
             <Link href="#" className="hover:text-indigo-600">Terms</Link>

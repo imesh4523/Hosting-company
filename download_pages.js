@@ -29,7 +29,7 @@ const iconStyles = `
 `;
 
 const pages = [
-    { url: 'https://bill.ultahost.com/password/reset', file: 'frontend/public/password-reset.html' },
+    { url: 'https://bill.youuhost.com/password/reset', file: 'frontend/public/password-reset.html' },
 ];
 
 let done = 0;

@@ -1,5 +1,5 @@
 const https = require('https');
-https.get('https://ultahost.com/', (res) => {
+https.get('https://youuhost.com/', (res) => {
     let d = '';
     res.on('data', c => d += c);
     res.on('end', () => {

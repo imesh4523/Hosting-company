@@ -21,7 +21,7 @@ for (const file of files) {
     productName = nameMatch[1].trim();
   } else {
     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    if (titleMatch) productName = titleMatch[1].replace(' - UltaHost', '').trim();
+    if (titleMatch) productName = titleMatch[1].replace(' - youuhost', '').trim();
   }
 
   // Extract base price

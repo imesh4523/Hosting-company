@@ -16,8 +16,8 @@ nav = nav.replace(/\/logout\.php/g, '/api/auth/logout');
 main = main.replace(/\/logout\.php/g, '/api/auth/logout');
 
 // Remove hardcoded domain
-nav = nav.replace(/https:\/\/bill\.ultahost\.com/g, '');
-main = main.replace(/https:\/\/bill\.ultahost\.com/g, '');
+nav = nav.replace(/https:\/\/bill\.youuhost\.com/g, '');
+main = main.replace(/https:\/\/bill\.youuhost\.com/g, '');
 
 fs.writeFileSync(navPath, nav);
 fs.writeFileSync(mainPath, main);

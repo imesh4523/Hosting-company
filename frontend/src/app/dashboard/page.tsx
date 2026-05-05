@@ -7,9 +7,6 @@ export default function DashboardPage() {
   const [html, setHtml] = useState('<div style="padding:40px;text-align:center">Loading dashboard...</div>');
 
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) { router.replace('/login'); return; }
-
     fetch('/api/fragment?name=fullpage&page=main')
       .then(r => r.text())
       .then(content => setHtml(content))

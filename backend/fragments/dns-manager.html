@@ -1,516 +1,545 @@
+<script>
+    var translations = {
+        "Boost your search rankings": "Boost your search rankings",
+        "with a RapidSSL™ Certificate": "with a RapidSSL™ Certificate",
+        "Activate HTTPS and the lock icon": "Activate HTTPS and the lock icon",
+        "Encrypt sensitive data": "Encrypt sensitive data",
+        "Protect user privacy": "Protect user privacy",
+        "Secure online transactions": "Secure online transactions",
+        "Generate Password": "Generate Password",
+        "Enter a name for this card (Optional)": "Enter a name for this card (Optional)",
+        "We would like to send you occasional news, information and special offers by email. To join our mailing list, simply tick the box below. You can unsubscribe at any time.": "We would like to send you occasional news, information and special offers by email. To join our mailing list, simply tick the box below. You can unsubscribe at any time.",
+        "Receive Emails": "Receive Emails",
+        "Copyright © 2024 youuhost. All Rights Reserved.": "Copyright © 2024 youuhost. All Rights Reserved.",
+        "Last Chance": "Last Chance",
+        "Gateway Charge": "Gateway Charge",
+        "VAT Number": "VAT Number",
+        "Products": "Products",
+        "Website Backup": "Website Backup",
+        "SEO Tools": "SEO Tools",
+        "Website Security": "Website Security",
+        "Calculated": "Calculated",
+        "Provision": "Provision",
+        "Name": "Name",
+        "Protect your site with SSL": "Protect your site with SSL",
+        "Add SSL to your web hosting to give visitors confidence that your website is safe and secure and help build trust.": "Add SSL to your web hosting to give visitors confidence that your website is safe and secure and help build trust.",
+        "Learn more...": "Learn more...",
+        "SpamExperts Email Security": "SpamExperts Email Security",
+        "Add professional email security and archiving to your domain to protect and secure your email against attacks and malware.": "Add professional email security and archiving to your domain to protect and secure your email against attacks and malware.",
+        "SiteLock Website Security": "SiteLock Website Security",
+        "SiteLock provides a range of features designed to protect both your website and your business’ reputation.": "SiteLock provides a range of features designed to protect both your website and your business' reputation.",
+        "CodeGuard Backup": "CodeGuard Backup",
+        "The fastest, most reliable website backup service, which tracks all of your changes daily.": "The fastest, most reliable website backup service, which tracks all of your changes daily.",
+        "Marketgoo SEO Tools": "Marketgoo SEO Tools",
+        "Improve your site's traffic and grow your business with do-it-yourself SEO Tools from marketgoo.": "Improve your site's traffic and grow your business with do-it-yourself SEO Tools from marketgoo.",
+        "ISPmanager Licenses": "ISPmanager Licenses",
+        "cPanel Licenses": "cPanel Licenses",
+        "Plesk Licenses": "Plesk Licenses",
+        "No Control Panel": "No Control Panel",
+        "Join our mailing list": "Join our mailing list",
+        "Password Length": "Password Length",
+        "Generated Password": "Generated Password",
+        "Generate new password": "Generate new password",
+        "Copy to clipboard and Insert": "Copy to clipboard and Insert",
+        "Copy": "Copy",
+        "Close": "Close",
+        "Server Location": "Server Location",
+        "Operating System": "Operating System",
+        "Control Panel": "Control Panel",
+        "cPanel": "cPanel",
+        "ISPmanager": "ISPmanager",
+        "Plesk": "Plesk",
+        "Additional Disks Space": "Additional Disks Space",
+        "Additional IPv4 Addresses": "Additional IPv4 Addresses",
+        "Select Script": "Select Script",
+        "Type of Service": "Type of Service",
+        "New Installation": "New Installation",
+        "Linux Shared Hosting": "Linux Shared Hosting",
+        "Windows Shared Hosting": "Windows Shared Hosting",
+        "Linux VPS Hosting": "Linux VPS Hosting",
+        "Linux VDS Hosting": "Linux VDS Hosting",
+        "Windows VPS Hosting": "Windows VPS Hosting",
+        "Windows VDS Hosting": "Windows VDS Hosting",
+        "MacOS VPS Hosting": "MacOS VPS Hosting",
+        "MacOS VDS Hosting": "MacOS VDS Hosting",
+        "Dedicated Servers": "Dedicated Servers",
+        "WordPress Hosting": "WordPress Hosting",
+        "Email Hosting": "Email Hosting",
+        "Server Support Services": "Server Support Services",
+        "Other Products": "Other Products",
+        "Plesk Panel Licence": "Plesk Panel Licence",
+        "Server Optimization": "Server Optimization",
+        "Radio Hosting": "Radio Hosting",
+        "Android Emulator VPS": "Android Emulator VPS",
+        "Windows Reseller Hosting": "Windows Reseller Hosting",
+        "Internet Radio Reseller": "Internet Radio Reseller",
+        "Cloud Email": "Cloud Email",
+        "macOS VDS Hosting": "macOS VDS Hosting",
+        "Shared Hosting": "Shared Hosting",
+        "Wordpress Hosting": "Wordpress Hosting",
+        "VPS Hosting": "VPS Hosting",
+        "VDS Hosting": "VDS Hosting",
+        "macOS VPS Hosting": "macOS VPS Hosting",
+        "Reseller Hosting": "Reseller Hosting",
+        "Linux Reseller Hosting": "Linux Reseller Hosting",
+        "Popular Hosting": "Popular Hosting",
+        "CyberPanel Hosting": "CyberPanel Hosting",
+        "Plesk Hosting": "Plesk Hosting",
+        "Game Servers": "Game Servers",
+        "Website & Security": "Website & Security",
+        "SSL Certificates": "SSL Certificates",
+        "Website Builder": "Website Builder",
+        "(required fields are marked with *)": "(required fields are marked with *)",
+        "Where did you hear about us?": "Where did you hear about us?",
+        "Resolution Center": "Resolution Center",
+        "Dashboard": "Dashboard",
+        "Forgot": "Forgot?",
+        "Not a member yet?": "Not a member yet? ",
+        "Accesses for old hosting (cPanel, SSH, FTP, etc...) ": "Accesses for old hosting (cPanel, SSH, FTP, etc...)",
+        "These are your assigned youuhost nameservers: ns1.youuhost.com ns2.youuhost.com ns3.youuhost.com ns4.youuhost.com": "These are your assigned youuhost nameservers: ns1.youuhost.com ns2.youuhost.com ns3.youuhost.com ns4.youuhost.com"
+    };
 
-                                <script>
-var translations = {
-    "Boost your search rankings": "Boost your search rankings",
-    "with a RapidSSL™ Certificate": "with a RapidSSL™ Certificate",
-    "Activate HTTPS and the lock icon": "Activate HTTPS and the lock icon",
-    "Encrypt sensitive data": "Encrypt sensitive data",
-    "Protect user privacy": "Protect user privacy",
-    "Secure online transactions": "Secure online transactions",
-    "Generate Password": "Generate Password",
-    "Enter a name for this card (Optional)": "Enter a name for this card (Optional)",
-    "We would like to send you occasional news, information and special offers by email. To join our mailing list, simply tick the box below. You can unsubscribe at any time.": "We would like to send you occasional news, information and special offers by email. To join our mailing list, simply tick the box below. You can unsubscribe at any time.",
-    "Receive Emails": "Receive Emails",
-    "Copyright © 2024 UltaHost. All Rights Reserved.": "Copyright © 2024 UltaHost. All Rights Reserved.",
-    "Last Chance": "Last Chance",
-    "Gateway Charge": "Gateway Charge",
-    "VAT Number": "VAT Number",
-    "Products": "Products",
-    "Website Backup": "Website Backup",
-    "SEO Tools": "SEO Tools",
-    "Website Security": "Website Security",
-    "Calculated": "Calculated",
-    "Provision": "Provision",
-    "Name": "Name",
-    "Protect your site with SSL": "Protect your site with SSL",
-    "Add SSL to your web hosting to give visitors confidence that your website is safe and secure and help build trust.": "Add SSL to your web hosting to give visitors confidence that your website is safe and secure and help build trust.",
-    "Learn more...": "Learn more...",
-    "SpamExperts Email Security": "SpamExperts Email Security",
-    "Add professional email security and archiving to your domain to protect and secure your email against attacks and malware.": "Add professional email security and archiving to your domain to protect and secure your email against attacks and malware.",
-    "SiteLock Website Security": "SiteLock Website Security",
-    "SiteLock provides a range of features designed to protect both your website and your business’ reputation.": "SiteLock provides a range of features designed to protect both your website and your business' reputation.",
-    "CodeGuard Backup": "CodeGuard Backup",
-    "The fastest, most reliable website backup service, which tracks all of your changes daily.": "The fastest, most reliable website backup service, which tracks all of your changes daily.",
-    "Marketgoo SEO Tools": "Marketgoo SEO Tools",
-    "Improve your site's traffic and grow your business with do-it-yourself SEO Tools from marketgoo.": "Improve your site's traffic and grow your business with do-it-yourself SEO Tools from marketgoo.",
-    "ISPmanager Licenses": "ISPmanager Licenses",
-    "cPanel Licenses": "cPanel Licenses",
-    "Plesk Licenses": "Plesk Licenses",
-    "No Control Panel": "No Control Panel",
-    "Join our mailing list": "Join our mailing list",
-    "Password Length": "Password Length",
-    "Generated Password": "Generated Password",
-    "Generate new password": "Generate new password",
-    "Copy to clipboard and Insert": "Copy to clipboard and Insert",
-    "Copy": "Copy",
-    "Close": "Close",
-    "Server Location": "Server Location",
-    "Operating System": "Operating System",
-    "Control Panel": "Control Panel",
-    "cPanel": "cPanel",
-    "ISPmanager": "ISPmanager",
-    "Plesk": "Plesk",
-    "Additional Disks Space": "Additional Disks Space",
-    "Additional IPv4 Addresses": "Additional IPv4 Addresses",
-    "Select Script": "Select Script",
-    "Type of Service": "Type of Service",
-    "New Installation": "New Installation",
-    "Linux Shared Hosting": "Linux Shared Hosting",
-    "Windows Shared Hosting": "Windows Shared Hosting",
-    "Linux VPS Hosting": "Linux VPS Hosting",
-    "Linux VDS Hosting": "Linux VDS Hosting",
-    "Windows VPS Hosting": "Windows VPS Hosting",
-    "Windows VDS Hosting": "Windows VDS Hosting",
-    "MacOS VPS Hosting": "MacOS VPS Hosting",
-    "MacOS VDS Hosting": "MacOS VDS Hosting",
-    "Dedicated Servers": "Dedicated Servers",
-    "WordPress Hosting": "WordPress Hosting",
-    "Email Hosting": "Email Hosting",
-    "Server Support Services": "Server Support Services",
-    "Other Products": "Other Products",
-    "Plesk Panel Licence": "Plesk Panel Licence",
-    "Server Optimization": "Server Optimization",
-    "Radio Hosting": "Radio Hosting",
-    "Android Emulator VPS": "Android Emulator VPS",
-    "Windows Reseller Hosting": "Windows Reseller Hosting",
-    "Internet Radio Reseller": "Internet Radio Reseller",
-    "Cloud Email": "Cloud Email",
-    "macOS VDS Hosting": "macOS VDS Hosting",
-    "Shared Hosting": "Shared Hosting",
-    "Wordpress Hosting": "Wordpress Hosting",
-    "VPS Hosting": "VPS Hosting",
-    "VDS Hosting": "VDS Hosting",
-    "macOS VPS Hosting": "macOS VPS Hosting",
-    "Reseller Hosting": "Reseller Hosting",
-    "Linux Reseller Hosting": "Linux Reseller Hosting",
-    "Popular Hosting": "Popular Hosting",
-    "CyberPanel Hosting": "CyberPanel Hosting",
-    "Plesk Hosting": "Plesk Hosting",
-    "Game Servers": "Game Servers",
-    "Website & Security": "Website & Security",
-    "SSL Certificates": "SSL Certificates",
-    "Website Builder": "Website Builder",
-    "(required fields are marked with *)": "(required fields are marked with *)",
-    "Where did you hear about us?": "Where did you hear about us?",
-    "Resolution Center": "Resolution Center",
-    "Dashboard": "Dashboard",
-    "Forgot": "Forgot?",   
-    "Not a member yet?": "Not a member yet? ", 
-    "Accesses for old hosting (cPanel, SSH, FTP, etc...) ": "Accesses for old hosting (cPanel, SSH, FTP, etc...)",
-    "These are your assigned Ultahost nameservers: ns1.ultahost.com ns2.ultahost.com ns3.ultahost.com ns4.ultahost.com": "These are your assigned Ultahost nameservers: ns1.ultahost.com ns2.ultahost.com ns3.ultahost.com ns4.ultahost.com"      
-};
-
-function replaceText() {
-    // Function to replace text in a text node
-    function replaceTextInNode(node, key, value) {
-        // If the text contains the key, replace it with the value
-        if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes(key)) {
-            node.nodeValue = node.nodeValue.replace(new RegExp(key, 'g'), value);
+    function replaceText() {
+        // Function to replace text in a text node
+        function replaceTextInNode(node, key, value) {
+            // If the text contains the key, replace it with the value
+            if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes(key)) {
+                node.nodeValue = node.nodeValue.replace(new RegExp(key, 'g'), value);
+            }
         }
-    }
 
-    // Iterate over each key-value pair in the translations object
-    for (let key in translations) {
-        if (translations.hasOwnProperty(key)) {
-            // Get all elements in the body
-            let elements = document.body.getElementsByTagName("*");
+        // Iterate over each key-value pair in the translations object
+        for (let key in translations) {
+            if (translations.hasOwnProperty(key)) {
+                // Get all elements in the body
+                let elements = document.body.getElementsByTagName("*");
 
-            // Loop through all elements
-            for (let i = 0; i < elements.length; i++) {
-                let element = elements[i];
+                // Loop through all elements
+                for (let i = 0; i < elements.length; i++) {
+                    let element = elements[i];
 
-                // Loop through the child nodes of the element
-                for (let j = 0; j < element.childNodes.length; j++) {
-                    let childNode = element.childNodes[j];
-                    if (translations[key].length > 0) {
-                        replaceTextInNode(childNode, key, translations[key]);
+                    // Loop through the child nodes of the element
+                    for (let j = 0; j < element.childNodes.length; j++) {
+                        let childNode = element.childNodes[j];
+                        if (translations[key].length > 0) {
+                            replaceTextInNode(childNode, key, translations[key]);
+                        }
                     }
                 }
             }
         }
-    }
 
-    // Call replaceText again after 2 seconds
-    //setTimeout(replaceText, 2000);
-}
+        // Call replaceText again after 2 seconds
+        //setTimeout(replaceText, 2000);
+    }
 </script>
 
 
-    <div class="main-body">
-        <div class="container">
-                    
-
-    
-
-
-
-    
-    
+<div class="main-body">
+    <div class="container">
 
 
 
 
-                        <div class="login">
-                <div class="login-wrapper">
-            <div class="login-body"> 
-                <h1 class="login-title">Secure Client Login</h1>
-                                                                <form class="login-form" method="post" action="/login" role="form">
-<input type="hidden" name="token" value="6a8884b149746dcd98a5d1da455130c0e649d634">
-                    <div class="form-group">
-                        <label for="inputEmail">Email Address</label>
-                        <input type="email" name="username" class="form-control input-lg" id="inputEmail" placeholder="Enter email" autofocus="" tabindex="1">
-                    </div>
-                    <div class="form-group">
-                        <div class="d-flex space-between">
-                            <label for="inputPassword">Password</label>
-                            <a href="/password/reset" tabindex="3">Forgot?</a>
+
+
+
+
+
+
+
+
+        <div class="login">
+            <div class="login-wrapper">
+                <div class="login-body">
+                    <h1 class="login-title">Secure Client Login</h1>
+                    <form class="login-form" method="post" action="/login" role="form">
+                        <input type="hidden" name="token" value="6a8884b149746dcd98a5d1da455130c0e649d634">
+                        <div class="form-group">
+                            <label for="inputEmail">Email Address</label>
+                            <input type="email" name="username" class="form-control input-lg" id="inputEmail"
+                                placeholder="Enter email" autofocus="" tabindex="1">
                         </div>
-                        <input type="password" name="password" class="form-control input-lg" id="inputPassword" placeholder="Password" autocomplete="off" tabindex="2">
+                        <div class="form-group">
+                            <div class="d-flex space-between">
+                                <label for="inputPassword">Password</label>
+                                <a href="/password/reset" tabindex="3">Forgot?</a>
+                            </div>
+                            <input type="password" name="password" class="form-control input-lg" id="inputPassword"
+                                placeholder="Password" autocomplete="off" tabindex="2">
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox m-b-2x">
+                                <div class="checkbox-styled"><input class="icheck-control" type="checkbox"
+                                        name="rememberme"
+                                        style="position: absolute; top: -40%; left: -40%; display: block; width: 180%; height: 180%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
+                                        class="iCheck-helper"
+                                        style="position: absolute; top: -40%; left: -40%; display: block; width: 180%; height: 180%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                </div> Remember Me
+                            </label>
+                        </div>
+                        <div class="login-captcha">
+
+                        </div>
+                        <button type="submit"
+                            class="btn btn-lg btn-primary btn-block  btn-recaptcha btn-recaptcha-invisible" id="login"
+                            tabindex="4">
+                            <span class="btn-text">
+                                Login
+                            </span>
+                            <div class="loader loader-button hidden">
+
+                                <div class="spinner spinner-sm spinner-light">
+                                    <div class="rect1"></div>
+                                    <div class="rect2"></div>
+                                    <div class="rect3"></div>
+                                    <div class="rect4"></div>
+                                    <div class="rect5"></div>
+                                </div>
+                            </div>
+                        </button>
+                        <div id="#divDynamicRecaptcha1" class="g-recaptcha"><iframe aria-hidden="true"
+                                data-hcaptcha-widget-id="0x5nrkamue7" data-hcaptcha-response=""
+                                src="https://newassets.hcaptcha.com/captcha/v1/c6e277da86802178b920b24f7bd79dd5d0c81e0d/static/hcaptcha.html#frame=checkbox-invisible"
+                                style="display: none;"></iframe><textarea id="g-recaptcha-response-0x5nrkamue7"
+                                name="g-recaptcha-response" style="display: none;"></textarea><textarea
+                                id="h-captcha-response-0x5nrkamue7" name="h-captcha-response"
+                                style="display: none;"></textarea></div>
+                    </form>
+                    <div class="login-divider">
+                        <span></span>
+                        <span>or</span>
+                        <span></span>
                     </div>
-                    <div class="form-group">
-                        <label class="checkbox m-b-2x">
-                            <div class="checkbox-styled"><input class="icheck-control" type="checkbox" name="rememberme" style="position: absolute; top: -40%; left: -40%; display: block; width: 180%; height: 180%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: -40%; left: -40%; display: block; width: 180%; height: 180%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div> Remember Me
-                        </label>
-                    </div>
-                                        <div class="login-captcha">
-                             
-                                                                </div>
-                                                            <button type="submit" class="btn btn-lg btn-primary btn-block  btn-recaptcha btn-recaptcha-invisible" id="login" tabindex="4">
-                        <span class="btn-text">
-                            Login
-                        </span>
-                        <div class="loader loader-button hidden">
-                             
-    <div class="spinner spinner-sm spinner-light">
-        <div class="rect1"></div>
-        <div class="rect2"></div>
-        <div class="rect3"></div>
-        <div class="rect4"></div>
-        <div class="rect5"></div>
-    </div>
-                             </div>
-                    </button>
-                <div id="#divDynamicRecaptcha1" class="g-recaptcha"><iframe aria-hidden="true" data-hcaptcha-widget-id="0x5nrkamue7" data-hcaptcha-response="" src="https://newassets.hcaptcha.com/captcha/v1/c6e277da86802178b920b24f7bd79dd5d0c81e0d/static/hcaptcha.html#frame=checkbox-invisible" style="display: none;"></iframe><textarea id="g-recaptcha-response-0x5nrkamue7" name="g-recaptcha-response" style="display: none;"></textarea><textarea id="h-captcha-response-0x5nrkamue7" name="h-captcha-response" style="display: none;"></textarea></div></form>
-                <div class="login-divider">
-                    <span></span>
-                    <span>or</span>
-                    <span></span>
-                </div> 
-                
-<link href="https://bill.ultahost.com/modules/addons/SocialMediaLogIn/assets/providers/FontAwesome.css" rel="stylesheet" type="text/css">
+
+                    <link
+                        href="https://bill.youuhost.com/modules/addons/SocialMediaLogIn/assets/providers/FontAwesome.css"
+                        rel="stylesheet" type="text/css">
 
 
 
-<style>
-    .btn-media {
-        background-color:#5bc0de; 
-        border-color: #e4e4e4; 
-    } 
-    .btn-media:hover {
-        background-color:#31b0d5; 
-        border-color: #e4e4e4; 
-    } 
-    .btn-info {
-        color:#000; 
-    } 
-    .btn-info:hover {
-        color:#000; 
-    } 
-    .fa2 {
-        color: #000;
-    }
-    .row-centered {
-                                    width: 48%;
+                    <style>
+                        .btn-media {
+                            background-color: #5bc0de;
+                            border-color: #e4e4e4;
                         }
-</style>
 
- 
-    <style>
-        a[href="?module_provider=Facebook"] {
-            background-color:#5bc0de;
-            color:#000;
-        }
-        a[href="?module_provider=Facebook"]:hover {
-            background-color:#31b0d5;
-            color:#000;
-        }
-   </style>
- 
-    <style>
-        a[href="?module_provider=GitHub"] {
-            background-color:#5bc0de;
-            color:#000;
-        }
-        a[href="?module_provider=GitHub"]:hover {
-            background-color:#31b0d5;
-            color:#000;
-        }
-   </style>
- 
-    <style>
-        a[href="?module_provider=Google"] {
-            background-color:#5bc0de;
-            color:#000;
-        }
-        a[href="?module_provider=Google"]:hover {
-            background-color:#31b0d5;
-            color:#000;
-        }
-   </style>
+                        .btn-media:hover {
+                            background-color: #31b0d5;
+                            border-color: #e4e4e4;
+                        }
 
- 
-        
-        
-    <style>   
-        .fa-facebook  {
-            color:  #000
-        }
-    </style>    
- 
-        
-        
-    <style>   
-        .fa-github  {
-            color:  #000
-        }
-    </style>    
- 
-        
-        
-    <style>   
-        .fa-google  {
-            color:  #000
-        }
-    </style>    
- 
-<div class="row row-media row-centered" style="width: 100%" id="asd">
-     
-        <a href="?module_provider=Facebook" class="btn btn-info btn-media"><i class="fa2 fa-facebook"></i>Facebook</a>
-     
-        <a href="?module_provider=GitHub" class="btn btn-info btn-media"><i class="fa2 fa-github"></i>GitHub</a>
-     
-        <a href="?module_provider=Google" class="btn btn-info btn-media"><i class="fa2 fa-google"></i>Google</a>
-    </div>
+                        .btn-info {
+                            color: #000;
+                        }
+
+                        .btn-info:hover {
+                            color: #000;
+                        }
+
+                        .fa2 {
+                            color: #000;
+                        }
+
+                        .row-centered {
+                            width: 48%;
+                        }
+                    </style>
 
 
-            </div>
-                        <div class="login-footer">
-                <div class="text-light">Not a member yet? <a href="/register.php" tabindex="5">Create a New Account</a></div>
-            </div>
+                    <style>
+                        a[href="?module_provider=Facebook"] {
+                            background-color: #5bc0de;
+                            color: #000;
+                        }
+
+                        a[href="?module_provider=Facebook"]:hover {
+                            background-color: #31b0d5;
+                            color: #000;
+                        }
+                    </style>
+
+                    <style>
+                        a[href="?module_provider=GitHub"] {
+                            background-color: #5bc0de;
+                            color: #000;
+                        }
+
+                        a[href="?module_provider=GitHub"]:hover {
+                            background-color: #31b0d5;
+                            color: #000;
+                        }
+                    </style>
+
+                    <style>
+                        a[href="?module_provider=Google"] {
+                            background-color: #5bc0de;
+                            color: #000;
+                        }
+
+                        a[href="?module_provider=Google"]:hover {
+                            background-color: #31b0d5;
+                            color: #000;
+                        }
+                    </style>
+
+
+
+
+                    <style>
+                        .fa-facebook {
+                            color: #000
+                        }
+                    </style>
+
+
+
+                    <style>
+                        .fa-github {
+                            color: #000
+                        }
+                    </style>
+
+
+
+                    <style>
+                        .fa-google {
+                            color: #000
+                        }
+                    </style>
+
+                    <div class="row row-media row-centered" style="width: 100%" id="asd">
+
+                        <a href="?module_provider=Facebook" class="btn btn-info btn-media"><i
+                                class="fa2 fa-facebook"></i>Facebook</a>
+
+                        <a href="?module_provider=GitHub" class="btn btn-info btn-media"><i
+                                class="fa2 fa-github"></i>GitHub</a>
+
+                        <a href="?module_provider=Google" class="btn btn-info btn-media"><i
+                                class="fa2 fa-google"></i>Google</a>
                     </div>
-               
-    </div>
-            
-        </div>
-    </div>
 
 
-                
-        
-
-    
-
-
-
-    
-    
-
-
-
-
-                        
-    
-            <div class="main-footer">
-                        <div class="footer-bottom">
-                <div class="container">
-                    <div class="footer-copyright">Copyright © 2026 UltaHost. All Rights Reserved.</div>
-                                            <ul class="footer-nav footer-nav-h">
-                                                            <li class="dropdown dropup" data-language-select="">
-                                    <a data-toggle="dropdown" href="">
-                                                                                                                            <span class="language-flag english"></span><span>English</span>
-                                                                                                                            <b class="ls ls-caret"></b>
-                                                                            </a>
-                                                                                <div class="dropdown-menu dropdown-language-search  dropdown-menu-right">
-                                                <input type="hidden" data-language-select-value="" value="English">
-        <input type="hidden" data-language-select-backlink="" value="/login?">
-        <input type="hidden" data-language-select-lang="" value="Select">
-        <div class="dropdown-header input-group align-center">
-            <i class="input-group-icon lm lm-search"></i>
-            <input class="form-control" placeholder="Search..." type="text" data-language-select-search="">
-        </div>
-        <div class="nav-divider"></div>
-        <div class="dropdown-menu-items has-scroll" data-language-select-list="">
-                    <div class="dropdown-menu-item " data-value="arabic" data-language="العربية">
-                                                                    <a href="/login?language=arabic">
-                    <span class="language-flag arabic"></span>
-                    <span class="language-text">العربية</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="azerbaijani" data-language="Azerbaijani">
-                                                                    <a href="/login?language=azerbaijani">
-                    <span class="language-flag azerbaijani"></span>
-                    <span class="language-text">Azerbaijani</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="catalan" data-language="Català">
-                                                                    <a href="/login?language=catalan">
-                    <span class="language-flag catalan"></span>
-                    <span class="language-text">Català</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="chinese" data-language="中文">
-                                                                    <a href="/login?language=chinese">
-                    <span class="language-flag chinese"></span>
-                    <span class="language-text">中文</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="croatian" data-language="Hrvatski">
-                                                                    <a href="/login?language=croatian">
-                    <span class="language-flag croatian"></span>
-                    <span class="language-text">Hrvatski</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="czech" data-language="Čeština">
-                                                                    <a href="/login?language=czech">
-                    <span class="language-flag czech"></span>
-                    <span class="language-text">Čeština</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="danish" data-language="Dansk">
-                                                                    <a href="/login?language=danish">
-                    <span class="language-flag danish"></span>
-                    <span class="language-text">Dansk</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="dutch" data-language="Nederlands">
-                                                                    <a href="/login?language=dutch">
-                    <span class="language-flag dutch"></span>
-                    <span class="language-text">Nederlands</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item active" data-value="english" data-language="English">
-                                                                    <a href="/login?language=english">
-                    <span class="language-flag english"></span>
-                    <span class="language-text">English</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="estonian" data-language="Estonian">
-                                                                    <a href="/login?language=estonian">
-                    <span class="language-flag estonian"></span>
-                    <span class="language-text">Estonian</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="farsi" data-language="Persian">
-                                                                    <a href="/login?language=farsi">
-                    <span class="language-flag farsi"></span>
-                    <span class="language-text">Persian</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="french" data-language="Français">
-                                                                    <a href="/login?language=french">
-                    <span class="language-flag french"></span>
-                    <span class="language-text">Français</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="german" data-language="Deutsch">
-                                                                    <a href="/login?language=german">
-                    <span class="language-flag german"></span>
-                    <span class="language-text">Deutsch</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="hebrew" data-language="עברית">
-                                                                    <a href="/login?language=hebrew">
-                    <span class="language-flag hebrew"></span>
-                    <span class="language-text">עברית</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="hungarian" data-language="Magyar">
-                                                                    <a href="/login?language=hungarian">
-                    <span class="language-flag hungarian"></span>
-                    <span class="language-text">Magyar</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="italian" data-language="Italiano">
-                                                                    <a href="/login?language=italian">
-                    <span class="language-flag italian"></span>
-                    <span class="language-text">Italiano</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="macedonian" data-language="Macedonian">
-                                                                    <a href="/login?language=macedonian">
-                    <span class="language-flag macedonian"></span>
-                    <span class="language-text">Macedonian</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="norwegian" data-language="Norwegian">
-                                                                    <a href="/login?language=norwegian">
-                    <span class="language-flag norwegian"></span>
-                    <span class="language-text">Norwegian</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="portuguese-br" data-language="Português">
-                                                                    <a href="/login?language=portuguese-br">
-                    <span class="language-flag portuguese-br"></span>
-                    <span class="language-text">Português</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="portuguese-pt" data-language="Português">
-                                                                    <a href="/login?language=portuguese-pt">
-                    <span class="language-flag portuguese-pt"></span>
-                    <span class="language-text">Português</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="romanian" data-language="Română">
-                                                                    <a href="/login?language=romanian">
-                    <span class="language-flag romanian"></span>
-                    <span class="language-text">Română</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="russian" data-language="Русский">
-                                                                    <a href="/login?language=russian">
-                    <span class="language-flag russian"></span>
-                    <span class="language-text">Русский</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="spanish" data-language="Español">
-                                                                    <a href="/login?language=spanish">
-                    <span class="language-flag spanish"></span>
-                    <span class="language-text">Español</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="swedish" data-language="Svenska">
-                                                                    <a href="/login?language=swedish">
-                    <span class="language-flag swedish"></span>
-                    <span class="language-text">Svenska</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="turkish" data-language="Türkçe">
-                                                                    <a href="/login?language=turkish">
-                    <span class="language-flag turkish"></span>
-                    <span class="language-text">Türkçe</span>
-                </a>
-            </div>
-                    <div class="dropdown-menu-item " data-value="ukranian" data-language="Українська">
-                                                                    <a href="/login?language=ukranian">
-                    <span class="language-flag ukranian"></span>
-                    <span class="language-text">Українська</span>
-                </a>
-            </div>
                 </div>
-        <div class="dropdown-menu-item dropdown-menu-no-data">
-            <span class="text-info text-large">
-                No Records Found
-            </span>
-        </div>                  
-    </div>
-                                                                                                        </li>
-                                                            <li>
-                                    <a href="#">
-                                                                                    <i class="lm lm-go-top"></i>
-                                                                                                                                                            </a>
-                                                                                                        </li>
-                                                    </ul>
-                                    </div>
+                <div class="login-footer">
+                    <div class="text-light">Not a member yet? <a href="/register.php" tabindex="5">Create a New
+                            Account</a></div>
+                </div>
             </div>
+
         </div>
-    
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="main-footer">
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="footer-copyright">Copyright © 2026 youuhost. All Rights Reserved.</div>
+            <ul class="footer-nav footer-nav-h">
+                <li class="dropdown dropup" data-language-select="">
+                    <a data-toggle="dropdown" href="">
+                        <span class="language-flag english"></span><span>English</span>
+                        <b class="ls ls-caret"></b>
+                    </a>
+                    <div class="dropdown-menu dropdown-language-search  dropdown-menu-right">
+                        <input type="hidden" data-language-select-value="" value="English">
+                        <input type="hidden" data-language-select-backlink="" value="/login?">
+                        <input type="hidden" data-language-select-lang="" value="Select">
+                        <div class="dropdown-header input-group align-center">
+                            <i class="input-group-icon lm lm-search"></i>
+                            <input class="form-control" placeholder="Search..." type="text"
+                                data-language-select-search="">
+                        </div>
+                        <div class="nav-divider"></div>
+                        <div class="dropdown-menu-items has-scroll" data-language-select-list="">
+                            <div class="dropdown-menu-item " data-value="arabic" data-language="العربية">
+                                <a href="/login?language=arabic">
+                                    <span class="language-flag arabic"></span>
+                                    <span class="language-text">العربية</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="azerbaijani" data-language="Azerbaijani">
+                                <a href="/login?language=azerbaijani">
+                                    <span class="language-flag azerbaijani"></span>
+                                    <span class="language-text">Azerbaijani</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="catalan" data-language="Català">
+                                <a href="/login?language=catalan">
+                                    <span class="language-flag catalan"></span>
+                                    <span class="language-text">Català</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="chinese" data-language="中文">
+                                <a href="/login?language=chinese">
+                                    <span class="language-flag chinese"></span>
+                                    <span class="language-text">中文</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="croatian" data-language="Hrvatski">
+                                <a href="/login?language=croatian">
+                                    <span class="language-flag croatian"></span>
+                                    <span class="language-text">Hrvatski</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="czech" data-language="Čeština">
+                                <a href="/login?language=czech">
+                                    <span class="language-flag czech"></span>
+                                    <span class="language-text">Čeština</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="danish" data-language="Dansk">
+                                <a href="/login?language=danish">
+                                    <span class="language-flag danish"></span>
+                                    <span class="language-text">Dansk</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="dutch" data-language="Nederlands">
+                                <a href="/login?language=dutch">
+                                    <span class="language-flag dutch"></span>
+                                    <span class="language-text">Nederlands</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item active" data-value="english" data-language="English">
+                                <a href="/login?language=english">
+                                    <span class="language-flag english"></span>
+                                    <span class="language-text">English</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="estonian" data-language="Estonian">
+                                <a href="/login?language=estonian">
+                                    <span class="language-flag estonian"></span>
+                                    <span class="language-text">Estonian</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="farsi" data-language="Persian">
+                                <a href="/login?language=farsi">
+                                    <span class="language-flag farsi"></span>
+                                    <span class="language-text">Persian</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="french" data-language="Français">
+                                <a href="/login?language=french">
+                                    <span class="language-flag french"></span>
+                                    <span class="language-text">Français</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="german" data-language="Deutsch">
+                                <a href="/login?language=german">
+                                    <span class="language-flag german"></span>
+                                    <span class="language-text">Deutsch</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="hebrew" data-language="עברית">
+                                <a href="/login?language=hebrew">
+                                    <span class="language-flag hebrew"></span>
+                                    <span class="language-text">עברית</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="hungarian" data-language="Magyar">
+                                <a href="/login?language=hungarian">
+                                    <span class="language-flag hungarian"></span>
+                                    <span class="language-text">Magyar</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="italian" data-language="Italiano">
+                                <a href="/login?language=italian">
+                                    <span class="language-flag italian"></span>
+                                    <span class="language-text">Italiano</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="macedonian" data-language="Macedonian">
+                                <a href="/login?language=macedonian">
+                                    <span class="language-flag macedonian"></span>
+                                    <span class="language-text">Macedonian</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="norwegian" data-language="Norwegian">
+                                <a href="/login?language=norwegian">
+                                    <span class="language-flag norwegian"></span>
+                                    <span class="language-text">Norwegian</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="portuguese-br" data-language="Português">
+                                <a href="/login?language=portuguese-br">
+                                    <span class="language-flag portuguese-br"></span>
+                                    <span class="language-text">Português</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="portuguese-pt" data-language="Português">
+                                <a href="/login?language=portuguese-pt">
+                                    <span class="language-flag portuguese-pt"></span>
+                                    <span class="language-text">Português</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="romanian" data-language="Română">
+                                <a href="/login?language=romanian">
+                                    <span class="language-flag romanian"></span>
+                                    <span class="language-text">Română</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="russian" data-language="Русский">
+                                <a href="/login?language=russian">
+                                    <span class="language-flag russian"></span>
+                                    <span class="language-text">Русский</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="spanish" data-language="Español">
+                                <a href="/login?language=spanish">
+                                    <span class="language-flag spanish"></span>
+                                    <span class="language-text">Español</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="swedish" data-language="Svenska">
+                                <a href="/login?language=swedish">
+                                    <span class="language-flag swedish"></span>
+                                    <span class="language-text">Svenska</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="turkish" data-language="Türkçe">
+                                <a href="/login?language=turkish">
+                                    <span class="language-flag turkish"></span>
+                                    <span class="language-text">Türkçe</span>
+                                </a>
+                            </div>
+                            <div class="dropdown-menu-item " data-value="ukranian" data-language="Українська">
+                                <a href="/login?language=ukranian">
+                                    <span class="language-flag ukranian"></span>
+                                    <span class="language-text">Українська</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="dropdown-menu-item dropdown-menu-no-data">
+                            <span class="text-info text-large">
+                                No Records Found
+                            </span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="lm lm-go-top"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

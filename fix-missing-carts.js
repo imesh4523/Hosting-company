@@ -42,7 +42,7 @@ function fetchWithCookies(url) {
 
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         let redirectUrl = res.headers.location;
-        if (!redirectUrl.startsWith('http')) redirectUrl = 'https://bill.ultahost.com' + redirectUrl;
+        if (!redirectUrl.startsWith('http')) redirectUrl = 'https://bill.youuhost.com' + redirectUrl;
 
         https.get(redirectUrl, { headers: { 'Cookie': cookieStr, 'User-Agent': 'Mozilla/5.0' } }, (res2) => {
           let data = '';
@@ -123,11 +123,11 @@ async function downloadMissing() {
   const BATCH = 5;
   for (let i = 0; i < missing.length; i += BATCH) {
     const batch = missing.slice(i, i + BATCH);
-    console.log(`Batch ${Math.floor(i/BATCH)+1}/${Math.ceil(missing.length/BATCH)}: ${batch.map(b=>b.subSlug).join(', ')}`);
+    console.log(`Batch ${Math.floor(i / BATCH) + 1}/${Math.ceil(missing.length / BATCH)}: ${batch.map(b => b.subSlug).join(', ')}`);
 
     await Promise.all(batch.map(async ({ slug, subSlug }) => {
       try {
-        const html = await fetchWithCookies(`https://bill.ultahost.com/store/${slug}/${subSlug}`);
+        const html = await fetchWithCookies(`https://bill.youuhost.com/store/${slug}/${subSlug}`);
         if (!html) { console.log(`  EMPTY: ${subSlug}`); return; }
 
         let extracted = extractAppMain(html);

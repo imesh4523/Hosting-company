@@ -1,19 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 
-const srcDir = 'C:/My Web Sites/host/ultahost.com';
+const srcDir = 'C:/My Web Sites/host/youuhost.com';
 const destDir = 'c:/Users/azureuser/Desktop/Hosting site/frontend/public';
 
 function copyRecursiveSync(src, dest) {
     const exists = fs.existsSync(src);
     const stats = exists && fs.statSync(src);
     const isDirectory = exists && stats.isDirectory();
-    
+
     if (isDirectory) {
         if (!fs.existsSync(dest)) {
             fs.mkdirSync(dest);
         }
-        fs.readdirSync(src).forEach(function(childItemName) {
+        fs.readdirSync(src).forEach(function (childItemName) {
             copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
         });
     } else {
@@ -24,7 +24,7 @@ function copyRecursiveSync(src, dest) {
                 return; // Skip existing HTML files in root
             }
         }
-        
+
         fs.copyFileSync(src, dest);
     }
 }

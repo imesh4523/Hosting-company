@@ -7,9 +7,9 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2">
-              <img src="/custom-logo.png" alt="ultahost" style={{ height: '36px', display: 'block' }} />
+              <img src="/custom-logo.png" alt="youuhost" style={{ height: '36px', display: 'block' }} />
             </Link>
-            
+
             <div className="hidden md:flex items-center gap-6">
               <Link href="#" className="text-slate-600 hover:text-primary font-medium transition-colors">Domains</Link>
               <Link href="#" className="text-slate-600 hover:text-primary font-medium transition-colors">Hosting</Link>
@@ -17,7 +17,7 @@ export default function Navbar() {
               <Link href="#" className="text-slate-600 hover:text-primary font-medium transition-colors">Support</Link>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <button className="hidden lg:flex items-center gap-2 px-6 py-2.5 rounded-full border border-primary/20 text-primary font-semibold hover:bg-primary/5 transition-all">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>

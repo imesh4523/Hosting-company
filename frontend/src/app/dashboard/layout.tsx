@@ -8,7 +8,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <link rel="stylesheet" href="/ultahost-assets/templates/lagom2/core/styles/modern/assets/css/vars/minified.css" />
       <link rel="stylesheet" href="/ultahost-assets/templates/lagom2/assets/css/theme.css" />
       <link rel="stylesheet" href="/ultahost-assets/templates/lagom2/assets/css/custom.css" />
-      <link rel="stylesheet" href="/ultahost-assets/assets/css/fontawesome-all.min.css" />`n      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" />
+      <link rel="stylesheet" href="/ultahost-assets/assets/css/fontawesome-all.min.css" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" />
       <link rel="stylesheet" href="/ultahost-assets/modules/addons/supportpin/assets/css/bootstrap-pincode-input.css" />
       {children}
       <script src="https://code.jquery.com/jquery-3.6.0.min.js" />

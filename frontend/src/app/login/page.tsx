@@ -23,7 +23,7 @@ function LoginContent() {
   const [methods, setMethods] = useState<AuthMethods>({ email: true, google: true, facebook: true, github: true });
 
   useEffect(() => {
-    // Force OAuth buttons to show for UI consistency with Ultahost
+    // Force OAuth buttons to show for UI consistency with youuhost
     // fetch('/api/auth/methods')
     //   .then(res => res.json())
     //   .then(data => {
@@ -79,7 +79,7 @@ function LoginContent() {
     <main className="login-section">
       <div className="login-form-card">
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <img src="/custom-logo.png" alt="ultahost" style={{ height: '45px', margin: '0 auto' }} />
+          <img src="/custom-logo.png" alt="youuhost" style={{ height: '45px', margin: '0 auto' }} />
         </div>
         <h2 className="form-title">Secure Client Login</h2>
 
@@ -90,7 +90,7 @@ function LoginContent() {
             fontSize: '13.5px', display: 'flex', alignItems: 'center', gap: '8px'
           }}>
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
             {error}
           </div>
@@ -100,13 +100,13 @@ function LoginContent() {
         <div className="social-login-grid">
           {methods.google && (
             <button onClick={() => handleOAuth('google')} className="social-button-item">
-              <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" fill="#4285F4"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" fill="#4285F4" /></svg>
               Continue with Google
             </button>
           )}
           {methods.facebook && (
             <button onClick={() => handleOAuth('facebook')} className="social-button-item btn-facebook">
-              <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/><path fill="#fff" d="M16.671 15.542l.532-3.469h-3.328V9.823c0-.949.465-1.874 1.956-1.874h1.514V5.004s-1.374-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669v2.645H7.078v3.469h3.047v8.385a12.09 12.09 0 003.75 0v-8.385h2.796z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /><path fill="#fff" d="M16.671 15.542l.532-3.469h-3.328V9.823c0-.949.465-1.874 1.956-1.874h1.514V5.004s-1.374-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669v2.645H7.078v3.469h3.047v8.385a12.09 12.09 0 003.75 0v-8.385h2.796z" /></svg>
               Continue with Facebook
             </button>
           )}
@@ -166,7 +166,7 @@ function LoginContent() {
 
             <button
               type="submit"
-              className="btn-submit-login" 
+              className="btn-submit-login"
               disabled={loading}
               style={{ opacity: loading ? 0.7 : 1 }}
             >
@@ -176,7 +176,7 @@ function LoginContent() {
         )}
 
         <div style={{ textAlign: 'center', marginTop: '30px', fontSize: '14px', color: '#666' }}>
-          New to <img src="/custom-logo.png" alt="ultahost" style={{ height: '14px', verticalAlign: 'middle', display: 'inline-block' }} /> ?{' '}
+          New to <img src="/custom-logo.png" alt="youuhost" style={{ height: '14px', verticalAlign: 'middle', display: 'inline-block' }} /> ?{' '}
           <Link href="/register" style={{ color: '#3B82F6', fontWeight: 600, textDecoration: 'none' }}>
             Create Account
           </Link>

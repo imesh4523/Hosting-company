@@ -10,9 +10,9 @@ function walk(dir) {
     list.forEach(file => {
         file = path.join(dir, file);
         const stat = fs.statSync(file);
-        if (stat && stat.isDirectory()) { 
+        if (stat && stat.isDirectory()) {
             results = results.concat(walk(file));
-        } else { 
+        } else {
             if (file.endsWith('.html')) results.push(file);
         }
     });
@@ -39,9 +39,9 @@ console.log(`Found ${missingAssets.size} missing assets.`);
 
 function download(urlPath) {
     return new Promise((resolve) => {
-        const fullUrl = 'https://ultahost.com' + urlPath;
+        const fullUrl = 'https://youuhost.com' + urlPath;
         const localPath = path.join(publicDir, urlPath);
-        
+
         // Ensure directory exists
         const dir = path.dirname(localPath);
         if (!fs.existsSync(dir)) {
@@ -58,16 +58,16 @@ function download(urlPath) {
                 });
             } else if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                 // Follow redirects
-                https.get(res.headers.location.startsWith('http') ? res.headers.location : 'https://ultahost.com' + res.headers.location, (res2) => {
+                https.get(res.headers.location.startsWith('http') ? res.headers.location : 'https://youuhost.com' + res.headers.location, (res2) => {
                     if (res2.statusCode === 200) {
-                         const file = fs.createWriteStream(localPath);
-                         res2.pipe(file);
-                         file.on('finish', () => {
-                             file.close();
-                             resolve(true);
-                         });
+                        const file = fs.createWriteStream(localPath);
+                        res2.pipe(file);
+                        file.on('finish', () => {
+                            file.close();
+                            resolve(true);
+                        });
                     } else {
-                         resolve(false);
+                        resolve(false);
                     }
                 }).on('error', () => resolve(false));
             } else {
@@ -83,7 +83,7 @@ async function downloadAll() {
     let success = 0;
     let fail = 0;
     const array = Array.from(missingAssets);
-    
+
     // Process in batches of 10 to avoid socket errors
     for (let i = 0; i < array.length; i += 10) {
         const batch = array.slice(i, i + 10);
@@ -91,7 +91,7 @@ async function downloadAll() {
         results.forEach(res => res ? success++ : fail++);
         console.log(`Progress: ${Math.min(i + 10, array.length)} / ${array.length}`);
     }
-    
+
     console.log(`Downloaded ${success} assets. Failed ${fail}.`);
 }
 

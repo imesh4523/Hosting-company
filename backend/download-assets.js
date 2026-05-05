@@ -4,7 +4,7 @@ import https from 'https';
 
 const assets = JSON.parse(fs.readFileSync('assets-list.json', 'utf8'));
 
-const publicDir = path.join('C:\\Users\\azureuser\\Desktop\\Hosting site\\frontend\\public', 'ultahost-assets');
+const publicDir = path.join('C:\\Users\\azureuser\\Desktop\\Hosting site\\frontend\\public', 'youuhost-assets');
 
 function ensureDir(dir) {
     if (!fs.existsSync(dir)) {
@@ -21,7 +21,7 @@ function download(url, dest) {
                 file.close(resolve);
             });
         }).on('error', (err) => {
-            fs.unlink(dest, () => {});
+            fs.unlink(dest, () => { });
             reject(err);
         });
     });
@@ -30,21 +30,21 @@ function download(url, dest) {
 (async () => {
     try {
         const allUrls = [...assets.links, ...assets.scripts];
-        const ultahostUrls = allUrls.filter(u => u.startsWith('https://bill.ultahost.com'));
-        
-        console.log(`Found ${ultahostUrls.length} ultahost assets.`);
-        
-        for (const u of ultahostUrls) {
+        const youuhostUrls = allUrls.filter(u => u.startsWith('https://bill.youuhost.com'));
+
+        console.log(`Found ${youuhostUrls.length} youuhost assets.`);
+
+        for (const u of youuhostUrls) {
             const parsedUrl = new URL(u);
             const relativePath = parsedUrl.pathname.replace(/^\/+/, ''); // Remove leading slash
             const localDest = path.join(publicDir, relativePath);
-            
+
             ensureDir(path.dirname(localDest));
-            
+
             console.log(`Downloading ${u} -> ${localDest}`);
             await download(u, localDest);
         }
-        
+
         console.log('Finished downloading assets.');
     } catch (err) {
         console.error(err);

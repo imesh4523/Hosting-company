@@ -1,7 +1,62 @@
-
-    <div class="error-container">
-<h1>Oops!</h1>
-<h2>Something went wrong and we couldn't process your request.</h2>
-<p>Please go back to the previous page and try again.</p>
+<div class="main-header">
+  <div class="container">
+    <h1 class="main-header-title">Mass Payment</h1>
+    <p class="main-header-subtitle">Pay multiple invoices at once</p>
+  </div>
 </div>
-  
+<div class="main-body">
+  <div class="container">
+    <div class="main-content">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <i class="fas fa-money-bill-wave" style="margin-right:8px;"></i>
+            Pending Invoices
+          </h4>
+        </div>
+        <div class="panel-body">
+          <div class="alert alert-info" style="border-radius:8px;">
+            <i class="fas fa-info-circle" style="margin-right:8px;"></i>
+            You have no unpaid invoices at this time. Mass payment allows you to pay all outstanding invoices in a single transaction.
+          </div>
+
+          <div style="text-align:center; padding: 60px 20px;">
+            <i class="fas fa-check-circle" style="font-size:64px; color:#28a745; margin-bottom:20px; display:block;"></i>
+            <h3 style="font-weight:600; color:#333;">All Paid Up!</h3>
+            <p style="color:#666; font-size:16px; margin-top:10px;">You have no pending invoices requiring payment.</p>
+            <a href="/dashboard/billing/invoices" class="btn btn-primary" style="margin-top:20px; border-radius:25px; padding:10px 30px;">
+              <i class="fas fa-file-invoice-dollar" style="margin-right:6px;"></i>
+              View Invoice History
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default" style="margin-top:20px;">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <i class="fas fa-credit-card" style="margin-right:8px;"></i>
+            Payment Methods
+          </h4>
+        </div>
+        <div class="panel-body">
+          <p style="color:#666;">Select a payment method to use for mass payment:</p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:15px;">
+            <div style="border:2px solid #4a6cf7; border-radius:12px; padding:15px 20px; display:flex; align-items:center; gap:10px; cursor:pointer; background:#f5f7ff;">
+              <i class="fas fa-university" style="font-size:22px; color:#4a6cf7;"></i>
+              <span style="font-weight:600;">Bank Transfer</span>
+            </div>
+            <div style="border:1px solid #ddd; border-radius:12px; padding:15px 20px; display:flex; align-items:center; gap:10px; cursor:pointer;">
+              <i class="fab fa-paypal" style="font-size:22px; color:#003087;"></i>
+              <span style="font-weight:600;">PayPal</span>
+            </div>
+            <div style="border:1px solid #ddd; border-radius:12px; padding:15px 20px; display:flex; align-items:center; gap:10px; cursor:pointer;">
+              <i class="fas fa-credit-card" style="font-size:22px; color:#333;"></i>
+              <span style="font-weight:600;">Credit Card</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

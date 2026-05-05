@@ -16,7 +16,7 @@ const appDeployLink = `
 content = content.replace(/(<li menuitemname="Dashboard"[^>]*>[\s\S]*?<\/li>)/, `$1${appDeployLink}`);
 
 // 2. Link Mappings
-content = content.replace(/https:\/\/bill\.ultahost\.com/g, '');
+content = content.replace(/https:\/\/bill\.youuhost\.com/g, '');
 
 // Actions
 content = content.replace(/href="clientarea\.php\?action=([^"]+)"/g, (match, action) => {

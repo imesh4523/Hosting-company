@@ -90,20 +90,86 @@ export default function StoreDynamicPage() {
     }
     
     styleEl.innerHTML = `
-        /* Premium Card Styling */
+        /* ── Card Styling (matched to bill.ultahost.com) ── */
         body .panel-check, body .panel-item { 
-            border: 1px solid #f0f0f0 !important; 
-            cursor: pointer !important; 
-            transition: all 0.3s ease !important; 
-            border-radius: 16px !important; 
-            background: #ffffff !important; 
-            margin-bottom: 20px; 
-            padding: 16px 20px !important;
+            background: #ffffff !important;
+            border: 1px solid #DEE0E3 !important; 
+            border-radius: 15px !important; 
+            width: 234px !important;
+            min-height: 89px !important;
+            max-height: 89px !important;
+            height: 89px !important;
+            padding: 0 16px !important;
+            box-shadow: 0 0 1px rgba(0,0,0,0.1), 0 2px 24px rgba(0,0,0,0.08) !important;
             display: flex !important;
             align-items: center !important;
-            min-height: 75px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.01) !important;
+            transition: all 0.24s ease !important;
+            margin-bottom: 16px !important;
+            cursor: pointer !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
         }
+        body .panel-check:hover, body .panel-item:hover { 
+            border-color: #1062FE !important; 
+            box-shadow: 0 0 1px rgba(16,98,254,0.12), 0 8px 32px rgba(16,98,254,0.08) !important;
+        }
+        body .active-card,
+        body .panel-check.active-card, body .panel-item.active-card { 
+            border: 2px solid #1062FE !important; 
+            box-shadow: 0 0 1px rgba(16,98,254,0.12), 0 8px 32px rgba(16,98,254,0.08) !important;
+        }
+
+        /* ── Label ── */
+        body .panel-check label, body .panel-item label {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            margin: 0 !important;
+            gap: 10px !important;
+            cursor: pointer !important;
+        }
+
+        /* ── Text content ── */
+        body .panel-check .check-content, body .panel-item .check-content,
+        body .panel-check h6, body .panel-item h6 {
+            flex-grow: 1 !important;
+            font-family: Roboto, sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 400 !important;
+            color: #232323 !important;
+            line-height: 24px !important;
+            white-space: normal !important;
+            margin: 0 !important;
+        }
+
+        /* ── Circular Flag Icons (24px as per reference) ── */
+        body .check-icon img,
+        body .panel-check img[src*="flagcdn"],
+        body .panel-item img[src*="flagcdn"],
+        body img[src*="flagcdn.com"] {
+            width: 24px !important;
+            height: 24px !important;
+            min-width: 24px !important;
+            min-height: 24px !important;
+            max-width: 24px !important;
+            max-height: 24px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            border: 1px solid #DEE0E3 !important;
+            display: block !important;
+            flex-shrink: 0 !important;
+        }
+        body .check-icon {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 26px !important;
+            height: 26px !important;
+            flex-shrink: 0 !important;
+        }
+
+
         body .panel-check:hover, body .panel-item:hover { 
             border-color: #4f5bff44 !important; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
@@ -235,7 +301,88 @@ export default function StoreDynamicPage() {
             }
         });
 
-        if (groups.plain.length === 0 && groups.cp.length === 0) return; // Not an OS configuration section
+        if (groups.plain.length === 0 && groups.cp.length === 0) return;
+
+        // Find the OS cards row using groups.plain[0] (reliable - actual OS card)
+        const plainCard = groups.plain[0] as HTMLElement;
+        const osCardRow = plainCard?.closest('.row') || plainCard?.parentElement;
+
+        // Create a single wrapper for injected CP + Apps groups
+        const injectedWrapper = document.createElement('div');
+        injectedWrapper.id = 'injected-tab-content';
+        injectedWrapper.style.cssText = 'width:100%;';
+
+        // ── Build CP cards ────────────────────────────────────────────────────
+        const cpContainer = document.createElement('div');
+        cpContainer.className = 'row cp-injected-group';
+        cpContainer.style.cssText = 'display:none; flex-wrap:wrap; margin:0 -15px;';
+
+        if (groups.cp.length === 0) {
+          const cpItems = [
+            { name: 'Plesk',       icon: '🖥️', desc: 'Windows-optimized panel' },
+            { name: 'DirectAdmin', icon: '⚙️', desc: 'Lightweight & fast' },
+            { name: 'cPanel',      icon: '🔧', desc: 'Most popular panel' },
+            { name: 'CyberPanel',  icon: '🛡️', desc: 'OpenLiteSpeed based' },
+            { name: 'None',        icon: '🚫', desc: 'Without control panel', checked: true },
+          ];
+          cpItems.forEach((item, i) => {
+            const col = document.createElement('div');
+            col.className = 'col-sm-4';
+            col.style.cssText = 'padding:0 15px; margin-bottom:16px;';
+            col.innerHTML = `
+              <div class="panel panel-check cp-card${item.checked?' active-card':''}" style="border-radius:15px;border:1px solid ${item.checked?'#1062FE':'#DEE0E3'};border-width:${item.checked?'2':'1'}px;display:flex;align-items:center;padding:0 16px;height:89px;width:100%;box-shadow:0 2px 24px rgba(0,0,0,0.08);cursor:pointer;box-sizing:border-box;">
+                <label style="display:flex;align-items:center;width:100%;gap:10px;cursor:pointer;margin:0;">
+                  <input type="radio" name="cp_selection" value="${item.name}" style="width:18px;height:18px;flex-shrink:0;accent-color:#1062FE;" ${item.checked?'checked':''}>
+                  <div style="flex:1;">
+                    <div style="font-size:14px;font-weight:600;color:#232323;">${item.icon} ${item.name}</div>
+                    <div style="font-size:11px;color:#888;margin-top:2px;">${item.desc}</div>
+                  </div>
+                </label>
+              </div>`;
+            cpContainer.appendChild(col);
+          });
+        }
+
+        // ── Build Apps cards ──────────────────────────────────────────────────
+        const appContainer = document.createElement('div');
+        appContainer.className = 'row app-injected-group';
+        appContainer.style.cssText = 'display:none; flex-wrap:wrap; margin:0 -15px;';
+
+        if (groups.apps.length === 0) {
+          const appItems = [
+            { name: 'Docker',    icon: '🐳', desc: 'Container platform', checked: true },
+            { name: 'WordPress', icon: '📝', desc: 'CMS & blog platform' },
+            { name: 'Node.js',   icon: '🟢', desc: 'JS runtime server' },
+            { name: 'Laravel',   icon: '🎯', desc: 'PHP framework' },
+            { name: 'N8N',       icon: '🔁', desc: 'Workflow automation' },
+            { name: 'Magento',   icon: '🛒', desc: 'E-commerce platform' },
+          ];
+          appItems.forEach((item) => {
+            const col = document.createElement('div');
+            col.className = 'col-sm-4';
+            col.style.cssText = 'padding:0 15px; margin-bottom:16px;';
+            col.innerHTML = `
+              <div class="panel panel-check app-card${item.checked?' active-card':''}" style="border-radius:15px;border:1px solid ${item.checked?'#1062FE':'#DEE0E3'};border-width:${item.checked?'2':'1'}px;display:flex;align-items:center;padding:0 16px;height:89px;width:100%;box-shadow:0 2px 24px rgba(0,0,0,0.08);cursor:pointer;box-sizing:border-box;">
+                <label style="display:flex;align-items:center;width:100%;gap:10px;cursor:pointer;margin:0;">
+                  <input type="radio" name="app_selection" value="${item.name}" style="width:18px;height:18px;flex-shrink:0;accent-color:#1062FE;" ${item.checked?'checked':''}>
+                  <div style="flex:1;">
+                    <div style="font-size:14px;font-weight:600;color:#232323;">${item.icon} ${item.name}</div>
+                    <div style="font-size:11px;color:#888;margin-top:2px;">${item.desc}</div>
+                  </div>
+                </label>
+              </div>`;
+            appContainer.appendChild(col);
+          });
+        }
+
+        injectedWrapper.appendChild(cpContainer);
+        injectedWrapper.appendChild(appContainer);
+
+        // Insert wrapper right after the OS cards row (one reliable DOM insert)
+        if (osCardRow) {
+          osCardRow.insertAdjacentElement('afterend', injectedWrapper);
+        }
+
 
         // Create the Tab Container
         const tabBar = document.createElement('div');
@@ -251,21 +398,40 @@ export default function StoreDynamicPage() {
             tabBar.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
             tabBar.querySelector(`[data-group="${group}"]`)?.classList.add('active');
             
-            // Hide all categorized cards
+            // Hide ALL group containers first
+            const cpRow = document.querySelector('.cp-injected-group') as HTMLElement;
+            const appRow = document.querySelector('.app-injected-group') as HTMLElement;
+            if (cpRow) cpRow.style.display = 'none';
+            if (appRow) appRow.style.display = 'none';
+
+            // Hide all original categorized cards and their cols
             [...groups.plain, ...groups.cp, ...groups.apps].forEach((c: HTMLElement) => {
-                c.classList.add('os-card-hidden');
-                // Hide the parent column if it's in a grid
-                const col = c.closest('.col-sm-4, .col-md-4, .col-lg-4, .col-xs-12') as HTMLElement;
-                if (col) col.classList.add('os-card-hidden');
+                if (!c) return;
+                // Only hide original (non-injected) cards
+                if (!c.classList.contains('cp-card') && !c.classList.contains('app-card')) {
+                    c.classList.add('os-card-hidden');
+                    const col = c.closest('.col-sm-4, .col-md-4, .col-lg-4, .col-xs-12') as HTMLElement;
+                    if (col) col.classList.add('os-card-hidden');
+                }
             });
 
-            // Show selected cards
-            groups[group].forEach((c: HTMLElement) => {
-                c.classList.remove('os-card-hidden');
-                const col = c.closest('.col-sm-4, .col-md-4, .col-lg-4, .col-xs-12') as HTMLElement;
-                if (col) col.classList.remove('os-card-hidden');
-            });
+            if (group === 'plain') {
+                // Show original plain OS cards
+                groups.plain.forEach((c: HTMLElement) => {
+                    if (!c) return;
+                    c.classList.remove('os-card-hidden');
+                    const col = c.closest('.col-sm-4, .col-md-4, .col-lg-4, .col-xs-12') as HTMLElement;
+                    if (col) col.classList.remove('os-card-hidden');
+                });
+            } else if (group === 'cp') {
+                // Show CP injected group container
+                if (cpRow) cpRow.style.display = '';
+            } else if (group === 'apps') {
+                // Show Apps injected group container
+                if (appRow) appRow.style.display = '';
+            }
         };
+
 
         // Attach click listeners to the tabs
         tabBar.querySelectorAll('.os-tab').forEach(t => {

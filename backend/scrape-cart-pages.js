@@ -7,26 +7,26 @@ import path from 'path';
         const browserURL = 'http://127.0.0.1:9222';
         const browser = await puppeteer.connect({ browserURL });
         const pages = await browser.pages();
-        
+
         let targetPage = null;
         for (const p of pages) {
-            if (p.url().includes('bill.ultahost.com')) {
+            if (p.url().includes('bill.youuhost.com')) {
                 targetPage = p;
                 break;
             }
         }
-        
+
         if (!targetPage) {
-            console.log('Ultahost page not found. Please open bill.ultahost.com in Chrome.');
+            console.log('youuhost page not found. Please open bill.youuhost.com in Chrome.');
             await browser.disconnect();
             return;
         }
 
         const cartPages = [
-            { name: 'cart-configure', url: 'https://bill.ultahost.com/cart.php?a=confproduct&i=0' },
-            { name: 'cart-checkout', url: 'https://bill.ultahost.com/cart.php?a=checkout' },
-            { name: 'dns-manager', url: 'https://bill.ultahost.com/index.php?m=DNSManager3' },
-            { name: 'resolution-center', url: 'https://bill.ultahost.com/index.php?rp=/announcements' } // Placeholder for Resolution Center
+            { name: 'cart-configure', url: 'https://bill.youuhost.com/cart.php?a=confproduct&i=0' },
+            { name: 'cart-checkout', url: 'https://bill.youuhost.com/cart.php?a=checkout' },
+            { name: 'dns-manager', url: 'https://bill.youuhost.com/index.php?m=DNSManager3' },
+            { name: 'resolution-center', url: 'https://bill.youuhost.com/index.php?rp=/announcements' } // Placeholder for Resolution Center
         ];
 
         const outputDir = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\backend\\fragments';

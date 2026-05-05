@@ -9,7 +9,7 @@ let errors = 0;
 function downloadAsset(urlPath) {
     const localPath = path.join(publicDir, urlPath);
     if (fs.existsSync(localPath)) return;
-    
+
     const dir = path.dirname(localPath);
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -17,7 +17,7 @@ function downloadAsset(urlPath) {
 
     console.log('Downloading', urlPath);
     const file = fs.createWriteStream(localPath);
-    https.get('https://ultahost.com' + urlPath, (res) => {
+    https.get('https://youuhost.com' + urlPath, (res) => {
         if (res.statusCode === 200) {
             res.pipe(file);
             downloaded++;

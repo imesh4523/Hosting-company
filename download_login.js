@@ -1,8 +1,8 @@
 const fs = require('fs');
 const https = require('https');
 
-// Download login page fresh from bill.ultahost.com
-https.get('https://bill.ultahost.com/login', { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+// Download login page fresh from bill.youuhost.com
+https.get('https://bill.youuhost.com/login', { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
     let d = '';
     res.on('data', c => d += c);
     res.on('end', () => {

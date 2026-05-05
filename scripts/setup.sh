@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Starting UltaHost VPS Platform Setup..."
+echo "🚀 Starting youuhost VPS Platform Setup..."
 
 # 1. Install dependencies for all parts
 echo "📦 Installing Backend dependencies..."

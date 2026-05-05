@@ -36,12 +36,21 @@ const fragmentMap: Record<string, string> = {
   'seo_tools': 'seo-tools.html',
   'website_security': 'website-security.html',
   'manage_ssl': 'manage-ssl.html',
-  // Account sub-pages (show main for now - no dedicated fragment)
-  'details': 'main.html',
-  'contacts': 'main.html',
-  'emails': 'main.html',
-  'paymentmethods': 'main.html',
-  'users': 'main.html',
+  // Account sub-pages
+  'details': 'account-details.html',
+  'contacts': 'account-contacts.html',
+  'emails': 'account-emails.html',
+  'paymentmethods': 'account-paymentmethods.html',
+  'users': 'account-users.html',
+  // User pages
+  'user_profile': 'account-details.html',
+  'user_password': 'user-password.html',
+  // Support
+  'support': 'support.html',
+  'knowledgebase': 'knowledgebase.html',
+  // Network status
+  'serverstatus': 'network-status.html',
+  'announcements': 'announcements.html',
   // Cart
   'cart_configure': 'cart-configure.html',
   'cart_checkout': 'cart-checkout.html',
@@ -56,103 +65,144 @@ const fragmentMap: Record<string, string> = {
   'website_security_page': 'website-security.html',
 };
 
+// Country name → ISO2 code for flagcdn.com
+const FLAG_MAP: Record<string, string> = {
+  'germany':'de','France':'fr','france':'fr','united-kingdom':'gb','netherlands':'nl',
+  'sweden':'se','poland':'pl','switzerland':'ch','spain':'es','norway':'no','italy':'it',
+  'turkey':'tr','us':'us','canada':'ca','brazil':'br','australia':'au','india':'in',
+  'japan':'jp','singapore':'sg','south-korea':'kr','hong-kong-sar-china':'hk',
+  'united-arab-emirates':'ae','south-africa':'za','finland':'fi','denmark':'dk',
+  'austria':'at','belgium':'be','portugal':'pt','czech':'cz','hungary':'hu','romania':'ro'
+};
+
 function fixLinks(html: string): string {
-  // ── 1. Strip the external billing domain prefix (including trailing slash if present) ──
-  html = html.replace(/https:\/\/bill\.ultahost\.com\//g, '/');
-  html = html.replace(/https:\/\/bill\.ultahost\.com/g, '');
-  html = html.replace(/https:\/\/ultahost\.com\//g, '/');
-  html = html.replace(/https:\/\/ultahost\.com/g, '');
+  // ── 0. Country flag URLs ────────────────────────────────────────────────────
+  html = html.replace(/https?:\/\/bill\.youuhost\.com\/templates\/flags-new\/Country=([^"'.]+)\.svg/g, 
+    (_, country) => {
+      const iso = FLAG_MAP[country] || FLAG_MAP[country.toLowerCase()];
+      const src = iso ? `https://flagcdn.com/48x36/${iso}.png` : '';
+      if (!src) return '';
+      // Return a circular flag — inline styles for reliable rendering
+      return `${src}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.18);display:inline-block;vertical-align:middle;border:none;background:#f0f0f0`;
+    });
+
+  // ── 1. Asset path rewrites (do this BEFORE stripping domain) ──────────────
+  html = html.replace(/https:\/\/bill\.youuhost\.com\/templates\//g, '/ultahost-assets/templates/');
+  html = html.replace(/https:\/\/bill\.youuhost\.com\/assets\//g, '/ultahost-assets/assets/');
+  html = html.replace(/https:\/\/bill\.youuhost\.com\/modules\//g, '/ultahost-assets/modules/');
+
+  html = html.replace(/https:\/\/bill\.youuhost\.com\//g, '/');
+  html = html.replace(/https:\/\/bill\.youuhost\.com/g, '');
+  html = html.replace(/https:\/\/youuhost\.com\//g, '/');
+  html = html.replace(/https:\/\/youuhost\.com/g, '');
+
+  // Fix bare relative asset paths
+  html = html.replace(/href="\/templates\//g, 'href="/ultahost-assets/templates/');
+  html = html.replace(/src="\/templates\//g, 'src="/ultahost-assets/templates/');
+  html = html.replace(/href="\/assets\//g, 'href="/ultahost-assets/assets/');
+  html = html.replace(/src="\/assets\//g, 'src="/ultahost-assets/assets/');
+  html = html.replace(/href="\/modules\//g, 'href="/ultahost-assets/modules/');
+  html = html.replace(/src="\/modules\//g, 'src="/ultahost-assets/modules/');
+  html = html.replace(/href="templates\//g, 'href="/ultahost-assets/templates/');
+  html = html.replace(/src="templates\//g, 'src="/ultahost-assets/templates/');
+  html = html.replace(/href="assets\//g, 'href="/ultahost-assets/assets/');
+  html = html.replace(/src="assets\//g, 'src="/ultahost-assets/assets/');
   
+  // Clean up WHMCS variables
+  html = html.replace(/{userName}/g, 'User');
+  html = html.replace(/`n/g, ''); // Remove stray powershell/string artifacts
+  html = html.replace(/\\n/g, '');
+
   // ── 2. Fix specific store links to be relative ─────────────────────────────
   html = html.replace(/href="\/store\//g, 'href="/store/');
 
   // ── 2. clientarea.php action rewrites ────────────────────────────────────
-  html = html.replace(/clientarea\.php\?action=invoices/g,       '/dashboard/billing/invoices');
-  html = html.replace(/clientarea\.php\?action=quotes/g,         '/dashboard/billing/quotes');
-  html = html.replace(/clientarea\.php\?action=addfunds/g,       '/dashboard/billing/addfunds');
-  html = html.replace(/clientarea\.php\?action=masspay/g,        '/dashboard/billing/masspay');
-  html = html.replace(/clientarea\.php\?action=services/g,       '/dashboard/services');
-  html = html.replace(/clientarea\.php\?action=domains/g,        '/dashboard/domains');
-  html = html.replace(/clientarea\.php\?action=details/g,        '/dashboard/account/details');
-  html = html.replace(/clientarea\.php\?action=contacts/g,       '/dashboard/account/contacts');
-  html = html.replace(/clientarea\.php\?action=emails/g,         '/dashboard/account/emails');
+  html = html.replace(/clientarea\.php\?action=invoices/g, '/dashboard/billing/invoices');
+  html = html.replace(/clientarea\.php\?action=quotes/g, '/dashboard/billing/quotes');
+  html = html.replace(/clientarea\.php\?action=addfunds/g, '/dashboard/billing/addfunds');
+  html = html.replace(/clientarea\.php\?action=masspay/g, '/dashboard/billing/masspay');
+  html = html.replace(/clientarea\.php\?action=services/g, '/dashboard/services');
+  html = html.replace(/clientarea\.php\?action=domains/g, '/dashboard/domains');
+  html = html.replace(/clientarea\.php\?action=details/g, '/dashboard/account/details');
+  html = html.replace(/clientarea\.php\?action=contacts/g, '/dashboard/account/contacts');
+  html = html.replace(/clientarea\.php\?action=emails/g, '/dashboard/account/emails');
   html = html.replace(/clientarea\.php\?action=paymentmethods/g, '/dashboard/account/paymentmethods');
-  html = html.replace(/clientarea\.php\?action=addcontact/g,     '/dashboard/account/contacts');
-  html = html.replace(/clientarea\.php\?action=security/g,       '/dashboard/account/security');
-  html = html.replace(/clientarea\.php/g,                        '/dashboard');
+  html = html.replace(/clientarea\.php\?action=addcontact/g, '/dashboard/account/contacts');
+  html = html.replace(/clientarea\.php\?action=security/g, '/dashboard/account/security');
+  html = html.replace(/clientarea\.php/g, '/dashboard');
 
   // ── 3. PHP page rewrites ─────────────────────────────────────────────────
-  html = html.replace(/href="affiliates\.php"/g,           'href="/dashboard/affiliates"');
-  html = html.replace(/href="knowledgebase\.php[^"]*"/g,   'href="/dashboard/kb"');
-  html = html.replace(/href="announcements\.php[^"]*"/g,   'href="/dashboard/announcements"');
-  html = html.replace(/href="serverstatus\.php[^"]*"/g,    'href="/dashboard/serverstatus"');
-  html = html.replace(/href="downloads\.php[^"]*"/g,       'href="/dashboard/downloads"');
-  html = html.replace(/href="supporttickets\.php[^"]*"/g,  'href="/dashboard/tickets"');
-  html = html.replace(/href="submitticket\.php[^"]*"/g,    'href="/dashboard/tickets/new"');
-    html = html.replace(/href="domainchecker\.php[^"]*"/g,   'href="https://ultahost.com/domains"');
+  html = html.replace(/href="affiliates\.php"/g, 'href="/dashboard/affiliates"');
+  html = html.replace(/href="knowledgebase\.php[^"]*"/g, 'href="/dashboard/kb"');
+  html = html.replace(/href="announcements\.php[^"]*"/g, 'href="/dashboard/announcements"');
+  html = html.replace(/href="serverstatus\.php[^"]*"/g, 'href="/dashboard/serverstatus"');
+  html = html.replace(/href="downloads\.php[^"]*"/g, 'href="/dashboard/downloads"');
+  html = html.replace(/href="supporttickets\.php[^"]*"/g, 'href="/dashboard/tickets"');
+  html = html.replace(/href="submitticket\.php[^"]*"/g, 'href="/dashboard/tickets/new"');
+  html = html.replace(/href="domainchecker\.php[^"]*"/g, 'href="https://youuhost.com/domains"');
 
   // ── 4. index.php rewrites ────────────────────────────────────────────────
-  html = html.replace(/href="index\.php\?m=DNSManager3"/g,                    'href="/dashboard/tools/dns"');
-  html = html.replace(/href="index\.php\?rp=\/store\/ssl-certificates"/g,     'href="/dashboard/security/ssl"');
-  html = html.replace(/href="index\.php\?rp=\/store\/codeguard"/g,            'href="/dashboard/security/backup"');
-  html = html.replace(/href="index\.php\?rp=\/store\/marketgoo"/g,            'href="/dashboard/security/seo"');
-  html = html.replace(/href="index\.php\?rp=\/store\/sitelock"/g,             'href="/dashboard/security/malware"');
+  html = html.replace(/href="index\.php\?m=DNSManager3"/g, 'href="/dashboard/tools/dns"');
+  html = html.replace(/href="index\.php\?rp=\/store\/ssl-certificates"/g, 'href="/dashboard/security/ssl"');
+  html = html.replace(/href="index\.php\?rp=\/store\/codeguard"/g, 'href="/dashboard/security/backup"');
+  html = html.replace(/href="index\.php\?rp=\/store\/marketgoo"/g, 'href="/dashboard/security/seo"');
+  html = html.replace(/href="index\.php\?rp=\/store\/sitelock"/g, 'href="/dashboard/security/malware"');
   html = html.replace(/href="index\.php\?rp=\/clientarea\/ssl-certificates\/manage"/g, 'href="/dashboard/security/manage-ssl"');
-  html = html.replace(/href="index\.php\?rp=\/announcements"/g,               'href="/dashboard/tools/resolution"');
-  html = html.replace(/href="index\.php[^"]*"/g,                              'href="/dashboard"');
+  html = html.replace(/href="index\.php\?rp=\/announcements"/g, 'href="/dashboard/tools/resolution"');
+  html = html.replace(/href="index\.php[^"]*"/g, 'href="/dashboard"');
 
   // ── 5. /account/* → /dashboard/account/* ─────────────────────────────────
-  html = html.replace(/href="\/account\/users"/g,          'href="/dashboard/account/users"');
+  html = html.replace(/href="\/account\/users"/g, 'href="/dashboard/account/users"');
   html = html.replace(/href="\/account\/paymentmethods"/g, 'href="/dashboard/account/paymentmethods"');
-  html = html.replace(/href="\/account\/contacts"/g,       'href="/dashboard/account/contacts"');
-  html = html.replace(/href="\/account\/security"/g,       'href="/dashboard/account/security"');
-  html = html.replace(/href="\/account\/details"/g,        'href="/dashboard/account/details"');
-  html = html.replace(/href="\/account\/emails"/g,         'href="/dashboard/account/emails"');
-  html = html.replace(/href="\/account[^"]*"/g,            'href="/dashboard/account/details"');
+  html = html.replace(/href="\/account\/contacts"/g, 'href="/dashboard/account/contacts"');
+  html = html.replace(/href="\/account\/security"/g, 'href="/dashboard/account/security"');
+  html = html.replace(/href="\/account\/details"/g, 'href="/dashboard/account/details"');
+  html = html.replace(/href="\/account\/emails"/g, 'href="/dashboard/account/emails"');
+  html = html.replace(/href="\/account[^"]*"/g, 'href="/dashboard/account/details"');
 
   // ── 6. /user/* → /dashboard/user/* ───────────────────────────────────────
-  html = html.replace(/href="\/user\/profile"/g,   'href="/dashboard/user/profile"');
-  html = html.replace(/href="\/user\/accounts"/g,  'href="/dashboard"');
-  html = html.replace(/href="\/user\/password"/g,  'href="/dashboard/user/password"');
-  html = html.replace(/href="\/user\/security"/g,  'href="/dashboard/account/security"');
-  html = html.replace(/href="\/user[^"]*"/g,        'href="/dashboard"');
+  html = html.replace(/href="\/user\/profile"/g, 'href="/dashboard/user/profile"');
+  html = html.replace(/href="\/user\/accounts"/g, 'href="/dashboard"');
+  html = html.replace(/href="\/user\/password"/g, 'href="/dashboard/user/password"');
+  html = html.replace(/href="\/user\/security"/g, 'href="/dashboard/account/security"');
+  html = html.replace(/href="\/user[^"]*"/g, 'href="/dashboard"');
 
   // ── 7. Logout ─────────────────────────────────────────────────────────────
   html = html.replace(/href="\/logout\.php"/g, 'href="/api/auth/logout"');
 
   // ── 8. Protocol-relative URLs (//) ───────────────────────────────────────
-  html = html.replace(/action="\/\/dashboard/g,        'action="/dashboard');
-  html = html.replace(/value="\/\/dashboard/g,         'value="/dashboard');
+  html = html.replace(/action="\/\/dashboard/g, 'action="/dashboard');
+  html = html.replace(/value="\/\/dashboard/g, 'value="/dashboard');
   html = html.replace(/href="\/\/dashboard\?rsstyle=[^"]+"/g, 'href="#"');
-  html = html.replace(/href="\/\/dashboard\?language=[^"]+"/g,'href="#"');
-  
+  html = html.replace(/href="\/\/dashboard\?language=[^"]+"/g, 'href="#"');
+
   // Replace bare //dashboard exactly, but leave //dashboard/services alone to be fixed later
-  html = html.replace(/href="\/\/dashboard"/g,    'href="/dashboard"');
-  html = html.replace(/href="\/\/dashboard\//g,   'href="/dashboard/');
+  html = html.replace(/href="\/\/dashboard"/g, 'href="/dashboard"');
+  html = html.replace(/href="\/\/dashboard\//g, 'href="/dashboard/');
 
   // ── 9. /dashboard# hash stripping ────────────────────────────────────────
   html = html.replace(/href="\/dashboard#[^"]*"/g, 'href="/dashboard"');
 
   // 10. Store
-  html = html.replace(/href="\/store\/ssl-certificaties"/g,  'href="/dashboard/security/ssl"');
-  html = html.replace(/href="\/store\/codeguard"/g,           'href="/dashboard/security/backup"');
-  html = html.replace(/href="\/store\/marketgoo"/g,           'href="/dashboard/security/seo"');
-  html = html.replace(/href="\/store\/sitelock"/g,            'href="/dashboard/security/malware"');
+  html = html.replace(/href="\/store\/ssl-certificaties"/g, 'href="/dashboard/security/ssl"');
+  html = html.replace(/href="\/store\/codeguard"/g, 'href="/dashboard/security/backup"');
+  html = html.replace(/href="\/store\/marketgoo"/g, 'href="/dashboard/security/seo"');
+  html = html.replace(/href="\/store\/sitelock"/g, 'href="/dashboard/security/malware"');
   html = html.replace(/href="\/clientarea\/ssl-certificates\/manage"/g, 'href="/dashboard/security/manage-ssl"');
-  html = html.replace(/href="\/store\/([^"]+)"/g,            'href="/store/$1"');
-  html = html.replace(/href="\/ultahost-assets\/index\.php[^"]*"/g, 'href="https://ultahost.com/store"');
+  html = html.replace(/href="\/store\/([^"]+)"/g, 'href="/store/$1"');
+  html = html.replace(/href="\/youuhost-assets\/index\.php[^"]*"/g, 'href="https://youuhost.com/store"');
 
   // ── 11. Masspay extra params ──────────────────────────────────────────────
   html = html.replace(/href="\/dashboard\/billing\/masspay&amp;all=true"/g, 'href="/dashboard/billing/masspay"');
 
   // ── 12. Cart PHP rewrites ─────────────────────────────────────────────────
-  html = html.replace(/href="cart\.php\?a=checkout"/g,              'href="/dashboard/cart/checkout"');
-    html = html.replace(/href="\/cart\.php\?a=checkout"/g,          'href="/dashboard/cart/checkout"');
+  html = html.replace(/href="cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
+  html = html.replace(/href="\/cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
   html = html.replace(/href="\/cart\.php\?a=confproduct&amp;i=\d+"/g, 'href="/dashboard/cart/configure"');
-  html = html.replace(/href="cart\.php\?a=checkout"/g,            'href="/dashboard/cart/checkout"');
-  html = html.replace(/href="cart\.php\?a=confproduct&amp;i=\d+"/g,   'href="/dashboard/cart/configure"');
-  html = html.replace(/href="\/cart\.php[^"]*"/g,                 'href="/dashboard/cart"');
-  html = html.replace(/href="cart\.php[^"]*"/g,                   'href="/dashboard/cart"');
+  html = html.replace(/href="cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
+  html = html.replace(/href="cart\.php\?a=confproduct&amp;i=\d+"/g, 'href="/dashboard/cart/configure"');
+  html = html.replace(/href="\/cart\.php[^"]*"/g, 'href="/dashboard/cart"');
+  html = html.replace(/href="cart\.php[^"]*"/g, 'href="/dashboard/cart"');
 
   // ── 13. User display name ─────────────────────────────────────────────────
   html = html.replace(/Romania Srilanka/g, 'User');
@@ -178,7 +228,7 @@ function fixLinks(html: string): string {
     (match) => match.replace(/href="[^"]*"/, 'href="/dashboard"'));
 
   // ── 17. Fix relative modules/ paths ──────────────────────────────────────
-  html = html.replace(/src="modules\//g,  'src="/ultahost-assets/modules/');
+  html = html.replace(/src="modules\//g, 'src="/ultahost-assets/modules/');
   html = html.replace(/href="modules\//g, 'href="/ultahost-assets/modules/');
 
   // ── 18. Catch-all: any remaining bare relative href (no leading /) ────────
@@ -402,11 +452,11 @@ export async function GET(request: NextRequest) {
     if (slug && pageName === 'services' && pageFile === 'services.html') {
       // Try exact slug first, then fall back to linux variant for generic category slugs
       const fallbackMap: Record<string, string> = {
-        'vps-hosting':         'linux-vps-hosting',
-        'vds-hosting':         'linux-vds-hosting',
-        'dedicated-hosting':   'dedicated-hosting',
-        'reseller-hosting':    'linux-reseller-hosting',
-        'game-servers':        'minecraft-game-server',
+        'vps-hosting': 'linux-vps-hosting',
+        'vds-hosting': 'linux-vds-hosting',
+        'dedicated-hosting': 'dedicated-hosting',
+        'reseller-hosting': 'linux-reseller-hosting',
+        'game-servers': 'minecraft-game-server',
       };
       const lookupSlug = slug || '';
       const exactPath = path.join(FRAGMENTS_DIR, `store-${lookupSlug}.html`);
@@ -433,13 +483,13 @@ export async function GET(request: NextRequest) {
       let product = searchParams.get('product');
       let price = searchParams.get('price') || '20.50';
       const isEmpty = searchParams.get('empty') === '1' || !product;
-      
+
       if (!product) product = 'MacOS VPS Hosting'; // Fallback name just in case it's used elsewhere
-      
+
       if (isEmpty) price = '0.00';
       const gatewayCharge = isEmpty ? '0.00' : '0.62';
       const total = isEmpty ? '0.00' : (parseFloat(price) + 0.62).toFixed(2);
-      
+
       pageHtml = `
       <div class="main-header">
           <div class="container">

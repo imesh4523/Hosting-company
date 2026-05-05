@@ -8,7 +8,7 @@ const $ = cheerio.load(html);
 // Helper to fix URLs in fragments
 function fixUrls(html) {
     if (!html) return '';
-    return html.replace(/https:\/\/bill\.ultahost\.com/g, '/ultahost-assets');
+    return html.replace(/https:\/\/bill\.youuhost\.com/g, '/youuhost-assets');
 }
 
 const nav = fixUrls($('.app-nav').parent().html() || $('.app-nav').html());

@@ -7,8 +7,8 @@ let c = fs.readFileSync(p, 'utf8');
 c = c.replace(/action=\\"\/\/dashboard/g, 'action=\\"/dashboard');
 // Fix value="//dashboard/..." in hidden inputs
 c = c.replace(/value=\\"\/\/dashboard/g, 'value=\\"/dashboard');
-// Fix /ultahost-assets//dashboard -> /ultahost-assets removed, just #
-c = c.replace(/href=\\"\/ultahost-assets\/\/dashboard[^"\\]*\\"/g, 'href=\\"#\\"');
+// Fix /youuhost-assets//dashboard -> /youuhost-assets removed, just #
+c = c.replace(/href=\\"\/youuhost-assets\/\/dashboard[^"\\]*\\"/g, 'href=\\"#\\"');
 
 const remaining = (c.match(/\/\/dashboard/g) || []).length;
 console.log(`Remaining //dashboard: ${remaining}`);

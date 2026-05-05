@@ -18,7 +18,7 @@ for (const file of files) {
   let productName = 'Hosting Plan';
   const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
   if (titleMatch) {
-    productName = titleMatch[1].replace(' - UltaHost', '').replace(' | UltaHost', '').trim();
+    productName = titleMatch[1].replace(' - youuhost', '').replace(' | youuhost', '').trim();
   } else {
     const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
     if (h1Match) productName = h1Match[1].trim();
@@ -71,7 +71,7 @@ for (const file of files) {
             </div>
             <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px;">
                 <span style="font-size:13px; color:#888;">Total Due Today</span>
-                <span id="os-total" style="font-size:26px; font-weight:800; color:#1a1a2e;">$${(parseFloat(basePrice)+0.62).toFixed(2)} <span style="font-size:14px;">USD</span></span>
+                <span id="os-total" style="font-size:26px; font-weight:800; color:#1a1a2e;">$${(parseFloat(basePrice) + 0.62).toFixed(2)} <span style="font-size:14px;">USD</span></span>
             </div>
             <a href="/store/checkout?product=${encodeURIComponent(productName)}&price=${basePrice}" 
                class="btn btn-primary btn-block btn-lg" id="btnCompleteProductConfig"
@@ -121,7 +121,7 @@ for (const file of files) {
 
   // Replace the old sidebar div (main-sidebar) with our new one
   const oldSidebarPattern = /<div class="main-sidebar main-sidebar-lg"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>\s*<div class="order-summary order-summary-mob/;
-  
+
   // Simpler: replace just the content of the #orderSummary div
   const sidebarStart = html.indexOf('<div class="main-sidebar main-sidebar-lg">');
   const orderSummaryMobStart = html.indexOf('<div class="order-summary order-summary-mob');

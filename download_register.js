@@ -1,7 +1,7 @@
 const fs = require('fs');
 const https = require('https');
 
-https.get('https://bill.ultahost.com/register.php', (res) => {
+https.get('https://bill.youuhost.com/register.php', (res) => {
     let d = '';
     res.on('data', c => d += c);
     res.on('end', () => {

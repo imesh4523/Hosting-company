@@ -3,31 +3,31 @@ import fs from 'fs';
 import path from 'path';
 
 // ── CONFIG ─────────────────────────────────────────────────────────────────
-const EMAIL    = 'Imeshcheak2@gmail.com';
+const EMAIL = 'Imeshcheak2@gmail.com';
 const PASSWORD = 'Is4P4WvggnIX>Ktno(';
-const BASE_URL = 'https://bill.ultahost.com';
-const OUT_DIR  = path.join('C:\\Users\\azureuser\\Desktop\\Hosting site\\backend\\fragments');
+const BASE_URL = 'https://bill.youuhost.com';
+const OUT_DIR = path.join('C:\\Users\\azureuser\\Desktop\\Hosting site\\backend\\fragments');
 
 // Pages to scrape: { filename, path }
 const PAGES_TO_SCRAPE = [
-  { file: 'main.html',              url: '/clientarea.php' },
-  { file: 'invoices.html',          url: '/clientarea.php?action=invoices' },
-  { file: 'quotes.html',            url: '/clientarea.php?action=quotes' },
-  { file: 'addfunds.html',          url: '/clientarea.php?action=addfunds' },
-  { file: 'services.html',          url: '/clientarea.php?action=services' },
-  { file: 'domains.html',           url: '/clientarea.php?action=domains' },
-  { file: 'tickets.html',           url: '/supporttickets.php' },
-  { file: 'affiliates.html',        url: '/affiliates.php' },
-  { file: 'announcements.html',     url: '/announcements.php' },
-  { file: 'knowledgebase.html',     url: '/knowledgebase.php' },
-  { file: 'downloads.html',         url: '/downloads.php' },
-  { file: 'network-status.html',    url: '/serverstatus.php' },
-  { file: 'ssl-certificates.html',  url: '/store/ultasecurity' },
-  { file: 'website-backup.html',    url: '/store/codeguard' },
-  { file: 'website-security.html',  url: '/store/sitelock' },
-  { file: 'seo-tools.html',         url: '/store/marketgoo' },
-  { file: 'security.html',          url: '/clientarea.php?action=security' },
-  { file: 'dns-manager.html',       url: '/index.php?m=DNSManager3' },
+  { file: 'main.html', url: '/clientarea.php' },
+  { file: 'invoices.html', url: '/clientarea.php?action=invoices' },
+  { file: 'quotes.html', url: '/clientarea.php?action=quotes' },
+  { file: 'addfunds.html', url: '/clientarea.php?action=addfunds' },
+  { file: 'services.html', url: '/clientarea.php?action=services' },
+  { file: 'domains.html', url: '/clientarea.php?action=domains' },
+  { file: 'tickets.html', url: '/supporttickets.php' },
+  { file: 'affiliates.html', url: '/affiliates.php' },
+  { file: 'announcements.html', url: '/announcements.php' },
+  { file: 'knowledgebase.html', url: '/knowledgebase.php' },
+  { file: 'downloads.html', url: '/downloads.php' },
+  { file: 'network-status.html', url: '/serverstatus.php' },
+  { file: 'ssl-certificates.html', url: '/store/ultasecurity' },
+  { file: 'website-backup.html', url: '/store/codeguard' },
+  { file: 'website-security.html', url: '/store/sitelock' },
+  { file: 'seo-tools.html', url: '/store/marketgoo' },
+  { file: 'security.html', url: '/clientarea.php?action=security' },
+  { file: 'dns-manager.html', url: '/index.php?m=DNSManager3' },
 ];
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ function ensureDir(dir) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-async function loginToUltahost(page) {
+async function loginToyouuhost(page) {
   console.log('🔐 Going to login page...');
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await new Promise(r => setTimeout(r, 3000));
@@ -104,7 +104,7 @@ async function scrapeFragments() {
   const page = await browser.newPage();
 
   try {
-    await loginToUltahost(page);
+    await loginToyouuhost(page);
 
     for (const { file, url } of PAGES_TO_SCRAPE) {
       const fullUrl = `${BASE_URL}${url}`;

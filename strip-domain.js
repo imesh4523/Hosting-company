@@ -9,9 +9,9 @@ function walk(dir) {
     list.forEach(file => {
         file = path.join(dir, file);
         const stat = fs.statSync(file);
-        if (stat && stat.isDirectory()) { 
+        if (stat && stat.isDirectory()) {
             results = results.concat(walk(file));
-        } else { 
+        } else {
             if (file.endsWith('.html')) results.push(file);
         }
     });
@@ -25,7 +25,7 @@ htmlFiles.forEach(filePath => {
     let original = html;
 
     // 1. Strip the domain from absolute URLs
-    html = html.replace(/https?:\/\/(www\.|bill\.)?ultahost\.com/gi, '');
+    html = html.replace(/https?:\/\/(www\.|bill\.)?youuhost\.com/gi, '');
 
     // 2. Fix links to ensure they point to .html or /index.html
     html = html.replace(/href="([^"#]+)"/g, (match, url) => {
@@ -65,13 +65,13 @@ htmlFiles.forEach(filePath => {
         return match;
     });
 
-    // 3. Replace any remaining text mentions of ultahost.com (not in URLs)
-    // Actually, we can just replace 'ultahost.com' with 'localhost:3000' to be safe everywhere
+    // 3. Replace any remaining text mentions of youuhost.com (not in URLs)
+    // Actually, we can just replace 'youuhost.com' with 'localhost:3000' to be safe everywhere
     // Wait, replacing it everywhere might break some external things if they exist, but user said "kisima thenakaaape code eke mention venna ne" (should not be mentioned anywhere in our code)
-    html = html.replace(/ultahost\.com/gi, 'localhost:3000');
-    // Also replace UltaHost with HostingCompany
-    html = html.replace(/UltaHost/g, 'Hosting Company');
-    html = html.replace(/ultahost/gi, 'hostingcompany');
+    html = html.replace(/youuhost\.com/gi, 'localhost:3000');
+    // Also replace youuhost with HostingCompany
+    html = html.replace(/youuhost/g, 'Hosting Company');
+    html = html.replace(/youuhost/gi, 'hostingcompany');
 
     if (html !== original) {
         fs.writeFileSync(filePath, html);

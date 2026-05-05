@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const STORE_URL = 'https://bill.ultahost.com/store/';
+const STORE_URL = 'https://bill.youuhost.com/store/';
 const TARGET_DIR = path.join(__dirname, '..', 'backend', 'fragments');
 
 if (!fs.existsSync(TARGET_DIR)) {
@@ -36,13 +36,13 @@ function fetchWithCookies(url) {
   return new Promise((resolve, reject) => {
     https.get(url, (res) => {
       const cookies = res.headers['set-cookie'];
-      
+
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         let redirectUrl = res.headers.location;
         if (!redirectUrl.startsWith('http')) {
-          redirectUrl = 'https://bill.ultahost.com' + redirectUrl;
+          redirectUrl = 'https://bill.youuhost.com' + redirectUrl;
         }
-        
+
         const req = https.get(redirectUrl, {
           headers: {
             'Cookie': cookies ? cookies.map(c => c.split(';')[0]).join('; ') : ''
@@ -78,22 +78,22 @@ function extractAppMain(html) {
 
 async function scrapeAll() {
   console.log(`Starting extraction of ${CATEGORY_SLUGS.length} categories...`);
-  
+
   let allOrderLinks = [];
 
   // 1. Scrape Store Pages in batches of 5
   const BATCH_SIZE = 5;
   for (let i = 0; i < CATEGORY_SLUGS.length; i += BATCH_SIZE) {
     const batch = CATEGORY_SLUGS.slice(i, i + BATCH_SIZE);
-    console.log(`Processing category batch ${i/BATCH_SIZE + 1} / ${Math.ceil(CATEGORY_SLUGS.length/BATCH_SIZE)}`);
-    
+    console.log(`Processing category batch ${i / BATCH_SIZE + 1} / ${Math.ceil(CATEGORY_SLUGS.length / BATCH_SIZE)}`);
+
     await Promise.all(batch.map(async (slug) => {
       try {
         const html = await fetchHtml(STORE_URL + slug);
         const extracted = extractAppMain(html);
         if (extracted) {
           fs.writeFileSync(path.join(TARGET_DIR, `store-${slug}.html`), extracted);
-          
+
           // Extract order links e.g., /store/vps-hosting/vps-basic
           const linkRegex = new RegExp(`href="/store/${slug}/([^"]+)"`, 'g');
           let match;
@@ -107,10 +107,10 @@ async function scrapeAll() {
         console.error(`Error scraping store page ${slug}:`, e.message);
       }
     }));
-    
+
     await sleep(2000); // 2 second delay between batches
   }
-  
+
   // Deduplicate links
   const uniqueLinks = [];
   const seen = new Set();
@@ -126,9 +126,9 @@ async function scrapeAll() {
   // 2. Scrape Cart Configuration Pages in batches of 5
   for (let i = 0; i < uniqueLinks.length; i += BATCH_SIZE) {
     const batch = uniqueLinks.slice(i, i + BATCH_SIZE);
-    console.log(`Processing cart batch ${i/BATCH_SIZE + 1} / ${Math.ceil(uniqueLinks.length/BATCH_SIZE)}`);
-    
-    await Promise.all(batch.map(async ({slug, subSlug}) => {
+    console.log(`Processing cart batch ${i / BATCH_SIZE + 1} / ${Math.ceil(uniqueLinks.length / BATCH_SIZE)}`);
+
+    await Promise.all(batch.map(async ({ slug, subSlug }) => {
       try {
         const html = await fetchWithCookies(STORE_URL + slug + '/' + subSlug);
         let extracted = extractAppMain(html);
@@ -140,7 +140,7 @@ async function scrapeAll() {
                <i class="fas fa-arrow-circle-right"></i> Continue
              </a>`
           );
-          
+
           fs.writeFileSync(path.join(TARGET_DIR, `cart-configure-${subSlug}.html`), extracted);
         } else {
           console.log(`Warning: Could not extract cart configuration for ${subSlug}`);
@@ -149,7 +149,7 @@ async function scrapeAll() {
         console.error(`Error scraping cart configure ${subSlug}:`, e.message);
       }
     }));
-    
+
     await sleep(2000);
   }
 

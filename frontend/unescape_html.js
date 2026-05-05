@@ -37,18 +37,18 @@ if ((content.startsWith('"') && content.endsWith('"')) || (content.startsWith("'
     content = decodeString(content);
 }
 
-// Fix paths to absolute UltaHost URLs for assets we don't have locally
-const baseUrl = 'https://bill.ultahost.com';
+// Fix paths to absolute youuhost URLs for assets we don't have locally
+const baseUrl = 'https://bill.youuhost.com';
 content = content.replace(/(href|src|url)\s*=\s*["']\//g, (match) => {
     return match.slice(0, -1) + baseUrl + '/';
 });
 
 // Intercept dashboard links
-content = content.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php\?action=domains/g, '/dashboard/domains');
-content = content.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php\?action=services/g, '/dashboard/services');
-content = content.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php/g, '/dashboard');
-content = content.replace(/https:\/\/bill\.ultahost\.com/g, '/dashboard');
-content = content.replace(/https:\/\/ultahost\.com/g, 'http://localhost:3001');
+content = content.replace(/https:\/\/bill\.youuhost\.com\/clientarea\.php\?action=domains/g, '/dashboard/domains');
+content = content.replace(/https:\/\/bill\.youuhost\.com\/clientarea\.php\?action=services/g, '/dashboard/services');
+content = content.replace(/https:\/\/bill\.youuhost\.com\/clientarea\.php/g, '/dashboard');
+content = content.replace(/https:\/\/bill\.youuhost\.com/g, '/dashboard');
+content = content.replace(/https:\/\/youuhost\.com/g, 'http://localhost:3001');
 content = content.replace(/href="[^"]*clientarea\.php"/g, 'href="http://localhost:3000/dashboard"');
 content = content.replace(/href="[^"]*index\.php"/g, 'href="/dashboard"');
 

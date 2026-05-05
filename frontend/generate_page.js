@@ -6,10 +6,10 @@ let template = fs.readFileSync(templatePath, 'utf8');
 
 function generatePage(pageName, title, breadcrumb, contentHtml) {
     let page = template;
-    
+
     // Replace Title
     page = page.replace(/<h1[^>]*>[\s\S]*?<\/h1>/, `<h1>${title}</h1>`);
-    
+
     // Replace Breadcrumb
     page = page.replace(/<ol class="breadcrumb">[\s\S]*?<\/ol>/, `
         <ol class="breadcrumb">
@@ -18,7 +18,7 @@ function generatePage(pageName, title, breadcrumb, contentHtml) {
             <li class="breadcrumb-item active">${breadcrumb}</li>
         </ol>
     `);
-    
+
     // Replace Main Content Area
     // The main content area in the Lagom theme is usually inside .main-content .main-body or .main-grid
     // We'll replace the entire .main-grid content for simplicity
@@ -27,7 +27,7 @@ function generatePage(pageName, title, breadcrumb, contentHtml) {
         const nextDiv = page.indexOf('<div', mainGridStart + 1); // Start of content
         // This is a bit tricky with raw string replacement, 
         // so we'll look for the end of the main-grid or just replace the inner part
-        
+
         // Let's try a simpler approach: Replace the specific dashboard cards
         // Searching for the first card-row
         page = page.replace(/<div class="row row-cards">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>/, `
@@ -44,11 +44,11 @@ function generatePage(pageName, title, breadcrumb, contentHtml) {
     }
 
     const outputPath = path.join(__dirname, 'public', `${pageName}-static.html`);
-    
+
     // Final cleanup of any leftover links
-    page = page.replace(/https:\/\/bill\.ultahost\.com\/clientarea\.php/g, '/dashboard');
-    page = page.replace(/https:\/\/ultahost\.com/g, 'http://localhost:3001');
-    
+    page = page.replace(/https:\/\/bill\.youuhost\.com\/clientarea\.php/g, '/dashboard');
+    page = page.replace(/https:\/\/youuhost\.com/g, 'http://localhost:3001');
+
     fs.writeFileSync(outputPath, page);
     console.log(`Generated ${outputPath}`);
 }
@@ -70,7 +70,7 @@ const domainsContent = `
     </div>
     <h6 class="message-title">No Domains Registered With Us</h6>
     <div class="message-action">
-        <a class="btn btn-primary" href="https://ultahost.com/domains">
+        <a class="btn btn-primary" href="https://youuhost.com/domains">
             Register a New Domain
         </a>
     </div>

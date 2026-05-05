@@ -7,28 +7,28 @@ import path from 'path';
         const browserURL = 'http://127.0.0.1:9222';
         const browser = await puppeteer.connect({ browserURL });
         const pages = await browser.pages();
-        
+
         let targetPage = null;
         for (const p of pages) {
-            if (p.url().includes('bill.ultahost.com')) {
+            if (p.url().includes('bill.youuhost.com')) {
                 targetPage = p;
                 break;
             }
         }
-        
+
         if (!targetPage) {
-            console.log('Could not find Ultahost page.');
+            console.log('Could not find youuhost page.');
             await browser.disconnect();
             return;
         }
 
         const subpages = [
-            { name: 'affiliates', url: 'https://bill.ultahost.com/affiliates.php' },
-            { name: 'knowledgebase', url: 'https://bill.ultahost.com/knowledgebase.php' },
-            { name: 'announcements', url: 'https://bill.ultahost.com/announcements.php' },
-            { name: 'network-status', url: 'https://bill.ultahost.com/serverstatus.php' },
-            { name: 'downloads', url: 'https://bill.ultahost.com/downloads.php' },
-            { name: 'security', url: 'https://bill.ultahost.com/clientarea.php?action=details' }
+            { name: 'affiliates', url: 'https://bill.youuhost.com/affiliates.php' },
+            { name: 'knowledgebase', url: 'https://bill.youuhost.com/knowledgebase.php' },
+            { name: 'announcements', url: 'https://bill.youuhost.com/announcements.php' },
+            { name: 'network-status', url: 'https://bill.youuhost.com/serverstatus.php' },
+            { name: 'downloads', url: 'https://bill.youuhost.com/downloads.php' },
+            { name: 'security', url: 'https://bill.youuhost.com/clientarea.php?action=details' }
         ];
 
         const outputDir = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\backend\\fragments';

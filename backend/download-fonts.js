@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 
-const publicDir = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\frontend\\public\\ultahost-assets';
+const publicDir = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\frontend\\public\\youuhost-assets';
 
 function ensureDir(dir) {
     if (!fs.existsSync(dir)) {
@@ -23,7 +23,7 @@ function download(url, dest) {
                 file.close(resolve);
             });
         }).on('error', (err) => {
-            fs.unlink(dest, () => {});
+            fs.unlink(dest, () => { });
             reject(err);
         });
     });
@@ -33,7 +33,7 @@ function getAllFiles(dirPath, arrayOfFiles) {
     const files = fs.readdirSync(dirPath);
     arrayOfFiles = arrayOfFiles || [];
 
-    files.forEach(function(file) {
+    files.forEach(function (file) {
         if (fs.statSync(dirPath + "/" + file).isDirectory()) {
             arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
         } else {
@@ -67,9 +67,9 @@ function getAllFiles(dirPath, arrayOfFiles) {
                     // It's relative to the CSS file's location on the original server
                     // We need to know the original base URL of this CSS file.
                     // From assets-list.json, we know where they came from.
-                    // But for simplicity, we can assume they are all from bill.ultahost.com
+                    // But for simplicity, we can assume they are all from bill.youuhost.com
                     const cssRelativePath = path.relative(publicDir, cssFile).replace(/\\/g, '/');
-                    const originalCssUrl = `https://bill.ultahost.com/${cssRelativePath}`;
+                    const originalCssUrl = `https://bill.youuhost.com/${cssRelativePath}`;
                     absoluteUrl = new URL(fontPath, originalCssUrl).href;
                 }
                 fontUrls.add(absoluteUrl);
@@ -80,11 +80,11 @@ function getAllFiles(dirPath, arrayOfFiles) {
 
         for (const url of fontUrls) {
             const parsedUrl = new URL(url);
-            if (parsedUrl.hostname !== 'bill.ultahost.com') continue;
+            if (parsedUrl.hostname !== 'bill.youuhost.com') continue;
 
             const relativePath = parsedUrl.pathname.replace(/^\/+/, '');
             const localDest = path.join(publicDir, relativePath);
-            
+
             ensureDir(path.dirname(localDest));
             console.log(`Downloading font: ${url} -> ${localDest}`);
             try {

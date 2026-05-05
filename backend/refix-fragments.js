@@ -5,8 +5,8 @@ const fragmentsPath = 'C:\\Users\\azureuser\\Desktop\\Hosting site\\frontend\\sr
 let content = fs.readFileSync(fragmentsPath, 'utf8');
 
 // Normalize URLs in all fragments
-// 1. Make all bill.ultahost.com links relative
-content = content.replace(/https:\/\/bill\.ultahost\.com/g, '');
+// 1. Make all bill.youuhost.com links relative
+content = content.replace(/https:\/\/bill\.youuhost\.com/g, '');
 
 // 2. Fix Sidebar Links to point to our Next.js routes
 // We use a map of PHP patterns to our Next.js routes

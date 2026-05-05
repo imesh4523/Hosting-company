@@ -13,7 +13,7 @@ files.forEach(f => {
 
     // Fix links AT THE HTML LEVEL before embedding in TS
     // Remove absolute domains
-    html = html.replace(/https:\/\/bill\.ultahost\.com/g, '');
+    html = html.replace(/https:\/\/bill\.youuhost\.com/g, '');
 
     // Fix PHP action links
     html = html.replace(/clientarea\.php\?action=invoices/g, '/dashboard/billing/invoices');
@@ -42,7 +42,7 @@ files.forEach(f => {
     html = html.replace(/href="\/logout\.php"/g, 'href="/api/auth/logout"');
 
     // Fix Cart
-    html = html.replace(/href="cart\.php[^"]*"/g, 'href="https://ultahost.com/cart"');
+    html = html.replace(/href="cart\.php[^"]*"/g, 'href="https://youuhost.com/cart"');
 
     // Username
     html = html.replace(/Romania Srilanka/g, '{userName}');
