@@ -94,6 +94,13 @@ function fixLinks(html: string): string {
     });
 
   // ── 1. Asset path rewrites (do this BEFORE stripping domain) ──────────────
+  // Preserve SVG icons from being rewritten to local assets
+  const isSvgIcon = (url: string) => url.endsWith('.svg') && (url.includes('/os/') || url.includes('/logos/'));
+  
+  html = html.replace(/https:\/\/bill\.ultahost\.com\/templates\/lagom2\/assets\/img\/logos\/([^"\s]+)/g, (match) => {
+    return match; // Keep these absolute
+  });
+
   html = html.replace(/https:\/\/bill\.youuhost\.com\/templates\//g, '/ultahost-assets/templates/');
   html = html.replace(/https:\/\/bill\.youuhost\.com\/assets\//g, '/ultahost-assets/assets/');
   html = html.replace(/https:\/\/bill\.youuhost\.com\/modules\//g, '/ultahost-assets/modules/');
@@ -650,6 +657,53 @@ export async function GET(request: NextRequest) {
   let html = fs.readFileSync(filePath, 'utf8');
   html = fixLinks(html);
   return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } });
+}
+
+export async function POST(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const pathParam = searchParams.get('path') || 'cart.php';
+  const backendUrl = `https://bill.youuhost.com/${pathParam}`;
+  
+  try {
+    const body = await request.text();
+    const headers = new Headers();
+    
+    // Forward essential headers
+    request.headers.forEach((value, key) => {
+      const k = key.toLowerCase();
+      if (k !== 'host' && k !== 'origin' && k !== 'content-length') {
+        headers.set(key, value);
+      }
+    });
+
+    // Ensure it's recognized as AJAX
+    headers.set('X-Requested-With', 'XMLHttpRequest');
+
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      headers: headers,
+      body: body,
+      redirect: 'follow'
+    });
+
+    const data = await response.text();
+    const resHeaders = new Headers();
+    resHeaders.set('Content-Type', response.headers.get('Content-Type') || 'application/json');
+    
+    // Pass back cookies from backend to browser
+    const setCookie = response.headers.get('set-cookie');
+    if (setCookie) {
+      resHeaders.set('set-cookie', setCookie);
+    }
+
+    return new NextResponse(data, {
+      status: response.status,
+      headers: resHeaders
+    });
+  } catch (error) {
+    console.error('Proxy POST Error:', error);
+    return NextResponse.json({ error: 'Proxy failed' }, { status: 500 });
+  }
 }
 
 
