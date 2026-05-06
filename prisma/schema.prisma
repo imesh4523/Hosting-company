@@ -22,6 +22,21 @@ model User {
   activeVpsId   String?
   avatar          String?
   emailVerified   Boolean     @default(false)
+  
+  // Profile
+  phone         String?
+  address1      String?
+  address2      String?
+  city          String?
+  state         String?
+  postcode      String?
+  country       String?
+  company       String?
+
+  // 2FA
+  twoFactorEnabled Boolean     @default(false)
+  twoFactorSecret  String?     // AES Encrypted
+  twoFactorBackupCodes String[] @default([])
 
   vms           VM[]
   invoices      Invoice[]
@@ -32,6 +47,7 @@ model User {
   migrations    Migration[]
   vmHistory     VMHistory[]
   oauthAccounts   UserOAuth[]
+  domains       Domain[]
   
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -415,4 +431,17 @@ model UserIPLog {
   city          String?
   isSuspicious  Boolean   @default(false)
   createdAt     DateTime  @default(now())
+}
+
+// ─── Domains ───────────────────────────────────────────────────────────────
+model Domain {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  domainName    String    @unique
+  status        String    @default("pending")
+  expiryDate    DateTime
+  nextDueDate   DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

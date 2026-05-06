@@ -66,6 +66,14 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // Check 2FA
+    if (user.twoFactorEnabled) {
+      return res.json({
+        twoFactorRequired: true,
+        userId: user.id
+      });
+    }
+
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
     const refreshToken = jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '7d' });
 

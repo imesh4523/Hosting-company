@@ -9,6 +9,34 @@ export default function StoreDynamicPage() {
   const slug = slugArray.length > 0 ? slugArray[0] : '';
   const subSlug = slugArray.length > 1 ? slugArray[1] : '';
 
+  const [rates, setRates] = React.useState<Record<string, number>>({ USD: 1 });
+  const [currency, setCurrency] = React.useState('USD');
+
+  React.useEffect(() => {
+    fetch('/api/public/rates')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) setRates(data.rates);
+      })
+      .catch(console.error);
+
+    const saved = localStorage.getItem('user_currency');
+    if (saved) setCurrency(saved);
+  }, []);
+
+  const formatPrice = (usdPriceStr: string) => {
+    if (!usdPriceStr) return '';
+    const match = usdPriceStr.match(/\$(\d+\.\d{2})/);
+    if (!match) return usdPriceStr;
+    const usdPrice = parseFloat(match[1]);
+    const rate = rates[currency] || 1;
+    const converted = (usdPrice * rate).toFixed(2);
+    
+    const symbols: Record<string, string> = { LKR: 'Rs.', USD: '$', EUR: '€', GBP: '£', INR: '₹' };
+    const symbol = symbols[currency] || currency + ' ';
+    return `${symbol}${converted}`;
+  };
+
   const fragmentMapping: Record<string, string> = {
     'ultasecurity':                       'ssl_certificates',
     'vps-hosting':                        'services',
@@ -189,8 +217,8 @@ export default function StoreDynamicPage() {
         const priceMatch = priceStr.match(/\$(\d+\.\d{2})/);
         if (!priceMatch) return;
         
-        const cleanPrice = priceMatch[1];
-        const formattedPrice = `$${cleanPrice} USD`;
+        const cleanPriceUSD = priceMatch[1];
+        const formattedPrice = `${formatPrice('$' + cleanPriceUSD)} ${currency}`;
         
         const updateElements = () => {
             const summaryPanel = document.querySelector('.order-summary, #orderSummary, .summary-panel, #producttotal');
@@ -207,7 +235,7 @@ export default function StoreDynamicPage() {
                 const targets = {
                     'os-base-price': formattedPrice,
                     'os-recurring-price': formattedPrice,
-                    'os-total': formattedPrice + ' <span style="font-size: 16px; font-weight: 500;">USD</span>'
+                    'os-total': formattedPrice + ' <span style="font-size: 16px; font-weight: 500;">' + currency + '</span>'
                 };
 
                 Object.entries(targets).forEach(([id, val]) => {
@@ -220,9 +248,14 @@ export default function StoreDynamicPage() {
                 let node;
                 while(node = walkers.nextNode()) {
                     const text = node.nodeValue || "";
-                    if (text.includes('$') && !text.includes(cleanPrice)) {
-                        const newText = text.replace(/\$\d+\.\d{2}/g, `$${cleanPrice}`);
+                    // Regex to find USD-like prices
+                    const usdRegex = /\$\d+\.\d{2}/g;
+                    if (usdRegex.test(text)) {
+                        const newText = text.replace(usdRegex, (match) => formatPrice(match));
                         if (node.nodeValue !== newText) node.nodeValue = newText;
+                    } else if (currency !== 'USD' && text.includes('.')) {
+                        // Try to find already converted prices and update them if currency changed
+                        // This is complex, but for now we rely on the re-injection for the main UI
                     }
                 }
 
@@ -318,12 +351,12 @@ export default function StoreDynamicPage() {
                     : `https://flagcdn.com/32x24/${code}.png`;
                 content += `<h6>${item.name}</h6><img src="${iconUrl}">`;
             } else if (type === 'billing') {
-                const oldPriceHtml = item.oldPrice ? `<span class="original-price-strike" style="font-size: 11px; color: #8e8e8e; text-decoration: line-through; margin-left: 5px;">${item.oldPrice}</span>` : '';
+                const oldPriceHtml = item.oldPrice ? `<span class="original-price-strike" style="font-size: 11px; color: #8e8e8e; text-decoration: line-through; margin-left: 5px;">${formatPrice(item.oldPrice)}</span>` : '';
                 content += `
                     <div class="card-info">
                         <h6>${item.name}</h6>
                         <div class="price-container" style="display: flex; align-items: center; gap: 4px; margin-top: 4px; flex-wrap: wrap;">
-                            <span class="price" style="font-size: 13px; color: #1062FE; font-weight: 700;">${item.price}</span>
+                            <span class="price" style="font-size: 13px; color: #1062FE; font-weight: 700;">${formatPrice(item.price)}</span>
                             ${oldPriceHtml}
                         </div>
                     </div>
@@ -374,6 +407,12 @@ export default function StoreDynamicPage() {
         const cpData = scrapeSection('Control Panel');
 
         if (osData.length === 0 && locData.length === 0) return;
+        if (Object.keys(rates).length <= 1 && currency !== 'USD') {
+            console.log('Antigravity: Waiting for rates...');
+            return;
+        }
+
+        console.log('Antigravity: Injecting UI with currency', currency);
 
         const titles = Array.from(document.querySelectorAll('h2, .section-title, h3, .section-main-title'));
 
@@ -462,11 +501,35 @@ export default function StoreDynamicPage() {
         observer.disconnect();
         clearInterval(summaryInterval);
         if ((window as any)._summaryObserver) (window as any)._summaryObserver.disconnect();
+        const injectedMarker = document.getElementById('react-store-injected');
+        if (injectedMarker) injectedMarker.remove();
+        // Remove injected UIs to force fresh injection on re-run
+        ['react-billing-ui', 'react-os-ui', 'react-loc-ui'].forEach(id => {
+            document.getElementById(id)?.remove();
+        });
+        document.querySelectorAll('.hidden-original').forEach(el => el.classList.remove('hidden-original'));
     };
-  }, [pathname]);
+  }, [pathname, currency, rates]);
 
   return (
     <>
+      <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1000, background: '#fff', padding: '10px 15px', borderRadius: '50px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', display: 'flex', gap: 10, alignItems: 'center', border: '1px solid #eee' }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#666' }}>Currency:</span>
+        <select 
+          value={currency} 
+          onChange={(e) => {
+            setCurrency(e.target.value);
+            localStorage.setItem('user_currency', e.target.value);
+          }}
+          style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: 700, color: '#1062FE', cursor: 'pointer' }}
+        >
+          <option value="USD">USD ($)</option>
+          <option value="LKR">LKR (Rs.)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="INR">INR (₹)</option>
+        </select>
+      </div>
       <FragmentPage key={`${fragmentName}-${slug}`} fragmentName={fragmentName} slug={slug} subSlug={subSlug} />
     </>
   );

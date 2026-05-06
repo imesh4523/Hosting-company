@@ -18,10 +18,12 @@ import paymentRoutes from './routes/payment.routes.js';
 import ticketRoutes from './routes/ticket.routes.js';
 import billingRoutes from './routes/billing.routes.js';
 import domainRoutes from './routes/domain.routes.js';
+import publicRoutes from './routes/public.routes.js';
 import { SuspensionDetector } from './services/suspension.service.js';
 
 import passport from 'passport';
 import { OAuthService } from './services/oauth.service.js';
+import { standardLimiter, authLimiter } from './middleware/rate-limit.js';
 
 dotenv.config();
 
@@ -36,8 +38,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(passport.initialize());
 
+// Apply global rate limiting
+app.use(standardLimiter);
+
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/vps', vpsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/xhr.php', aiRoutes);
@@ -51,6 +56,7 @@ app.use('/api/payments',         paymentRoutes);
 app.use('/api/tickets',          ticketRoutes);
 app.use('/api/billing',          billingRoutes);
 app.use('/api/domains',          domainRoutes);
+app.use('/api/public',           publicRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'VPS Reseller Platform API is running' });
