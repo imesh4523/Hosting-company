@@ -1,223 +1,261 @@
-<!-- Account: Payment Methods -->
-<div class="main-header">
-  <div class="container">
-    <h1 class="main-header-title">Payment Methods</h1>
-    <ol class="breadcrumb">
-      <li><a href="/dashboard">Portal Home</a></li>
-      <li><a href="/dashboard">Client Area</a></li>
-      <li><a href="/dashboard/account/details">Account Details</a></li>
-      <li class="active">Payment Methods</li>
-    </ol>
-  </div>
-</div>
+<script src="https://js.stripe.com/v3/"></script>
+<div id="payment-methods-wrapper" style="font-family: 'Poppins', sans-serif, system-ui;">
+  <img src="x" onerror="
+    window.switchView = function(view) {
+      if (view === 'add') {
+        document.getElementById('view-list').style.display = 'none';
+        document.getElementById('view-add').style.display = 'block';
+        window.scrollTo(0,0);
+      } else {
+        document.getElementById('view-list').style.display = 'block';
+        document.getElementById('view-add').style.display = 'none';
+        window.scrollTo(0,0);
+      }
+    };
+    window.formatCardNumber = function(input) {
+      let val = input.value.replace(/\D/g,'').substring(0,16);
+      input.value = val.replace(/(.{4})/g,'$1 ').trim();
+    };
+    window.formatExpiry = function(input) {
+      let val = input.value.replace(/\D/g,'').substring(0,4);
+      if(val.length >= 2) val = val.substring(0,2) + ' / ' + val.substring(2,4);
+      input.value = val;
+    };
+    window.saveCardData = function(e) {
+      e.preventDefault();
+      alert('Card saved successfully!');
+      window.switchView('list');
+    };
+    this.remove();
+  " style="display:none;">
 
-<div class="main-body">
-  <div class="container">
-    <div class="main-content">
-      <div class="row">
+  <!-- 1. List View -->
+  <div id="view-list">
+    <div class="main-header" style="margin-bottom: 30px;">
+      <div class="container">
+        <h1 class="main-header-title" style="font-size: 32px; font-weight: 800; color: #111; margin-bottom: 5px;">Payment Methods</h1>
+        <div style="font-size: 12px; color: #888;">
+          <a href="/dashboard" style="color:#888; text-decoration:none;">Portal Home</a> / 
+          <a href="/dashboard" style="color:#888; text-decoration:none;">Client Area</a> / 
+          <a href="/dashboard/account/details" style="color:#888; text-decoration:none;">Account Details</a> / 
+          <span style="color:#888;">Payment Methods</span>
+        </div>
+      </div>
+    </div>
 
-        <!-- Left Account Sidebar -->
-        <div class="col-md-3">
-          <div class="panel panel-default hdcAccSide">
-            <div class="panel-heading" style="background:#f8f9fa; border-bottom:1px solid #eee; padding:14px 20px;">
-              <h4 style="margin:0; font-size:15px; font-weight:600; color:#333;">Account</h4>
+    <div class="main-body">
+      <div class="container">
+        <div class="row">
+          <!-- Sidebar -->
+          <div class="col-md-3">
+            <h4 style="font-size: 16px; font-weight: 700; color: #000; margin-bottom: 15px; margin-top: 0;">Account</h4>
+            <div class="list-group naked-sidebar" style="margin: 0; display: flex; flex-direction: column; gap: 4px;">
+              <a href="/dashboard/account/details" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-user" style="margin-right:12px; width:16px; text-align:center;"></i> Account Details</a>
+              <a href="/dashboard/account/users" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-arrows-alt-v" style="margin-right:12px; width:16px; text-align:center;"></i> User Management</a>
+              <a href="/dashboard/account/paymentmethods" class="list-group-item active" style="border:none; background:#f4f7fe; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:600; border-radius:8px;"><i class="fas fa-credit-card" style="margin-right:12px; width:16px; text-align:center;"></i> Payment Methods</a>
+              <a href="/dashboard/account/contacts" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-user" style="margin-right:12px; width:16px; text-align:center;"></i> Contacts</a>
+              <a href="/dashboard/account/security" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-shield-alt" style="margin-right:12px; width:16px; text-align:center;"></i> Account Security</a>
+              <a href="/dashboard/account/emails" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-envelope" style="margin-right:12px; width:16px; text-align:center;"></i> Email History</a>
             </div>
-            <ul class="list-group" style="margin:0; border-radius:0;">
-              <li class="list-group-item" style="border:none; border-bottom:1px solid #f0f0f0; padding:0;">
-                <a href="/dashboard/account/details" style="display:flex; align-items:center; gap:10px; padding:12px 18px; color:#4e5d78; text-decoration:none;">
-                  <i class="fas fa-user-circle" style="width:18px; text-align:center; color:#6b7280;"></i> Account Details
-                </a>
-              </li>
-              <li class="list-group-item" style="border:none; border-bottom:1px solid #f0f0f0; padding:0;">
-                <a href="/dashboard/account/users" style="display:flex; align-items:center; gap:10px; padding:12px 18px; color:#4e5d78; text-decoration:none;">
-                  <i class="fas fa-users-cog" style="width:18px; text-align:center; color:#6b7280;"></i> User Management
-                </a>
-              </li>
-              <li class="list-group-item active" style="border:none; border-bottom:1px solid #f0f0f0; padding:0; background:#eef2ff;">
-                <a href="/dashboard/account/paymentmethods" style="display:flex; align-items:center; gap:10px; padding:12px 18px; color:#4f5bff; text-decoration:none; font-weight:600;">
-                  <i class="fas fa-credit-card" style="width:18px; text-align:center; color:#4f5bff;"></i> Payment Methods
-                </a>
-              </li>
-              <li class="list-group-item" style="border:none; border-bottom:1px solid #f0f0f0; padding:0;">
-                <a href="/dashboard/account/contacts" style="display:flex; align-items:center; gap:10px; padding:12px 18px; color:#4e5d78; text-decoration:none;">
-                  <i class="fas fa-address-book" style="width:18px; text-align:center; color:#6b7280;"></i> Contacts
-                </a>
-              </li>
-              <li class="list-group-item" style="border:none; border-bottom:1px solid #f0f0f0; padding:0;">
-                <a href="/dashboard/account/security" style="display:flex; align-items:center; gap:10px; padding:12px 18px; color:#4e5d78; text-decoration:none;">
-                  <i class="fas fa-shield-alt" style="width:18px; text-align:center; color:#6b7280;"></i> Account Security
-                </a>
-              </li>
-              <li class="list-group-item" style="border:none; padding:0;">
-                <a href="/dashboard/account/emails" style="display:flex; align-items:center; gap:10px; padding:12px 18px; color:#4e5d78; text-decoration:none;">
-                  <i class="fas fa-envelope" style="width:18px; text-align:center; color:#6b7280;"></i> Email History
-                </a>
-              </li>
-            </ul>
+          </div>
+
+          <!-- Content Area -->
+          <div class="col-md-9" id="payment-methods-list-container">
+            <!-- Loading State -->
+            <div style="background: #fff; border-radius: 16px; border: 1px solid #f0f0f0; padding: 100px 40px; text-align: center;">
+               <i class="fas fa-spinner fa-spin" style="font-size:30px; color:#4a6aff; margin-bottom:15px;"></i>
+               <p>Loading payment methods...</p>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Main Content -->
-        <div class="col-md-9">
-          <div class="panel panel-default" style="border-radius:10px; border:1px solid #eee; overflow:hidden;">
-            <div class="panel-heading" style="background:#fff; border-bottom:1px solid #eee; padding:18px 24px; display:flex; align-items:center; justify-content:space-between;">
-              <h3 style="margin:0; font-size:18px; font-weight:700; color:#1a1a2e;">
-                <i class="fas fa-credit-card" style="color:#4f5bff; margin-right:10px;"></i>Saved Payment Methods
-              </h3>
-              <button id="add-card-btn" onclick="document.getElementById('add-card-modal').style.display='flex'" 
-                style="background:#4f5bff; color:white; border:none; border-radius:25px; padding:10px 22px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                <i class="fas fa-plus"></i> Add New Credit Card
+  <!-- 2. Add New View -->
+  <div id="view-add" style="display:none;">
+    <div class="main-header" style="margin-bottom: 30px;">
+      <div class="container">
+        <h1 class="main-header-title" style="font-size: 32px; font-weight: 800; color: #111; margin-bottom: 5px;">Payment Methods</h1>
+        <div style="font-size: 12px; color: #888;">
+          <a href="/dashboard" style="color:#888; text-decoration:none;">Portal Home</a> / 
+          <a href="/dashboard" style="color:#888; text-decoration:none;">Client Area</a> / 
+          <a href="/dashboard/account/details" style="color:#888; text-decoration:none;">Account Details</a> / 
+          <a href="#" onclick="window.switchView('list')" style="color:#888; text-decoration:none;">Payment Methods</a> / 
+          <span style="color:#888;">Add New Payment Method</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-body">
+      <div class="container">
+        <div class="row">
+          <!-- Sidebar -->
+          <div class="col-md-3">
+            <h4 style="font-size: 16px; font-weight: 700; color: #000; margin-bottom: 15px; margin-top: 0;">Account</h4>
+            <div class="list-group naked-sidebar" style="margin: 0; display: flex; flex-direction: column; gap: 4px;">
+              <a href="/dashboard/account/details" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-user" style="margin-right:12px; width:16px; text-align:center;"></i> Account Details</a>
+              <a href="/dashboard/account/users" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-arrows-alt-v" style="margin-right:12px; width:16px; text-align:center;"></i> User Management</a>
+              <a href="/dashboard/account/paymentmethods" class="list-group-item active" style="border:none; background:#f4f7fe; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:600; border-radius:8px;"><i class="fas fa-credit-card" style="margin-right:12px; width:16px; text-align:center;"></i> Payment Methods</a>
+              <a href="/dashboard/account/contacts" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-user" style="margin-right:12px; width:16px; text-align:center;"></i> Contacts</a>
+              <a href="/dashboard/account/security" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-shield-alt" style="margin-right:12px; width:16px; text-align:center;"></i> Account Security</a>
+              <a href="/dashboard/account/emails" class="list-group-item" style="border:none; background:transparent; padding:10px 15px; font-size:15px; color:#4a6aff; font-weight:500; border-radius:8px;"><i class="fas fa-envelope" style="margin-right:12px; width:16px; text-align:center;"></i> Email History</a>
+            </div>
+          </div>
+
+          <!-- Form Area -->
+          <div class="col-md-9">
+            <h2 style="font-size:22px; font-weight:600; color:#111; margin-bottom:25px; margin-top:0;">Add New Payment Method</h2>
+            
+            <div style="background: #fff; border-radius: 16px; border: 1px solid #f0f0f0; padding: 30px;">
+              <form id="payment-form">
+                <!-- Type Selection -->
+                <div style="margin-bottom:25px;">
+                  <label style="display:block; font-size:14px; color:#555; margin-bottom:10px;">Type</label>
+                  <label style="display:flex; align-items:center; cursor:pointer;">
+                    <input type="radio" name="payment_type" checked style="width:18px; height:18px; margin-right:10px; accent-color:#4a6aff;">
+                    <span style="font-size:15px; color:#111;">Credit - Debit Card | (Stripe)</span>
+                  </label>
+                </div>
+
+                <!-- Stripe Payment Element Container -->
+                <div style="margin-bottom:30px;">
+                  <label style="display:block; font-size:14px; color:#555; margin-bottom:15px;">Card Information</label>
+                  <div id="payment-element" style="border-radius:12px; border:1px solid #e0e0e0; padding:15px; background:#fff;">
+                      <!-- Stripe Element mounts here -->
+                  </div>
+                  <div id="payment-message" style="color: #d32f2f; margin-top: 15px; font-size: 14px; display: none;"></div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div style="display:flex; gap:15px;">
+                  <button id="submit-btn" type="submit" style="background:#4a6aff; color:#fff; border:none; padding:12px 30px; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer;">Save Changes</button>
+                  <button type="button" onclick="window.switchView('list')" style="background:#fff; border:1px solid #e0e0e0; padding:12px 30px; border-radius:8px; font-weight:600; font-size:14px; color:#555; cursor:pointer;">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const stripe = Stripe('pk_test_placeholder_key_should_be_here_or_handled_dynamically'); // User needs to set this
+    let elements;
+    const token = localStorage.getItem('token');
+
+    window.switchView = function(view) {
+      if (view === 'add') {
+        document.getElementById('view-list').style.display = 'none';
+        document.getElementById('view-add').style.display = 'block';
+        initializeStripe();
+      } else {
+        document.getElementById('view-list').style.display = 'block';
+        document.getElementById('view-add').style.display = 'none';
+        loadPaymentMethods();
+      }
+    };
+
+    async function initializeStripe() {
+      const response = await fetch('http://localhost:5000/api/account/payment-methods/setup-intent', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const { clientSecret } = await response.json();
+
+      const appearance = { theme: 'stripe' };
+      elements = stripe.elements({ appearance, clientSecret });
+
+      const paymentElementOptions = { layout: "tabs" };
+      const paymentElement = elements.create("payment", paymentElementOptions);
+      paymentElement.mount("#payment-element");
+    }
+
+    document.getElementById('payment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+
+      const { error } = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + "/dashboard/account/paymentmethods",
+        },
+      });
+
+      if (error) {
+        const messageContainer = document.querySelector("#payment-message");
+        messageContainer.textContent = error.message;
+        messageContainer.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+      } else {
+        // Success redirect or refresh
+      }
+    });
+
+    async function loadPaymentMethods() {
+      const container = document.getElementById('payment-methods-list-container');
+      try {
+        const res = await fetch('http://localhost:5000/api/account/payment-methods', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const json = await res.json();
+
+        if (json.success && json.data.length > 0) {
+          let html = '<div style="background: #fff; border-radius: 16px; border: 1px solid #f0f0f0; padding: 20px;">';
+          json.data.forEach(pm => {
+             html += `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #f0f0f0;">
+                <div style="display:flex; align-items:center; gap:15px;">
+                  <i class="fas fa-credit-card" style="font-size:20px; color:#555;"></i>
+                  <div>
+                    <div style="font-weight:600; color:#111;">${pm.card.brand.toUpperCase()} **** ${pm.card.last4}</div>
+                    <div style="font-size:12px; color:#888;">Expires ${pm.card.exp_month}/${pm.card.exp_year}</div>
+                  </div>
+                </div>
+                <button onclick="deletePM('${pm.id}')" style="background:transparent; border:none; color:#ff4d4f; cursor:pointer; font-size:13px; font-weight:600;">Remove</button>
+              </div>
+             `;
+          });
+          html += '<button onclick="window.switchView(\'add\')" style="width:100%; margin-top:20px; background:#4a6aff; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:600;">Add Another Card</button></div>';
+          container.innerHTML = html;
+        } else {
+          container.innerHTML = `
+            <div style="background: #fff; border-radius: 16px; border: 1px solid #f0f0f0; padding: 100px 40px; text-align: center;">
+              <div style="position:relative; width:80px; height:80px; margin:0 auto 20px;">
+                <div style="position:absolute; top:10px; right:10px; width:45px; height:32px; background:#4a6aff; border-radius:4px; transform: rotate(15deg);"></div>
+                <div style="position:absolute; bottom:15px; left:10px; width:45px; height:32px; background:#fff; border:2px solid #111; border-radius:4px; transform: rotate(-10deg); overflow:hidden;">
+                  <div style="position:absolute; top:6px; left:0; right:0; height:3px; background:#111;"></div>
+                  <div style="position:absolute; bottom:4px; left:4px; width:12px; height:3px; background:#111;"></div>
+                </div>
+              </div>
+              <h2 style="font-size:20px; font-weight:600; color:#111; margin-bottom:30px;">No payment methods have been created yet</h2>
+              <button onclick="window.switchView('add')" style="background:#4a6aff; color:#fff; border:none; padding:10px 24px; border-radius:24px; font-weight:600; font-size:14px; cursor:pointer;">
+                Add New Credit Card
               </button>
             </div>
-            <div class="panel-body" style="padding:60px 20px; text-align:center;">
-              <!-- Empty State -->
-              <div id="empty-cards-state">
-                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 24 24' fill='none' stroke='%23c4c9d4' stroke-width='1.5'><rect x='1' y='4' width='22' height='16' rx='2' ry='2'/><line x1='1' y1='10' x2='23' y2='10'/></svg>" 
-                  style="width:80px; height:80px; opacity:0.5; margin-bottom:20px;" alt="No cards">
-                <h3 style="font-size:20px; font-weight:700; color:#333; margin-bottom:8px;">No Payment Methods</h3>
-                <p style="color:#888; font-size:15px; margin-bottom:24px;">No payment methods have been created.<br>Add a credit card to enable automatic billing.</p>
-                <button onclick="document.getElementById('add-card-modal').style.display='flex'"
-                  style="background:#4f5bff; color:white; border:none; border-radius:25px; padding:12px 30px; font-size:15px; font-weight:600; cursor:pointer;">
-                  <i class="fas fa-plus" style="margin-right:8px;"></i> Add New Credit Card
-                </button>
-              </div>
-              <!-- Cards List (hidden by default, shown after adding) -->
-              <div id="saved-cards-list" style="display:none; text-align:left;"></div>
-            </div>
-          </div>
-        </div>
+          `;
+        }
+      } catch (err) {
+        container.innerHTML = '<p style="color:red; text-align:center;">Failed to load payment methods.</p>';
+      }
+    }
 
-      </div>
-    </div>
-  </div>
+    async function deletePM(id) {
+      if(!confirm('Are you sure you want to remove this card?')) return;
+      await fetch(\`http://localhost:5000/api/account/payment-methods/\${id}\`, {
+        method: 'DELETE',
+        headers: { 'Authorization': \`Bearer \${token}\` }
+      });
+      loadPaymentMethods();
+    }
+
+    // Initial load
+    loadPaymentMethods();
+  </script>
+</div>
 </div>
 
-<!-- Add Credit Card Modal -->
-<div id="add-card-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:white; border-radius:16px; width:100%; max-width:480px; margin:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); overflow:hidden;">
-    <!-- Modal Header -->
-    <div style="background:linear-gradient(135deg,#4f5bff,#7c3aed); padding:24px 28px; color:white;">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <h4 style="margin:0; font-size:18px; font-weight:700;">
-          <i class="fas fa-lock" style="margin-right:10px; opacity:0.9;"></i>Add New Credit Card
-        </h4>
-        <button onclick="document.getElementById('add-card-modal').style.display='none'"
-          style="background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;">
-          ✕
-        </button>
-      </div>
-      <p style="margin:8px 0 0; opacity:0.8; font-size:13px;">Your card information is encrypted and secure.</p>
-    </div>
-    <!-- Modal Body -->
-    <form id="add-card-form" style="padding:28px;" onsubmit="saveCard(event)">
-      <!-- Card Visual -->
-      <div id="card-visual" style="background:linear-gradient(135deg,#4f5bff,#7c3aed); border-radius:14px; padding:22px 24px; margin-bottom:24px; color:white; position:relative; height:120px; display:flex; flex-direction:column; justify-content:space-between;">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div style="font-size:13px; opacity:0.8; font-weight:500;">youuhost</div>
-          <i class="fab fa-cc-visa" style="font-size:32px; opacity:0.9;"></i>
-        </div>
-        <div>
-          <div id="card-number-display" style="font-size:16px; font-weight:600; letter-spacing:2px; margin-bottom:12px;">•••• •••• •••• ••••</div>
-          <div style="display:flex; gap:40px; font-size:12px; opacity:0.8;">
-            <div><div style="opacity:0.7; margin-bottom:2px;">CARDHOLDER</div><div id="card-name-display" style="font-weight:600; font-size:13px;">YOUR NAME</div></div>
-            <div><div style="opacity:0.7; margin-bottom:2px;">EXPIRES</div><div id="card-exp-display" style="font-weight:600; font-size:13px;">MM/YY</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Form Fields -->
-      <div style="margin-bottom:18px;">
-        <label style="display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:6px;">Cardholder Name</label>
-        <input type="text" id="card-name" placeholder="John Smith" required
-          oninput="document.getElementById('card-name-display').textContent=this.value||'YOUR NAME'"
-          style="width:100%; padding:12px 14px; border:2px solid #e5e7eb; border-radius:10px; font-size:14px; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
-          onfocus="this.style.borderColor='#4f5bff'" onblur="this.style.borderColor='#e5e7eb'">
-      </div>
-      <div style="margin-bottom:18px;">
-        <label style="display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:6px;">Card Number</label>
-        <div style="position:relative;">
-          <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" required
-            oninput="formatCardNumber(this)"
-            style="width:100%; padding:12px 44px 12px 14px; border:2px solid #e5e7eb; border-radius:10px; font-size:14px; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
-            onfocus="this.style.borderColor='#4f5bff'" onblur="this.style.borderColor='#e5e7eb'">
-          <i class="fas fa-credit-card" style="position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:16px;"></i>
-        </div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px;">
-        <div>
-          <label style="display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:6px;">Expiry Date</label>
-          <input type="text" id="card-exp" placeholder="MM/YY" maxlength="5" required
-            oninput="formatExpiry(this)"
-            style="width:100%; padding:12px 14px; border:2px solid #e5e7eb; border-radius:10px; font-size:14px; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
-            onfocus="this.style.borderColor='#4f5bff'" onblur="this.style.borderColor='#e5e7eb'">
-        </div>
-        <div>
-          <label style="display:block; font-size:13px; font-weight:600; color:#444; margin-bottom:6px;">CVV / CVC</label>
-          <div style="position:relative;">
-            <input type="password" id="card-cvv" placeholder="•••" maxlength="4" required
-              style="width:100%; padding:12px 44px 12px 14px; border:2px solid #e5e7eb; border-radius:10px; font-size:14px; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
-              onfocus="this.style.borderColor='#4f5bff'" onblur="this.style.borderColor='#e5e7eb'">
-            <i class="fas fa-lock" style="position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:14px;"></i>
-          </div>
-        </div>
-      </div>
-      <button type="submit"
-        style="width:100%; background:linear-gradient(135deg,#4f5bff,#7c3aed); color:white; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; transition:opacity 0.2s;"
-        onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-        <i class="fas fa-lock" style="margin-right:8px;"></i>Save Card Securely
-      </button>
-      <p style="text-align:center; color:#9ca3af; font-size:12px; margin-top:14px; margin-bottom:0;">
-        <i class="fas fa-shield-alt" style="color:#10b981; margin-right:4px;"></i>
-        256-bit SSL encrypted. We never store your CVV.
-      </p>
-    </form>
-  </div>
-</div>
-
-<script>
-function formatCardNumber(input) {
-  let val = input.value.replace(/\D/g,'').substring(0,16);
-  input.value = val.replace(/(.{4})/g,'$1 ').trim();
-  let disp = val ? val.replace(/(.{4})/g,'$1 ').trim() : '•••• •••• •••• ••••';
-  document.getElementById('card-number-display').textContent = disp;
-}
-function formatExpiry(input) {
-  let val = input.value.replace(/\D/g,'');
-  if(val.length>=2) val = val.substring(0,2)+'/'+val.substring(2,4);
-  input.value = val;
-  document.getElementById('card-exp-display').textContent = val || 'MM/YY';
-}
-function saveCard(e) {
-  e.preventDefault();
-  const name = document.getElementById('card-name').value;
-  const num = document.getElementById('card-number').value;
-  const exp = document.getElementById('card-exp').value;
-  const last4 = num.replace(/\s/g,'').slice(-4);
-  document.getElementById('add-card-modal').style.display='none';
-  document.getElementById('empty-cards-state').style.display='none';
-  document.getElementById('saved-cards-list').style.display='block';
-  document.getElementById('saved-cards-list').innerHTML = `
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border:2px solid #4f5bff; border-radius:14px; background:#f8f9ff; margin:20px;">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <div style="width:52px; height:36px; background:linear-gradient(135deg,#4f5bff,#7c3aed); border-radius:6px; display:flex; align-items:center; justify-content:center;">
-          <i class="fas fa-credit-card" style="color:white; font-size:16px;"></i>
-        </div>
-        <div>
-          <div style="font-weight:700; color:#1a1a2e; font-size:15px;">•••• •••• •••• ${last4}</div>
-          <div style="color:#888; font-size:13px; margin-top:2px;">${name} · Expires ${exp}</div>
-        </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span style="background:#dcfce7; color:#16a34a; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;">DEFAULT</span>
-        <button onclick="this.closest('[style*=border]').remove(); document.getElementById('empty-cards-state').style.display='block'; document.getElementById('saved-cards-list').style.display='none';"
-          style="background:none; border:1px solid #fee2e2; color:#ef4444; border-radius:8px; padding:6px 12px; cursor:pointer; font-size:13px;">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      </div>
-    </div>`;
-}
-// Close modal on backdrop click
-document.getElementById('add-card-modal').addEventListener('click', function(e){
-  if(e.target===this) this.style.display='none';
-});
-</script>

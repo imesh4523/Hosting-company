@@ -30,9 +30,8 @@ const nextConfig: NextConfig = {
       { source: '/api/auth/:path*', destination: 'http://localhost:5000/api/auth/:path*' },
 
       // ── PHP redirect rules → internal dashboard routes ─────────────────────
-      { source: '/cart.php', destination: 'https://youuhost.com/cart' },
-      { source: '/cart/:path*', destination: 'https://youuhost.com/cart' },
-      { source: '/domainchecker.php', destination: 'https://youuhost.com/domains' },
+      { source: '/cart.php', destination: '/dashboard/cart' },
+      { source: '/domainchecker.php', destination: '/dashboard/domains' },
       { source: '/index.php', destination: '/dashboard' },
 
       // ── /account/* → /dashboard/account/* (for any raw links that slip through) ──
@@ -101,6 +100,7 @@ const nextConfig: NextConfig = {
       { source: '/knowledge-base/:path*', destination: '/dashboard/kb' },
       { source: '/cart', destination: '/dashboard/cart' },
       { source: '/cart/:path*', destination: '/dashboard/cart/:path*' },
+      { source: '/store', destination: '/store/linux-vps-hosting' },
 
       // ── Backend API proxy — IMPORTANT: must come AFTER /api/auth and /api/fragment ──
       // NOTE: /api/fragment, /api/user, /api/save-html are handled by Next.js internally.
@@ -109,6 +109,12 @@ const nextConfig: NextConfig = {
       { source: '/api/servers/:path*', destination: 'http://localhost:5000/api/servers/:path*' },
       { source: '/api/admin/:path*', destination: 'http://localhost:5000/api/admin/:path*' },
       { source: '/api/deploy/:path*', destination: 'http://localhost:5000/api/deploy/:path*' },
+      { source: '/api/account/:path*', destination: 'http://localhost:5000/api/account/:path*' },
+      { source: '/api/orders/:path*', destination: 'http://localhost:5000/api/orders/:path*' },
+      { source: '/api/payments/:path*', destination: 'http://localhost:5000/api/payments/:path*' },
+      { source: '/api/tickets/:path*', destination: 'http://localhost:5000/api/tickets/:path*' },
+      { source: '/api/billing/:path*', destination: 'http://localhost:5000/api/billing/:path*' },
+      { source: '/api/domains/:path*', destination: 'http://localhost:5000/api/domains/:path*' },
     ];
   },
 };

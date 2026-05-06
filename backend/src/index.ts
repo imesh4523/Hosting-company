@@ -12,6 +12,12 @@ import adminServerRoutes from './routes/admin.servers.route.js';
 import adminMigrationRoutes from './routes/admin.migrations.route.js';
 import adminAuthRoutes from './routes/admin.auth.route.js';
 import appDeployRoutes from './routes/app-deploy.routes.js';
+import accountRoutes from './routes/account.routes.js';
+import orderRoutes from './routes/order.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
+import ticketRoutes from './routes/ticket.routes.js';
+import billingRoutes from './routes/billing.routes.js';
+import domainRoutes from './routes/domain.routes.js';
 import { SuspensionDetector } from './services/suspension.service.js';
 
 import passport from 'passport';
@@ -39,6 +45,12 @@ app.use('/api/admin/servers',    adminServerRoutes);
 app.use('/api/admin/migrations', adminMigrationRoutes);
 app.use('/api/admin/auth',       adminAuthRoutes);
 app.use('/api/apps',             appDeployRoutes);
+app.use('/api/account',          accountRoutes);
+app.use('/api/orders',           orderRoutes);
+app.use('/api/payments',         paymentRoutes);
+app.use('/api/tickets',          ticketRoutes);
+app.use('/api/billing',          billingRoutes);
+app.use('/api/domains',          domainRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'VPS Reseller Platform API is running' });

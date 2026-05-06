@@ -1,0 +1,100 @@
+<div class="main-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div id="ticketHeader" class="section-header">
+                    <h2 class="section-title">Loading Ticket...</h2>
+                </div>
+                
+                <div id="messageHistory" class="ticket-messages">
+                    <!-- Messages will be injected here -->
+                </div>
+
+                <div class="panel panel-default" style="margin-top: 30px;">
+                    <div class="panel-body">
+                        <h4>Reply to Ticket</h4>
+                        <form id="replyForm">
+                            <div class="form-group">
+                                <textarea id="replyMessage" class="form-control" rows="5" required placeholder="Type your reply here..."></textarea>
+                            </div>
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-primary">Send Reply</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ticket-messages { margin-bottom: 20px; }
+    .message-box { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
+    .message-user { background: #f9f9f9; border-left: 4px solid #337ab7; }
+    .message-staff { background: #e7f3ff; border-left: 4px solid #28a745; text-align: right; }
+    .message-meta { font-size: 12px; color: #777; margin-bottom: 5px; }
+</style>
+
+<script type="text/javascript">
+    (function() {
+        const pathParts = window.location.pathname.split('/');
+        const ticketId = pathParts[pathParts.length - 1];
+        
+        async function loadTicket() {
+            try {
+                const response = await fetch('/api/tickets/' + ticketId);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const ticket = result.data;
+                    document.getElementById('ticketHeader').innerHTML = `
+                        <h2 class="section-title">${ticket.subject}</h2>
+                        <span class="label label-primary">${ticket.status.toUpperCase()}</span>
+                        <span class="text-muted" style="margin-left: 10px;">Priority: ${ticket.priority}</span>
+                    `;
+                    
+                    const history = document.getElementById('messageHistory');
+                    history.innerHTML = ticket.messages.map(msg => `
+                        <div class="message-box ${msg.sender === 'user' ? 'message-user' : 'message-staff'}">
+                            <div class="message-meta">${msg.sender.toUpperCase()} - ${new Date(msg.createdAt).toLocaleString()}</div>
+                            <div class="message-text">${msg.message.replace(/\n/g, '<br>')}</div>
+                        </div>
+                    `).join('');
+                    
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            } catch (error) {
+                console.error("Failed to load ticket:", error);
+            }
+        }
+
+        document.getElementById('replyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button');
+            btn.disabled = true;
+            
+            const message = document.getElementById('replyMessage').value;
+            
+            try {
+                const response = await fetch('/api/tickets/' + ticketId + '/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('replyMessage').value = '';
+                    loadTicket();
+                }
+                btn.disabled = false;
+            } catch (error) {
+                alert('Error sending reply');
+                btn.disabled = false;
+            }
+        });
+
+        loadTicket();
+    })();
+</script>

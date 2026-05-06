@@ -22,6 +22,10 @@ const fragmentMap: Record<string, string> = {
   // Support
   'support': 'support.html',
   'tickets': 'tickets.html',
+  'ticket_new': 'ticket-new.html',
+  'ticket_view': 'ticket-view.html',
+  'billing_invoices': 'billing-invoices.html',
+  'domains': 'domains.html',
   'knowledgebase': 'knowledgebase.html',
   'kb': 'knowledgebase.html',
   // Other main nav
@@ -61,6 +65,10 @@ const fragmentMap: Record<string, string> = {
   'store': 'announcements.html',
   'affiliated': 'affiliates.html',
   'website_security_page': 'website-security.html',
+  // Auth pages (standalone)
+  'login': 'login.html',
+  'register': 'register.html',
+  'pwreset': 'password-reset.html',
 };
 
 
@@ -140,6 +148,21 @@ function fixLinks(html: string): string {
   html = html.replace(/href="submitticket\.php[^"]*"/g, 'href="/dashboard/tickets/new"');
   html = html.replace(/href="domainchecker\.php[^"]*"/g, 'href="https://youuhost.com/domains"');
 
+  // ── 3.3 Logo replacement ──────────────────────────────────────────────────
+  html = html.replace(/<img[^>]+src="[^"]*logo_big[^"]*"[^>]*>/g, '<img src="/y-logo.png" title="youuhost" alt="youuhost" style="height: 45px; width: auto;"/>');
+  html = html.replace(/<img[^>]+src="[^"]*logo_small[^"]*"[^>]*>/g, '<img src="/y-logo.png" title="youuhost" alt="youuhost" style="height: 35px; width: auto;"/>');
+
+  // ── 3.5 Auth page rewrites ────────────────────────────────────────────────
+  html = html.replace(/href="https:\/\/bill\.ultahost\.com\/login\.php"/g, 'href="/login"');
+  html = html.replace(/href="https:\/\/bill\.ultahost\.com\/register\.php"/g, 'href="/register"');
+  html = html.replace(/href="https:\/\/bill\.ultahost\.com\/password\/reset"/g, 'href="/forgot-password"');
+  html = html.replace(/href="\/login\.php"/g, 'href="/login"');
+  html = html.replace(/href="\/register\.php"/g, 'href="/register"');
+  html = html.replace(/href="\/password\/reset"/g, 'href="/forgot-password"');
+  html = html.replace(/href="login\.php"/g, 'href="/login"');
+  html = html.replace(/href="register\.php"/g, 'href="/register"');
+  html = html.replace(/href="password\/reset"/g, 'href="/forgot-password"');
+
   // ── 4. index.php rewrites ────────────────────────────────────────────────
   html = html.replace(/href="index\.php\?m=DNSManager3"/g, 'href="/dashboard/tools/dns"');
   html = html.replace(/href="index\.php\?rp=\/store\/ssl-certificates"/g, 'href="/dashboard/security/ssl"');
@@ -195,11 +218,17 @@ function fixLinks(html: string): string {
   html = html.replace(/href="\/dashboard\/billing\/masspay&amp;all=true"/g, 'href="/dashboard/billing/masspay"');
 
   // ── 12. Cart PHP rewrites ─────────────────────────────────────────────────
+  // Specific checkout/configure actions → cart pages
   html = html.replace(/href="cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
   html = html.replace(/href="\/cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
   html = html.replace(/href="\/cart\.php\?a=confproduct&amp;i=\d+"/g, 'href="/dashboard/cart/configure"');
-  html = html.replace(/href="cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
   html = html.replace(/href="cart\.php\?a=confproduct&amp;i=\d+"/g, 'href="/dashboard/cart/configure"');
+  // "Order New Services" / "View Available Addons" bare cart.php → go to Store
+  html = html.replace(/href="\/cart\.php\?gid=[^"]*"/g, 'href="/store/linux-vps-hosting"');
+  html = html.replace(/href="cart\.php\?gid=[^"]*"/g, 'href="/store/linux-vps-hosting"');
+  html = html.replace(/href="\/cart\.php"/g, 'href="/store/linux-vps-hosting"');
+  html = html.replace(/href="cart\.php"/g, 'href="/store/linux-vps-hosting"');
+  // Any remaining cart.php with params → dashboard/cart
   html = html.replace(/href="\/cart\.php[^"]*"/g, 'href="/dashboard/cart"');
   html = html.replace(/href="cart\.php[^"]*"/g, 'href="/dashboard/cart"');
 
@@ -218,7 +247,7 @@ function fixLinks(html: string): string {
   if (html.includes('Primary_Navbar-Dashboard') && !html.includes('Primary_Navbar-App_Deploy')) {
     html = html.replace(
       /(<li menuitemname="Dashboard"[^>]*>[\s\S]*?<\/li>)/,
-      `$1<li menuitemname="App Deploy" class="" id="Primary_Navbar-App_Deploy"><a href="/dashboard/app-deploy"><i><img src="data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' fill='%23a1a5b7' xmlns='http://www.w3.org/2000/svg'><path d='M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z'/></svg>" style="width:22px; height:22px; opacity:0.8; vertical-align:-3px;" /></i><span class="item-text">App Deploy</span></a></li>`
+      `$1<li menuitemname="App Deploy" class="" id="Primary_Navbar-App_Deploy"><a href="/dashboard/app-deploy"><i class="fab fa-test fab fa-github" style="font-family: 'Font Awesome 5 Brands' !important; font-size: 24px !important;"></i><span class="item-text">App Deploy</span></a></li>`
     );
   }
 
@@ -596,6 +625,13 @@ export async function GET(request: NextRequest) {
           </div>
       </div>
       `;
+    }
+
+    const isStandalone = ['login', 'register', 'pwreset'].includes(pageName) || searchParams.get('standalone') === '1';
+
+    if (isStandalone) {
+      pageHtml = fixLinks(pageHtml);
+      return new NextResponse(pageHtml, { headers: { 'Content-Type': 'text/html' } });
     }
 
     const combined = buildFullPage(navHtml, pageHtml);

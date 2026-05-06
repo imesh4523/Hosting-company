@@ -2685,4 +2685,74 @@
             </ul>
         </div>
     </div>
-</div>
+</div><script type="text/javascript">
+    (function() {
+        console.log("Initializing Dashboard Dynamic Data...");
+        
+        async function updateDashboard() {
+            try {
+                const response = await fetch("/api/account/summary");
+                const result = await response.json();
+                
+                if (result.success) {
+                    const data = result.data;
+                    console.log("Dashboard Summary Received:", data);
+                    
+                    // 1. Update Tiles
+                    const stats = document.querySelectorAll(".tile-stat");
+                    if (stats.length >= 4) {
+                        stats[0].innerText = data.services;
+                        stats[1].innerText = data.domains;
+                        stats[2].innerText = data.invoices;
+                        stats[3].innerText = data.tickets;
+                    }
+                    
+                    // 2. Replace {userName}
+                    document.querySelectorAll(".item-text, .dropdown-header-title, strong").forEach(el => {
+                        if (el.innerText.includes("{userName}")) {
+                            el.innerText = el.innerText.replace(/{userName}/g, data.user.name);
+                        }
+                    });
+
+                    // 3. Update Panels if counts > 0
+                    if (data.services > 0) {
+                        const servicesPanel = document.getElementById("servicesPanel");
+                        if (servicesPanel) {
+                            const body = servicesPanel.querySelector(".panel-body");
+                            const noData = body.querySelector(".no-data");
+                            if (noData) {
+                                noData.innerHTML = `
+                                    <div style="padding: 20px; text-align: center;">
+                                        <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745; margin-bottom: 15px;"></i>
+                                        <div style="font-size: 18px; font-weight: 600;">You have ${data.services} active services.</div>
+                                        <div style="margin-top: 10px;"><a href="/dashboard/services" class="btn btn-primary btn-sm">Manage Services</a></div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+
+                    if (data.tickets > 0) {
+                        const ticketsPanel = document.getElementById("ticketsPanel");
+                        if (ticketsPanel) {
+                             const noData = ticketsPanel.querySelector(".no-data");
+                             if (noData) {
+                                noData.innerHTML = `
+                                    <div style="padding: 20px; text-align: center;">
+                                        <i class="fas fa-ticket-alt" style="font-size: 48px; color: #ffc107; margin-bottom: 15px;"></i>
+                                        <div style="font-size: 18px; font-weight: 600;">You have ${data.tickets} open tickets.</div>
+                                        <div style="margin-top: 10px;"><a href="/dashboard/tickets" class="btn btn-warning btn-sm">View Tickets</a></div>
+                                    </div>
+                                `;
+                             }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to update dashboard:", error);
+            }
+        }
+        
+        setTimeout(updateDashboard, 500);
+    })();
+</script>

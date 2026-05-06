@@ -88,7 +88,7 @@ frag = frag.replace(/href="\/clientarea\/ssl-certificates\/manage"/g, 'href="htt
 frag = frag.replace(/href="\/logout\.php"/g, 'href="/api/auth/logout"');
 
 // App Deploy - ensure it's in nav (inject after Dashboard item)
-const appDeployLink = `\\n            <li menuitemname=\\"App Deploy\\" class=\\"\\" id=\\"Primary_Navbar-App_Deploy\\">\\n                            <a href=\\"/dashboard/app-deploy\\">\\n                                            <i class=\\"fab fa-github\\"></i>\\n                                                                <span class=\\"item-text\\">App Deploy<\\/span>\\n                                                                            <\\/a>\\n                                            <\\/li>`;
+const appDeployLink = `\\n            <li menuitemname=\\"App Deploy\\" class=\\"\\" id=\\"Primary_Navbar-App_Deploy\\">\\n                            <a href=\\"/dashboard/app-deploy\\">\\n                                            <i class=\\"fab fa-test fab fa-github\\" style=\\"font-family: 'Font Awesome 5 Brands' !important; font-size: 24px !important;\\"></i>\\n                                                                <span class=\\"item-text\\">App Deploy<\\/span>\\n                                                                            <\\/a>\\n                                            <\\/li>`;
 if (!frag.includes('Primary_Navbar-App_Deploy')) {
     frag = frag.replace(/(Primary_Navbar-Dashboard[^}]*<\/li>)/, `$1${appDeployLink}`);
 }

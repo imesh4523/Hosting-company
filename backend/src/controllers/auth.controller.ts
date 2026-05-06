@@ -8,7 +8,19 @@ const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh_secret';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, name } = req.body;
+    const { 
+      email, 
+      password, 
+      name, 
+      phone, 
+      address1, 
+      address2, 
+      city, 
+      state, 
+      postcode, 
+      country,
+      company 
+    } = req.body;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -21,6 +33,14 @@ export const register = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         name,
+        phone,
+        address1,
+        address2,
+        city,
+        state,
+        postcode,
+        country,
+        company
       },
     });
 
@@ -32,6 +52,7 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
+  console.log('Login attempt for:', req.body.email);
   try {
     const { email, password } = req.body;
 

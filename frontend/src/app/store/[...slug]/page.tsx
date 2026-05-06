@@ -97,8 +97,6 @@ export default function StoreDynamicPage() {
             border-radius: 15px !important; 
             width: 234px !important;
             min-height: 89px !important;
-            max-height: 89px !important;
-            height: 89px !important;
             padding: 0 16px !important;
             box-shadow: 0 0 1px rgba(0,0,0,0.1), 0 2px 24px rgba(0,0,0,0.08) !important;
             display: flex !important;
@@ -107,7 +105,8 @@ export default function StoreDynamicPage() {
             margin-bottom: 16px !important;
             cursor: pointer !important;
             box-sizing: border-box !important;
-            overflow: hidden !important;
+            overflow: visible !important;
+            position: relative !important;
         }
         body .panel-check:hover, body .panel-item:hover { 
             border-color: #1062FE !important; 
@@ -267,7 +266,52 @@ export default function StoreDynamicPage() {
             box-shadow: 0 4px 15px rgba(79, 91, 255, 0.3); 
         }
         .os-card-hidden { display: none !important; }
+
+        /* ── "Save $X" badge — pops out from top-right of card ── */
+        body .panel-check .discount-price:not(.original-price),
+        body .panel-item .discount-price:not(.original-price),
+        body .container-period .discount-price:not(.original-price) {
+            position: absolute !important;
+            top: -12px !important;
+            right: 12px !important;
+            left: auto !important;
+            transform: none !important;
+            background: linear-gradient(135deg, #4f5bff, #6c63ff) !important;
+            color: #fff !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            padding: 3px 10px !important;
+            border-radius: 20px !important;
+            white-space: nowrap !important;
+            box-shadow: 0 2px 8px rgba(79,91,255,0.35) !important;
+            letter-spacing: 0.3px !important;
+            z-index: 10 !important;
+            pointer-events: none !important;
+        }
+
+        /* Wrapper col needs overflow:visible so badge can pop out */
+        body .panel-check-group .col-sm-4 {
+            overflow: visible !important;
+        }
+
+        /* Billing cycle card needs padding-top so badge has space */
+        body #sectionCycles .panel-check,
+        body #sectionCycles .panel-item,
+        body #sectionCycles .container-period {
+            margin-top: 14px !important;
+            height: auto !important;
+            min-height: 89px !important;
+        }
+
+        /* Strike-through original price */
+        body .discount-price.original-price {
+            text-decoration: line-through !important;
+            color: #aaa !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+        }
     `;
+
 
     const setupSmartTabs = () => {
         // Stop if tabs already exist
@@ -514,7 +558,7 @@ export default function StoreDynamicPage() {
 
   return (
     <>
-      <FragmentPage key={pathname} fragmentName={fragmentName} slug={slug} subSlug={subSlug} />
+      <FragmentPage key={`${fragmentName}-${slug}`} fragmentName={fragmentName} slug={slug} subSlug={subSlug} />
     </>
   );
 }

@@ -1,0 +1,76 @@
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Get Params from URL
+    const params = new URLSearchParams(window.location.search);
+    const productName = params.get('product');
+    const price = params.get('price');
+    const cycle = params.get('cycle');
+
+    if (productName) {
+        // Update UI Summary
+        const items = document.querySelector('.summary-list');
+        if (items) {
+            items.innerHTML = '<li class="list-item"><span class="item-name">' + productName + '</span><span class="item-value">$' + price + ' USD</span></li>';
+        }
+        const totalDisplay = document.getElementById('totalDueToday');
+        if (totalDisplay) totalDisplay.innerText = '$' + price + ' USD';
+        
+        // Enable Checkout Button
+        const checkoutBtns = document.querySelectorAll('#checkout');
+        checkoutBtns.forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('disabled');
+        });
+    }
+
+    // 2. Handle Checkout Click
+    const checkoutBtn = document.getElementById('checkout');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please login first to complete your order.');
+                window.location.href = '/login?return=/store/checkout' + encodeURIComponent(window.location.search);
+                return;
+            }
+
+            checkoutBtn.disabled = true;
+            const loader = checkoutBtn.querySelector('.loader');
+            if(loader) loader.classList.remove('hidden');
+            
+            try {
+                const res = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        planName: productName,
+                        amount: price,
+                        billingCycle: cycle || 'monthly',
+                        paymentMethod: 'stripe'
+                    })
+                });
+
+                const result = await res.json();
+                if (res.ok) {
+                    alert('Order placed successfully! Redirecting to your dashboard...');
+                    window.location.href = '/dashboard';
+                } else {
+                    alert(result.message || 'Order failed');
+                    checkoutBtn.disabled = false;
+                    if(loader) loader.classList.add('hidden');
+                }
+            } catch (err) {
+                alert('Connection error. Please try again.');
+                checkoutBtn.disabled = false;
+                if(loader) loader.classList.add('hidden');
+            }
+        });
+    }
+});
+</script>

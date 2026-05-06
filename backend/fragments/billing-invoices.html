@@ -1,0 +1,67 @@
+<div class="main-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="section-header">
+                    <h2 class="section-title">My Invoices</h2>
+                </div>
+                
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table table-list">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Date</th>
+                                        <th>Due Date</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoicesList">
+                                    <tr>
+                                        <td colspan="6" class="text-center">Loading invoices...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    (function() {
+        async function loadInvoices() {
+            try {
+                const response = await fetch('/api/billing/invoices');
+                const result = await response.json();
+                const tbody = document.getElementById('invoicesList');
+                
+                if (result.success && result.data.length > 0) {
+                    tbody.innerHTML = result.data.map(inv => `
+                        <tr>
+                            <td><strong>#${inv.id.substring(0,8).toUpperCase()}</strong></td>
+                            <td>${new Date(inv.createdAt).toLocaleDateString()}</td>
+                            <td>${new Date(inv.dueDate).toLocaleDateString()}</td>
+                            <td>$${inv.amount.toFixed(2)} USD</td>
+                            <td><span class="label label-${inv.status === 'paid' ? 'success' : 'danger'}">${inv.status.toUpperCase()}</span></td>
+                            <td>
+                                <a href="/dashboard/billing/invoices/${inv.id}" class="btn btn-default btn-sm">View</a>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No invoices found.</td></tr>';
+                }
+            } catch (error) {
+                console.error("Failed to load invoices:", error);
+            }
+        }
+        loadInvoices();
+    })();
+</script>

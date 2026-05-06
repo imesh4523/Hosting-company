@@ -27,7 +27,17 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.onpopstate = function() {
+            window.location.reload();
+          };
+          window.addEventListener('pageshow', function(e) {
+            if (e.persisted) window.location.reload();
+          });
+        ` }} />
+      </body>
     </html>
   );
 }

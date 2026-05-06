@@ -24,6 +24,20 @@ model User {
   emailVerified   Boolean     @default(false)
   githubToken     String?
 
+  // Account Details
+  company         String?
+  phone           String?
+  address1        String?
+  address2        String?
+  city            String?
+  state           String?
+  postcode        String?
+  country         String?
+
+  // Security
+  twoFactorEnabled Boolean    @default(false)
+  twoFactorSecret  String?
+
   vms           VM[]
   invoices      Invoice[]
   tickets       SupportTicket[]
@@ -34,6 +48,13 @@ model User {
   vmHistory     VMHistory[]
   oauthAccounts   UserOAuth[]
   deployedApps    DeployedApp[]
+  
+  // Dashboard Account Features
+  subUsers      SubUser[]
+  contacts      Contact[]
+  emailLogs     EmailLog[]
+  orders        Order[]
+  domains       Domain[]
   
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -305,6 +326,7 @@ model Plan {
   bandwidth     String?
   doSize        String?      // DO slug e.g. "s-1vcpu-2gb"
   vms           VM[]
+  orders        Order[]
   createdAt     DateTime     @default(now())
 }
 
@@ -321,6 +343,22 @@ model Invoice {
   dueDate       DateTime      @default(now())
   transactions  Transaction[]
   createdAt     DateTime      @default(now())
+}
+
+model Order {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  planId          String
+  plan            Plan      @relation(fields: [planId], references: [id])
+  amount          Float
+  currency        String    @default("USD")
+  status          String    @default("pending") // pending/paid/provisioning/active/failed
+  paymentMethod   String    @default("stripe")
+  billingCycle    String    @default("monthly")
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 model Transaction {
@@ -501,4 +539,75 @@ model SubDomain {
   fullUrl     String
   sslActive   Boolean  @default(false)
   createdAt   DateTime @default(now())
+}
+
+// --- Dashboard Account Management ------------------------------------------
+
+model SubUser {
+  id              String   @id @default(uuid())
+  parentId        String
+  email           String   @unique
+  name            String
+  permissions     Json     // Array of permissions e.g. ["manage_billing", "manage_servers"]
+  status          String   @default("pending") // pending/active
+  inviteToken     String?  @unique
+  invitedAt       DateTime @default(now())
+  joinedAt        DateTime?
+  
+  parent          User     @relation(fields: [parentId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id              String   @id @default(uuid())
+  userId          String
+  firstName       String
+  lastName        String
+  email           String
+  company         String?
+  address1        String?
+  address2        String?
+  city            String?
+  state           String?
+  postcode        String?
+  country         String?
+  phone           String?
+  
+  isBilling       Boolean  @default(false)
+  isTechnical     Boolean  @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Domains ──────────────────────────────────────────────────────────────
+model Domain {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  domainName      String    @unique
+  status          String    @default("pending") // pending/active/expired/transferred
+  registrationDate DateTime  @default(now())
+  expiryDate      DateTime
+  nextDueDate     DateTime
+  registrar       String    @default("resellerid")
+  dnsManagement   Boolean   @default(false)
+  emailForwarding Boolean   @default(false)
+  idProtection    Boolean   @default(false)
+  nameservers     String[]  @default(["ns1.youuhost.com", "ns2.youuhost.com"])
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model EmailLog {
+  id              String   @id @default(uuid())
+  userId          String
+  subject         String
+  content         String   @db.Text
+  status          String   @default("sent") // sent/failed
+  sentAt          DateTime @default(now())
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
