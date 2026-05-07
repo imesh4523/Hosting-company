@@ -472,7 +472,7 @@
                                 </div>
                             </div>
 
-                            <div id="stripe-payment-container" style="display: none; margin-top: 25px;">
+                            <div id="stripe-payment-container" style="display: none; margin-top: 25px; max-width: 480px;">
                                 <div id="stripe-saved-cards-container" style="margin-bottom: 20px;"></div>
                                 <div id="stripe-new-card-section" style="background: #fcfcfc; border: 1px solid #eee; border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
                                     <h5 style="font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; margin-top: 0;">Enter Card Details</h5>
@@ -481,8 +481,9 @@
                                 <div id="stripe-error" style="color: #e53e3e; margin-top: 12px; font-size: 13px; font-weight: 500;"></div>
                             </div>
 
-                            <div class="form-actions">
-                                <button type="submit" value="Add Funds" class="btn btn-lg btn-block btn-primary"
+                            <div class="form-actions" style="margin-top: 25px;">
+                                <button type="submit" value="Add Funds" class="btn btn-lg btn-primary"
+                                    style="padding: 14px 40px; border-radius: 12px; font-weight: 700; width: 220px;"
                                     data-btn-loader="">
                                     <span>Add Funds</span>
                                     <div class="loader loader-button hidden">
