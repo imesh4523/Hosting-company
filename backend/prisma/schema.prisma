@@ -635,3 +635,13 @@ model UserCard {
   @@index([fingerprint])
 }
 
+model PaymentSettings {
+  id                  String   @id @default(uuid())
+  stripeEnabled       Boolean  @default(false)
+  stripePublicKey     String?
+  stripeSecretKey     String?  // encrypted
+  stripeWebhookSecret String?  // encrypted
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
