@@ -91,6 +91,7 @@ export class PaymentController {
 
       // If using a saved card
       if (paymentMethodId) {
+        delete intentData.setup_future_usage;
         intentData.payment_method = paymentMethodId;
         intentData.confirm = true;
         intentData.off_session = true;
