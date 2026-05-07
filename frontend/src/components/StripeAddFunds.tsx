@@ -165,6 +165,23 @@ export default function StripeAddFunds() {
         }
     }, [stripe, elements, selectedCardId]);
 
+    const [fragmentLoaded, setFragmentLoaded] = useState(false);
+
+    useEffect(() => {
+        const handler = () => {
+            console.log('Fragment loaded event received');
+            setFragmentLoaded(prev => !prev); // Toggle to trigger effect
+        };
+        window.addEventListener('fragment-loaded', handler);
+        
+        // Initial check
+        if (document.getElementById('add-funds-form')) {
+            setFragmentLoaded(true);
+        }
+
+        return () => window.removeEventListener('fragment-loaded', handler);
+    }, []);
+
     useEffect(() => {
         console.log('Stripe/Elements Effect:', { stripe: !!stripe, elements: !!elements });
         if (stripe && !elements) {
@@ -188,11 +205,13 @@ export default function StripeAddFunds() {
     useEffect(() => {
         const form = document.getElementById('add-funds-form');
         if (form) {
-            console.log('Binding submit listener');
+            console.log('Binding submit listener to form');
             form.addEventListener('submit', handleFormSubmit);
             return () => form.removeEventListener('submit', handleFormSubmit);
+        } else {
+            console.log('Form not found for binding');
         }
-    }, [handleFormSubmit]);
+    }, [handleFormSubmit, fragmentLoaded]);
 
     // Handle visibility of new card section
     useEffect(() => {
