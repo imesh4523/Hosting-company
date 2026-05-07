@@ -223,36 +223,218 @@ export class AccountController {
 
   // ─── 5. Payment Methods (Stripe) ────────────────────────────────────────
   
+  private getOrCreateStripeCustomer = async (userId: string, email: string): Promise<string> => {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user?.stripeCustomerId) return user.stripeCustomerId;
+
+    const customer = await stripe.customers.create({ email, metadata: { userId } });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { stripeCustomerId: customer.id }
+    });
+    return customer.id;
+  };
+
   public getPaymentMethods = async (req: Request, res: Response) => {
     try {
-      // In a real app, user should have stripeCustomerId saved in the DB.
-      // Here we assume it's stored or we fetch based on email (placeholder).
-      res.json({ success: true, data: [] }); 
+      const user = req.user as any;
+      const customerId = await this.getOrCreateStripeCustomer(user.id, user.email);
+      
+      const methods = await stripe.paymentMethods.list({
+        customer: customerId,
+        type: 'card',
+      });
+
+      const cards: any[] = [];
+      const fingerprintsSeenInThisRequest = new Set<string>();
+
+      for (const pm of methods.data) {
+        try {
+          const fingerprint = pm.card?.fingerprint;
+          if (!fingerprint) continue;
+
+          // 1. Check for duplicates in this specific API response
+          const isDuplicateInList = fingerprintsSeenInThisRequest.has(fingerprint);
+          fingerprintsSeenInThisRequest.add(fingerprint);
+
+          // 2. Sync with local database
+          let userCard = await prisma.userCard.findUnique({
+            where: { stripePmId: pm.id }
+          });
+
+          if (!userCard) {
+            // Check if this fingerprint already exists for this user in our DB
+            const existingSameFingerprint = await prisma.userCard.findFirst({
+              where: { userId: user.id, fingerprint: fingerprint }
+            });
+
+            // If it's a duplicate and we already have a record for this fingerprint,
+            // we skip creating a new one but don't detach yet to be safe
+            if (existingSameFingerprint && isDuplicateInList) {
+               console.log(`[FRAUD] Duplicate card skipped for user ${user.id}: ${pm.id}`);
+               continue; 
+            }
+
+            // Create record if not exists
+            userCard = await prisma.userCard.create({
+              data: {
+                userId: user.id,
+                stripePmId: pm.id,
+                fingerprint: fingerprint,
+                brand: pm.card?.brand,
+                last4: pm.card?.last4 || '',
+                expMonth: pm.card?.exp_month || 0,
+                expYear: pm.card?.exp_year || 0,
+              }
+            });
+          }
+
+          // 3. Multi-Account Check (Fraud)
+          const otherUsersWithThisCard = await prisma.userCard.findFirst({
+            where: {
+              fingerprint: fingerprint,
+              userId: { not: user.id }
+            }
+          });
+
+          if (otherUsersWithThisCard && !userCard.isFlagged) {
+            await prisma.userCard.updateMany({
+              where: { fingerprint: fingerprint },
+              data: { isFlagged: true }
+            });
+            userCard.isFlagged = true;
+          }
+
+          cards.push({
+            id: pm.id,
+            brand: pm.card?.brand,
+            last4: pm.card?.last4,
+            expMonth: pm.card?.exp_month,
+            expYear: pm.card?.exp_year,
+            funding: pm.card?.funding,
+            description: pm.metadata?.description || '',
+            isFlagged: userCard.isFlagged || isDuplicateInList
+          });
+        } catch (innerError) {
+          console.error("[DEBUG] Syncing individual card failed:", innerError);
+          // Continue to next card even if one fails
+        }
+      }
+
+      res.json({ success: true, data: cards });
     } catch (error) {
+      console.error("[DEBUG] getPaymentMethods Error:", error);
       res.status(500).json({ success: false, message: 'Failed to fetch payment methods' });
     }
   };
 
   public createSetupIntent = async (req: Request, res: Response) => {
     try {
-      // Create a SetupIntent to collect payment method securely
+      const user = req.user as any;
+      const customerId = await this.getOrCreateStripeCustomer(user.id, user.email);
+
       const setupIntent = await stripe.setupIntents.create({
+        customer: customerId,
         usage: 'off_session',
       });
       res.json({ success: true, clientSecret: setupIntent.client_secret });
-    } catch (error) {
-      res.status(500).json({ success: false, message: 'Failed to initialize payment setup' });
+    } catch (error: any) {
+      console.error("[DEBUG] createSetupIntent Error:", error);
+      res.status(500).json({ success: false, message: error.message || 'Failed to initialize payment setup' });
     }
   };
 
   public removePaymentMethod = async (req: Request, res: Response) => {
     try {
       await stripe.paymentMethods.detach(req.params.id as string);
+      // Also remove from our local DB
+      // We no longer delete from local DB to maintain ownership history
+      // This ensures the card remains "locked" to this user's ID forever
+      // await prisma.userCard.deleteMany({ where: { stripePmId: req.params.id } });
       res.json({ success: true, message: 'Payment method removed' });
     } catch (error) {
       res.status(500).json({ success: false, message: 'Failed to remove payment method' });
     }
   };
+
+  public verifyNewPaymentMethod = async (req: Request, res: Response) => {
+    try {
+      const { paymentMethodId } = req.body;
+      const user = req.user as any;
+
+      if (!paymentMethodId) {
+        return res.status(400).json({ success: false, message: 'Payment method ID is required' });
+      }
+
+      // Fetch the new PM details from Stripe
+      const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+      const fingerprint = pm.card?.fingerprint;
+
+      if (!fingerprint) {
+        return res.status(400).json({ success: false, message: 'Could not verify card details' });
+      }
+
+      // 1. Permanent Ownership Check (The "Lock" logic)
+      // Find the EARLIEST record of this card in our system
+      const originalOwnerRecord = await prisma.userCard.findFirst({
+        where: { fingerprint: fingerprint },
+        orderBy: { createdAt: 'asc' } // Earliest first
+      });
+
+      if (originalOwnerRecord && originalOwnerRecord.userId !== user.id) {
+        console.log(`[FRAUD] User ${user.id} tried to add card ${fingerprint} originally owned by user ${originalOwnerRecord.userId}.`);
+        await stripe.paymentMethods.detach(paymentMethodId);
+        
+        // Flag all instances of this card as fraudulent
+        await prisma.userCard.updateMany({
+          where: { fingerprint: fingerprint },
+          data: { isFlagged: true }
+        });
+
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Security Alert: This card is permanently linked to another account. Please contact support if you believe this is an error.' 
+        });
+      }
+
+      // 2. Active Duplicate Check (Same account)
+      // Check if the card is CURRENTLY active in this account (has a valid Stripe PM ID and not just a history record)
+      // Since we don't delete history, we need to check if the user is trying to add what they already have active.
+      // We can verify this by checking Stripe's current state in getPaymentMethods, 
+      // but here we check if they have any OTHER active PM ID for this card.
+      const activeSameAccountCard = await prisma.userCard.findFirst({
+        where: { 
+          userId: user.id, 
+          fingerprint: fingerprint,
+          stripePmId: { not: paymentMethodId }
+        }
+      });
+
+      // Note: If they deleted it from the UI, it's detached from Stripe, so it's fine to add again as a NEW PM ID.
+      // We allow the upsert below to handle the update/creation.
+
+      // If not a duplicate, ensure it's in our DB (sync it now)
+      await prisma.userCard.upsert({
+        where: { stripePmId: paymentMethodId },
+        update: {},
+        create: {
+          userId: user.id,
+          stripePmId: paymentMethodId,
+          fingerprint: fingerprint,
+          brand: pm.card?.brand,
+          last4: pm.card?.last4 || '',
+          expMonth: pm.card?.exp_month || 0,
+          expYear: pm.card?.exp_year || 0,
+        }
+      });
+
+      res.json({ success: true, message: 'Card verified' });
+    } catch (error: any) {
+      console.error("[DEBUG] verifyNewPaymentMethod Error:", error);
+      res.status(500).json({ success: false, message: error.message || 'Verification failed' });
+    }
+  };
+
 
   // ─── 6. Email History ───────────────────────────────────────────────────
   

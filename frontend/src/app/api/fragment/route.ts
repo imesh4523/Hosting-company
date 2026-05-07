@@ -83,7 +83,13 @@ const FLAG_MAP: Record<string, string> = {
 };
 
 function fixLinks(html: string): string {
-  // ── 0. Country flag URLs ────────────────────────────────────────────────────
+  // ── 0. Inject Stripe publishable key as global ───────────────────────────────
+  const stripePk = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
+  if (stripePk) {
+    html = `<script>window.__STRIPE_PK__ = ${JSON.stringify(stripePk)};</script>` + html;
+  }
+
+  // ── 0b. Country flag URLs ────────────────────────────────────────────────────
   html = html.replace(/https?:\/\/bill\.youuhost\.com\/templates\/flags-new\/Country=([^"'.]+)\.svg/g, 
     (_, country) => {
       const iso = FLAG_MAP[country] || FLAG_MAP[country.toLowerCase()];

@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { loadStripe } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51P...placeholder');
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_live_51TSotXGXMorGW5X8sHJWDCeTleA27pQrdgi21q6WIxZV5QHrXVSRjV4HSGnmTol3skCzg5LAD21yetRjGKo3ABO500lkucLtEI');
 
 export default function StripeAddFunds() {
     const [stripe, setStripe] = useState<any>(null);
@@ -14,8 +14,11 @@ export default function StripeAddFunds() {
     const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
         // Fetch real balance
-        fetch('/api/user/profile')
+        fetch('/api/user/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(res => res.json())
             .then(data => {
                 if (data && data.balance !== undefined) {
@@ -26,7 +29,9 @@ export default function StripeAddFunds() {
             .catch(err => console.error('Balance fetch error:', err));
 
         // Fetch saved cards
-        fetch('/api/payments/saved-cards')
+        fetch('/api/payments/saved-cards', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.cards.length > 0) {
@@ -93,10 +98,14 @@ export default function StripeAddFunds() {
         if (errorDiv) errorDiv.textContent = '';
 
         try {
+            const token = localStorage.getItem('token');
             // 1. Create Intent on backend
             const response = await fetch('/api/payments/create-add-funds-intent', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ 
                     amount,
                     paymentMethodId: selectedCardId || undefined

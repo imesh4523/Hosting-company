@@ -31,7 +31,8 @@ router.post('/security/2fa/disable', controller.disable2FA);
 
 // 5. Payment Methods (Stripe)
 router.get('/payment-methods', controller.getPaymentMethods);
-router.post('/payment-methods/setup-intent', controller.createSetupIntent);
+router.post('/create-setup-intent', controller.createSetupIntent);
+router.post('/verify-payment-method', controller.verifyNewPaymentMethod);
 router.delete('/payment-methods/:id', controller.removePaymentMethod);
 
 // 6. Email History

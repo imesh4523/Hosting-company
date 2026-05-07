@@ -34,6 +34,10 @@ model User {
   postcode        String?
   country         String?
 
+  // Stripe & Billing
+  stripeCustomerId String?    @unique
+  walletBalance    Float      @default(0.0)
+
   // Security
   twoFactorEnabled Boolean    @default(false)
   twoFactorSecret  String?
@@ -48,6 +52,7 @@ model User {
   vmHistory     VMHistory[]
   oauthAccounts   UserOAuth[]
   deployedApps    DeployedApp[]
+  userCards       UserCard[]
   
   // Dashboard Account Features
   subUsers      SubUser[]
@@ -611,3 +616,22 @@ model EmailLog {
   
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model UserCard {
+  id            String   @id @default(uuid())
+  userId        String
+  stripePmId    String   @unique
+  fingerprint   String   
+  brand         String?
+  last4         String
+  expMonth      Int
+  expYear      Int
+  isFlagged     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([fingerprint])
+}
+

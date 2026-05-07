@@ -102,6 +102,12 @@ export default function FragmentPage({ fragmentName, slug, subSlug }: FragmentPa
           setCache(cacheKey, content);
           setHtml(content);
           setLoaded(true);
+          // Dispatch event so other components know the fragment was injected/updated
+          setTimeout(() => {
+              if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new Event('fragment-loaded'));
+              }
+          }, 50);
         }
       } catch (e) {
         if (attempt < 2) {
@@ -185,6 +191,39 @@ export default function FragmentPage({ fragmentName, slug, subSlug }: FragmentPa
     document.addEventListener('click', handleCollapse, true);
     return () => document.removeEventListener('click', handleCollapse, true);
   }, [html]);
+
+  useEffect(() => {
+    if (!html || !mounted) return;
+    
+    const executeScripts = async () => {
+      const container = document.createElement('div');
+      container.innerHTML = html;
+      const scripts = Array.from(container.querySelectorAll('script'));
+      
+      for (const oldScript of scripts) {
+        await new Promise((resolve) => {
+          const newScript = document.createElement('script');
+          Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+          
+          if (oldScript.src) {
+            newScript.onload = () => resolve(null);
+            newScript.onerror = () => resolve(null);
+          } else {
+            newScript.textContent = oldScript.textContent;
+            setTimeout(() => resolve(null), 10);
+          }
+          
+          document.body.appendChild(newScript);
+          // Only remove inline scripts
+          if (!oldScript.src) {
+            setTimeout(() => { if (newScript.parentNode) newScript.parentNode.removeChild(newScript); }, 500);
+          }
+        });
+      }
+    };
+
+    executeScripts();
+  }, [html, mounted]);
 
   return (
     <>
