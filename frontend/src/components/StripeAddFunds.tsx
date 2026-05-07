@@ -28,15 +28,15 @@ export default function StripeAddFunds() {
             })
             .catch(err => console.error('Balance fetch error:', err));
 
-        // Fetch saved cards
-        fetch('/api/payments/saved-cards', {
+        // Fetch saved cards (using the account payment methods endpoint for consistency)
+        fetch('/api/account/payment-methods', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
             .then(data => {
-                if (data.success && data.cards.length > 0) {
-                    setSavedCards(data.cards);
-                    setSelectedCardId(data.cards[0].id);
+                if (data.success && data.data && data.data.length > 0) {
+                    setSavedCards(data.data);
+                    setSelectedCardId(data.data[0].id);
                 }
             })
             .catch(err => console.error('Saved cards fetch error:', err));
@@ -155,7 +155,13 @@ export default function StripeAddFunds() {
             const el = stripe.elements();
             const card = el.create('card', {
                 style: {
-                    base: { fontSize: '16px', color: '#32325d' },
+                    base: { 
+                        fontSize: '16px', 
+                        color: '#1a1a2e',
+                        fontFamily: 'Inter, system-ui, sans-serif',
+                        '::placeholder': { color: '#aab7c4' },
+                    },
+                    invalid: { color: '#e53e3e' }
                 },
             });
             card.mount('#stripe-element');
@@ -177,36 +183,61 @@ export default function StripeAddFunds() {
     }, [selectedCardId]);
 
     const SavedCardsUI = (
-        <div style={{ marginBottom: '20px' }}>
-            <h5 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '10px' }}>Select Payment Method:</h5>
-            {savedCards.map(card => (
+        <div style={{ marginBottom: '25px' }}>
+            <h5 style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a2e', marginBottom: '15px' }}>Use a Saved Card:</h5>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {savedCards.map(card => (
+                    <div 
+                        key={card.id} 
+                        onClick={() => setSelectedCardId(card.id)}
+                        style={{ 
+                            display: 'flex', alignItems: 'center', padding: '16px 20px', 
+                            border: '2px solid', borderRadius: '16px', cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            borderColor: selectedCardId === card.id ? '#4a6aff' : '#eee',
+                            background: selectedCardId === card.id ? '#f4f7fe' : '#fff',
+                            boxShadow: selectedCardId === card.id ? '0 4px 12px rgba(74, 106, 255, 0.1)' : 'none'
+                        }}
+                    >
+                        <div style={{ 
+                            width: '20px', height: '20px', borderRadius: '50%', border: '2px solid',
+                            marginRight: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            borderColor: selectedCardId === card.id ? '#4a6aff' : '#ddd',
+                            background: '#fff'
+                        }}>
+                            {selectedCardId === card.id && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4a6aff' }} />}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a2e' }}>
+                                    {card.brand.toUpperCase()} •••• {card.last4}
+                                </span>
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>Expires {card.expMonth}/{card.expYear}</div>
+                        </div>
+                    </div>
+                ))}
                 <div 
-                    key={card.id} 
-                    onClick={() => setSelectedCardId(card.id)}
+                    onClick={() => setSelectedCardId(null)}
                     style={{ 
-                        display: 'flex', alignItems: 'center', marginBottom: '8px', padding: '12px', 
-                        border: '1px solid', borderRadius: '6px', cursor: 'pointer',
-                        borderColor: selectedCardId === card.id ? '#5145ff' : '#eee',
-                        background: selectedCardId === card.id ? '#f0f4ff' : '#fff'
+                        display: 'flex', alignItems: 'center', padding: '16px 20px', 
+                        border: '2px solid', borderRadius: '16px', cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        borderColor: selectedCardId === null ? '#4a6aff' : '#eee',
+                        background: selectedCardId === null ? '#f4f7fe' : '#fff',
+                        boxShadow: selectedCardId === null ? '0 4px 12px rgba(74, 106, 255, 0.1)' : 'none'
                     }}
                 >
-                    <input type="radio" checked={selectedCardId === card.id} readOnly style={{ marginRight: '12px' }} />
-                    <span style={{ fontSize: '13px' }}>
-                        <strong>{card.brand.toUpperCase()}</strong> ending in {card.last4} (Exp: {card.expMonth}/{card.expYear})
-                    </span>
+                    <div style={{ 
+                        width: '20px', height: '20px', borderRadius: '50%', border: '2px solid',
+                        marginRight: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        borderColor: selectedCardId === null ? '#4a6aff' : '#ddd',
+                        background: '#fff'
+                    }}>
+                        {selectedCardId === null && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4a6aff' }} />}
+                    </div>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a2e' }}>Add a New Card</span>
                 </div>
-            ))}
-            <div 
-                onClick={() => setSelectedCardId(null)}
-                style={{ 
-                    display: 'flex', alignItems: 'center', padding: '12px', 
-                    border: '1px solid', borderRadius: '6px', cursor: 'pointer',
-                    borderColor: selectedCardId === null ? '#5145ff' : '#eee',
-                    background: selectedCardId === null ? '#f0f4ff' : '#fff'
-                }}
-            >
-                <input type="radio" checked={selectedCardId === null} readOnly style={{ marginRight: '12px' }} />
-                <span style={{ fontSize: '13px', fontWeight: 600 }}>Use a new credit or debit card</span>
             </div>
         </div>
     );
