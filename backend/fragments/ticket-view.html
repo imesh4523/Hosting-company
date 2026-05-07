@@ -43,7 +43,10 @@
         
         async function loadTicket() {
             try {
-                const response = await fetch('/api/tickets/' + ticketId);
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/tickets/' + ticketId, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const result = await response.json();
                 
                 if (result.success) {
@@ -77,9 +80,13 @@
             const message = document.getElementById('replyMessage').value;
             
             try {
+                const token = localStorage.getItem('token');
                 const response = await fetch('/api/tickets/' + ticketId + '/reply', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: JSON.stringify({ message })
                 });
                 

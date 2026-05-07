@@ -41,7 +41,10 @@
     (function() {
         async function loadTickets() {
             try {
-                const response = await fetch('/api/tickets');
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/tickets', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const result = await response.json();
                 const tbody = document.getElementById('ticketsList');
                 
