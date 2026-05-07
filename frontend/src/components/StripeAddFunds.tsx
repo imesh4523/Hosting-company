@@ -78,7 +78,7 @@ export default function StripeAddFunds() {
         setStripe(s);
     };
 
-    const handleFormSubmit = async (e: Event) => {
+    const handleFormSubmit = useCallback(async (e: Event) => {
         const select = document.getElementById('paymentmethod') as HTMLSelectElement;
         if (select?.value !== 'stripe') return;
 
@@ -148,7 +148,7 @@ export default function StripeAddFunds() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [stripe, elements, selectedCardId]);
 
     useEffect(() => {
         if (stripe && !elements) {
@@ -166,13 +166,16 @@ export default function StripeAddFunds() {
             });
             card.mount('#stripe-element');
             setElements(el);
-
-            const form = document.getElementById('add-funds-form');
-            if (form) {
-                form.addEventListener('submit', handleFormSubmit);
-            }
         }
-    }, [stripe]);
+    }, [stripe, elements]);
+
+    useEffect(() => {
+        const form = document.getElementById('add-funds-form');
+        if (form) {
+            form.addEventListener('submit', handleFormSubmit);
+            return () => form.removeEventListener('submit', handleFormSubmit);
+        }
+    }, [handleFormSubmit]);
 
     // Handle visibility of new card section
     useEffect(() => {
