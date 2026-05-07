@@ -79,7 +79,9 @@ export default function StripeAddFunds() {
     };
 
     const handleFormSubmit = useCallback(async (e: Event) => {
+        if (loading) return;
         console.log('Form submit triggered');
+        
         const select = document.getElementById('paymentmethod') as HTMLSelectElement;
         if (select?.value !== 'stripe') {
             console.log('Stripe not selected, skipping');
@@ -102,8 +104,14 @@ export default function StripeAddFunds() {
         const errorDiv = document.getElementById('stripe-error');
         if (errorDiv) errorDiv.textContent = '';
 
-        // Manually show loader
+        // Manually show loader and disable button
+        const submitBtn = document.querySelector('button[value="Add Funds"]') as HTMLButtonElement;
         const loader = document.querySelector('.loader-button');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+            submitBtn.style.cursor = 'not-allowed';
+        }
         if (loader) loader.classList.remove('hidden');
 
         try {
@@ -161,26 +169,53 @@ export default function StripeAddFunds() {
             if (errorDiv) errorDiv.textContent = err.message;
         } finally {
             setLoading(false);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
             if (loader) loader.classList.add('hidden');
         }
-    }, [stripe, elements, selectedCardId]);
+    }, [stripe, elements, selectedCardId, loading]);
 
     const [fragmentLoaded, setFragmentLoaded] = useState(false);
 
     useEffect(() => {
         const handler = () => {
             console.log('Fragment loaded event received');
-            setFragmentLoaded(prev => !prev); // Toggle to trigger effect
+            setFragmentLoaded(prev => !prev);
         };
         window.addEventListener('fragment-loaded', handler);
         
-        // Initial check
         if (document.getElementById('add-funds-form')) {
             setFragmentLoaded(true);
         }
 
         return () => window.removeEventListener('fragment-loaded', handler);
     }, []);
+
+    // Effect for amount preset buttons
+    useEffect(() => {
+        const btnGroup = document.getElementById('add-credits-buttons');
+        const amountInput = document.getElementById('amount') as HTMLInputElement;
+
+        if (btnGroup && amountInput) {
+            const btns = btnGroup.querySelectorAll('button');
+            const handleBtnClick = (e: MouseEvent) => {
+                const target = e.currentTarget as HTMLButtonElement;
+                const price = target.getAttribute('data-price');
+                if (price) {
+                    amountInput.value = price;
+                    // Also update active state classes
+                    btns.forEach(b => b.classList.remove('active'));
+                    target.classList.add('active');
+                }
+            };
+
+            btns.forEach(btn => btn.addEventListener('click', handleBtnClick));
+            return () => btns.forEach(btn => btn.removeEventListener('click', handleBtnClick));
+        }
+    }, [fragmentLoaded]);
 
     useEffect(() => {
         console.log('Stripe/Elements Effect:', { stripe: !!stripe, elements: !!elements });
@@ -212,6 +247,7 @@ export default function StripeAddFunds() {
             console.log('Form not found for binding');
         }
     }, [handleFormSubmit, fragmentLoaded]);
+
 
     // Handle visibility of new card section
     useEffect(() => {
