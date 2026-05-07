@@ -186,57 +186,73 @@ export default function StripeAddFunds() {
         <div style={{ marginBottom: '25px' }}>
             <h5 style={{ fontSize: '15px', fontWeight: 700, color: '#1a1a2e', marginBottom: '15px' }}>Use a Saved Card:</h5>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {savedCards.map(card => (
-                    <div 
-                        key={card.id} 
-                        onClick={() => setSelectedCardId(card.id)}
-                        style={{ 
-                            display: 'flex', alignItems: 'center', padding: '16px 20px', 
-                            border: '2px solid', borderRadius: '16px', cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            borderColor: selectedCardId === card.id ? '#4a6aff' : '#eee',
-                            background: selectedCardId === card.id ? '#f4f7fe' : '#fff',
-                            boxShadow: selectedCardId === card.id ? '0 4px 12px rgba(74, 106, 255, 0.1)' : 'none'
-                        }}
-                    >
-                        <div style={{ 
-                            width: '20px', height: '20px', borderRadius: '50%', border: '2px solid',
-                            marginRight: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            borderColor: selectedCardId === card.id ? '#4a6aff' : '#ddd',
-                            background: '#fff'
-                        }}>
-                            {selectedCardId === card.id && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4a6aff' }} />}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a2e' }}>
-                                    {card.brand.toUpperCase()} •••• {card.last4}
-                                </span>
+                {savedCards.map(card => {
+                    const brand = (card.brand || '').toLowerCase();
+                    const brandIcon = brand === 'visa' ? 'fab fa-cc-visa' : 
+                                     brand === 'mastercard' ? 'fab fa-cc-mastercard' : 
+                                     brand === 'amex' ? 'fab fa-cc-amex' : 
+                                     'fas fa-credit-card';
+                    const iconColor = brand === 'visa' ? '#1a1f71' : 
+                                     brand === 'mastercard' ? '#eb001b' : 
+                                     brand === 'amex' ? '#007bc1' : 
+                                     '#4a6aff';
+
+                    return (
+                        <div 
+                            key={card.id} 
+                            onClick={() => setSelectedCardId(card.id)}
+                            style={{ 
+                                display: 'flex', alignItems: 'center', padding: '10px 16px', 
+                                border: '2px solid', borderRadius: '12px', cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                borderColor: selectedCardId === card.id ? '#4a6aff' : '#eee',
+                                background: selectedCardId === card.id ? '#f4f7fe' : '#fff',
+                                boxShadow: selectedCardId === card.id ? '0 4px 10px rgba(74, 106, 255, 0.08)' : 'none'
+                            }}
+                        >
+                            <div style={{ 
+                                width: '18px', height: '18px', borderRadius: '50%', border: '2px solid',
+                                marginRight: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                borderColor: selectedCardId === card.id ? '#4a6aff' : '#ddd',
+                                background: '#fff', flexShrink: 0
+                            }}>
+                                {selectedCardId === card.id && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4a6aff' }} />}
                             </div>
-                            <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>Expires {card.expMonth}/{card.expYear}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                                <i className={brandIcon} style={{ fontSize: '24px', color: iconColor }}></i>
+                                <div>
+                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e', textTransform: 'capitalize' }}>
+                                        {brand} •••• {card.last4}
+                                    </div>
+                                    <div style={{ fontSize: '11px', color: '#888', marginTop: '1px' }}>Exp {card.expMonth}/{card.expYear}</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 <div 
                     onClick={() => setSelectedCardId(null)}
                     style={{ 
-                        display: 'flex', alignItems: 'center', padding: '16px 20px', 
-                        border: '2px solid', borderRadius: '16px', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', padding: '10px 16px', 
+                        border: '2px solid', borderRadius: '12px', cursor: 'pointer',
                         transition: 'all 0.2s ease',
                         borderColor: selectedCardId === null ? '#4a6aff' : '#eee',
                         background: selectedCardId === null ? '#f4f7fe' : '#fff',
-                        boxShadow: selectedCardId === null ? '0 4px 12px rgba(74, 106, 255, 0.1)' : 'none'
+                        boxShadow: selectedCardId === null ? '0 4px 10px rgba(74, 106, 255, 0.08)' : 'none'
                     }}
                 >
                     <div style={{ 
-                        width: '20px', height: '20px', borderRadius: '50%', border: '2px solid',
-                        marginRight: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '18px', height: '18px', borderRadius: '50%', border: '2px solid',
+                        marginRight: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         borderColor: selectedCardId === null ? '#4a6aff' : '#ddd',
-                        background: '#fff'
+                        background: '#fff', flexShrink: 0
                     }}>
-                        {selectedCardId === null && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4a6aff' }} />}
+                        {selectedCardId === null && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4a6aff' }} />}
                     </div>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#1a1a2e' }}>Add a New Card</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <i className="fas fa-plus-circle" style={{ fontSize: '20px', color: '#4a6aff' }}></i>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e' }}>Add a New Card</span>
+                    </div>
                 </div>
             </div>
         </div>
