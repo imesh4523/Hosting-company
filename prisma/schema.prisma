@@ -22,6 +22,8 @@ model User {
   activeVpsId   String?
   avatar          String?
   emailVerified   Boolean     @default(false)
+  balance         Float       @default(0.0)
+  stripeCustomerId String?
   
   // Profile
   phone         String?
@@ -106,6 +108,15 @@ model AuthSettings {
   githubSecret    String? // encrypted
   
   emailEnabled    Boolean @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+model PaymentSettings {
+  id              String  @id @default(cuid())
+  stripeEnabled   Boolean @default(false)
+  stripeSecretKey String? // AES Encrypted
+  stripePublicKey String?
+  stripeWebhookSecret String? // AES Encrypted
   updatedAt       DateTime @updatedAt
 }
 

@@ -241,7 +241,7 @@
                                     <span class="price-total">
                                         Your credit balance is
                                     </span>
-                                    <span class="price-amount">
+                                    <span class="price-amount" id="user-credit-balance">
                                         $0.00USD
                                     </span>
                                 </div>
@@ -440,15 +440,14 @@
 
                 <div class="panel panel-lg panel-default">
                     <div class="panel-body">
-                        <form method="post" action="/clientarea.php?action=addfunds" class="m-w-sm m-a">
+                        <form method="post" action="/clientarea.php?action=addfunds" class="m-w-sm m-a" id="add-funds-form">
                             <input type="hidden" name="token" value="0d057a41fe094d39c6eeff9c6da1ea179db12387">
                             <p class="text-light">Add funds to your account with us to avoid lots of small transactions
                                 and to automatically take care of any new invoices that are generated.</p>
                             <div class="form-group">
                                 <label for="paymentmethod" class="control-label">Payment Method:</label>
                                 <select name="paymentmethod" id="paymentmethod" class="form-control">
-
-
+                                    <option value="stripe">Stripe (Credit/Debit Card)</option>
                                     <option value="cryptomusgateway">Bitcoin | Ethereum | +8 Cryptocurrencies</option>
                                     <option value="dplstripe_alipay">Alipay</option>
 
@@ -468,11 +467,20 @@
                                     <button class="btn btn-lg btn-outline" type="button"
                                         data-price="100.00">$100</button>
                                 </div>
-                                <div class="input-group">
                                     <input type="text" name="amount" id="amount" value="50.00" class="form-control"
                                         required="">
                                 </div>
                             </div>
+
+                            <div id="stripe-payment-container" style="display: none; margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #fff;">
+                                <div id="stripe-saved-cards-container"></div>
+                                <div id="stripe-new-card-section">
+                                    <h5 style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Card Details:</h5>
+                                    <div id="stripe-element" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;"></div>
+                                </div>
+                                <div id="stripe-error" style="color: red; margin-top: 10px; font-size: 13px;"></div>
+                            </div>
+
                             <div class="form-actions">
                                 <button type="submit" value="Add Funds" class="btn btn-lg btn-block btn-primary"
                                     data-btn-loader="">

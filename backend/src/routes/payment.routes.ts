@@ -12,5 +12,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), paymentContro
 // Protected routes
 router.use(authenticate);
 router.post('/create-intent', paymentController.createPaymentIntent);
+router.post('/create-add-funds-intent', paymentController.createAddFundsIntent);
+router.get('/saved-cards', paymentController.getSavedCards);
 
 export default router;

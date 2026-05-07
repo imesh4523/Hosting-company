@@ -8,19 +8,7 @@ const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh_secret';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { 
-      email, 
-      password, 
-      name, 
-      phone, 
-      address1, 
-      address2, 
-      city, 
-      state, 
-      postcode, 
-      country,
-      company 
-    } = req.body;
+    const { email, password, name } = req.body;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -33,14 +21,6 @@ export const register = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         name,
-        phone,
-        address1,
-        address2,
-        city,
-        state,
-        postcode,
-        country,
-        company
       },
     });
 
@@ -52,7 +32,6 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  console.log('Login attempt for:', req.body.email);
   try {
     const { email, password } = req.body;
 
@@ -66,15 +45,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Check 2FA
-    if (user.twoFactorEnabled) {
-      return res.json({
-        twoFactorRequired: true,
-        userId: user.id
-      });
-    }
-
-    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
     const refreshToken = jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '7d' });
 
     res.json({
@@ -111,7 +82,7 @@ export const oauthCallback = async (req: Request, res: Response) => {
   const user = req.user as any;
   if (!user) return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=auth_failed`);
 
-  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
   const refreshToken = jwt.sign({ id: user.id }, REFRESH_SECRET, { expiresIn: '7d' });
 
   // Redirect to frontend with tokens in URL (or use cookies if preferred)

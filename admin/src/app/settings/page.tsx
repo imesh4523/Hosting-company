@@ -14,13 +14,14 @@ function Section({ title, sub, children }: { title: string; sub: string; childre
   );
 }
 
-function Field({ label, placeholder, type = "text", value, mono }: { label: string; placeholder?: string; type?: string; value?: string; mono?: boolean }) {
+function Field({ label, placeholder, type = "text", value, mono, onChange }: { label: string; placeholder?: string; type?: string; value?: string; mono?: boolean; onChange?: (val: string) => void }) {
   return (
     <div style={{ marginBottom: "14px" }}>
       <label style={{ fontSize: "12.5px", fontWeight: 600, color: "#374151", display: "block", marginBottom: "5px" }}>{label}</label>
       <input
         type={type}
-        defaultValue={value}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
         style={{
           width: "100%", padding: "8px 12px",
@@ -35,8 +36,7 @@ function Field({ label, placeholder, type = "text", value, mono }: { label: stri
   );
 }
 
-function Toggle({ label, sub, defaultOn }: { label: string; sub: string; defaultOn?: boolean }) {
-  const [on, setOn] = useState(defaultOn ?? false);
+function Toggle({ label, sub, on, setOn }: { label: string; sub: string; on: boolean; setOn: (val: boolean) => void }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid #F9FAFB" }}>
       <div>
@@ -63,7 +63,54 @@ function Toggle({ label, sub, defaultOn }: { label: string; sub: string; default
   );
 }
 
+import { useEffect } from "react";
+
 export default function SettingsPage() {
+  const [stripeEnabled, setStripeEnabled] = useState(false);
+  const [stripeSecretKey, setStripeSecretKey] = useState("");
+  const [stripePublicKey, setStripePublicKey] = useState("");
+  const [stripeWebhookSecret, setStripeWebhookSecret] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/settings/payment")
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          setStripeEnabled(res.data.stripeEnabled);
+          setStripePublicKey(res.data.stripePublicKey || "");
+          setStripeSecretKey(res.data.stripeSecretKey || "");
+          setStripeWebhookSecret(res.data.stripeWebhookSecret || "");
+        }
+      });
+  }, []);
+
+  const saveStripe = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/settings/payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stripeEnabled,
+          stripePublicKey,
+          stripeSecretKey,
+          stripeWebhookSecret
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Stripe settings saved successfully!");
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (e) {
+      alert("Failed to save settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#F8F9FA" }}>
       <Sidebar />
@@ -76,12 +123,12 @@ export default function SettingsPage() {
 
         {/* General */}
         <Section title="General" sub="System-wide toggles and preferences">
-          <Toggle label="Maintenance Mode"   sub="Disable customer access — show maintenance page" />
-          <Toggle label="New Registrations"  sub="Allow new user sign-ups" defaultOn={true} />
-          <Toggle label="Auto Failover"      sub="Automatically restore VPS on failure" defaultOn={true} />
-          <Toggle label="Fraud Detection"    sub="Enable IPQualityScore risk scoring" defaultOn={true} />
-          <Toggle label="Email Notifications" sub="Send emails via Resend on key events" defaultOn={true} />
-          <Toggle label="Telegram Alerts"    sub="Send critical alerts to Telegram admin chat" defaultOn={true} />
+          <Toggle label="Maintenance Mode"   sub="Disable customer access — show maintenance page" on={false} setOn={()=>{}} />
+          <Toggle label="New Registrations"  sub="Allow new user sign-ups" on={true} setOn={()=>{}} />
+          <Toggle label="Auto Failover"      sub="Automatically restore VPS on failure" on={true} setOn={()=>{}} />
+          <Toggle label="Fraud Detection"    sub="Enable IPQualityScore risk scoring" on={true} setOn={()=>{}} />
+          <Toggle label="Email Notifications" sub="Send emails via Resend on key events" on={true} setOn={()=>{}} />
+          <Toggle label="Telegram Alerts"    sub="Send critical alerts to Telegram admin chat" on={true} setOn={()=>{}} />
         </Section>
 
         {/* Authentication & OAuth */}
@@ -106,13 +153,22 @@ export default function SettingsPage() {
 
         {/* Stripe */}
         <Section title="Stripe Billing" sub="Payment gateway configuration">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-            <Field label="Stripe Secret Key"   placeholder="sk_live_..." type="password" mono />
-            <Field label="Stripe Webhook Secret" placeholder="whsec_..." type="password" mono />
-            <Field label="Stripe Publishable Key" placeholder="pk_live_..." mono />
+          <Toggle label="Enable Stripe" sub="Allow customers to pay via Stripe" on={stripeEnabled} setOn={setStripeEnabled} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginTop: "15px" }}>
+            <Field label="Stripe Secret Key" value={stripeSecretKey} onChange={setStripeSecretKey} placeholder="sk_live_..." type="password" mono />
+            <Field label="Stripe Webhook Secret" value={stripeWebhookSecret} onChange={setStripeWebhookSecret} placeholder="whsec_..." type="password" mono />
+            <Field label="Stripe Publishable Key" value={stripePublicKey} onChange={setStripePublicKey} placeholder="pk_live_..." mono />
           </div>
-          <button style={{ marginTop: "6px", fontSize: "13px", fontWeight: 600, color: "#fff", background: "#5145FF", border: "none", borderRadius: "8px", padding: "8px 20px", cursor: "pointer" }}>
-            Save Stripe Config
+          <button 
+            onClick={saveStripe}
+            disabled={loading}
+            style={{ 
+              marginTop: "6px", fontSize: "13px", fontWeight: 600, color: "#fff", 
+              background: loading ? "#9CA3AF" : "#5145FF", border: "none", 
+              borderRadius: "8px", padding: "8px 20px", cursor: loading ? "default" : "pointer" 
+            }}
+          >
+            {loading ? "Saving..." : "Save Stripe Config"}
           </button>
         </Section>
 

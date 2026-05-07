@@ -21,6 +21,7 @@ export const getProfile = async (req: Request, res: Response) => {
         state: true,
         postcode: true,
         country: true,
+        balance: true,
         createdAt: true,
       }
     });

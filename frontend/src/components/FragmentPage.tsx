@@ -34,11 +34,17 @@ const PATH_REDIRECTS: Record<string, string> = {
 function isInternalLink(href: string): boolean {
   if (!href || href === '#') return false;
   if (href.startsWith('http://localhost')) return true;
-  if (href.startsWith('https://') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return false;
-  if (href.startsWith('/dashboard') || href.startsWith('/login') || href.startsWith('/register')) return true;
-  if (href.startsWith('/account') || href.startsWith('/user')) return true;
-  if (href.startsWith('/store/')) return true;
-  return false;
+  
+  // Legacy domains are internal
+  if (href.includes('youuhost.com') || href.includes('ultahost.com')) return true;
+  
+  // Relative paths are internal
+  if (href.startsWith('/') && !href.startsWith('//')) return true;
+  
+  // Common protocols are external
+  if (href.startsWith('https://') || href.startsWith('http://') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return false;
+  
+  return true;
 }
 
 export default function FragmentPage({ fragmentName, slug, subSlug }: FragmentPageProps) {
@@ -106,10 +112,8 @@ export default function FragmentPage({ fragmentName, slug, subSlug }: FragmentPa
       }
     };
 
-    if (!html || !loaded) {
-      fetchFragment();
-    }
-  }, [cacheKey, fragmentName, slug, subSlug, loaded, html]);
+    fetchFragment();
+  }, [cacheKey, fragmentName, slug, subSlug]);
 
   const handleClick = useCallback((e: MouseEvent) => {
     const anchor = (e.target as HTMLElement).closest('a') as HTMLAnchorElement | null;
@@ -119,9 +123,33 @@ export default function FragmentPage({ fragmentName, slug, subSlug }: FragmentPa
     if (href.includes('/api/auth/logout')) return;
 
     e.preventDefault();
-    const cleanHref = href.split('#')[0];
-    const finalHref = PATH_REDIRECTS[cleanHref] || cleanHref;
-    if (finalHref && finalHref !== window.location.pathname) {
+
+    let targetPath = href;
+    try {
+      // Strip legacy domains to make it relative
+      if (href.includes('youuhost.com') || href.includes('ultahost.com') || href.includes('localhost')) {
+        const url = new URL(href.startsWith('http') ? href : window.location.origin + (href.startsWith('/') ? '' : '/') + href);
+        targetPath = url.pathname + url.search + url.hash;
+      }
+    } catch (e) {
+      console.error('Link Parse Error:', e);
+    }
+
+    const [pathPart, queryPart] = targetPath.split('?');
+    const [cleanPath, hashPart] = pathPart.split('#');
+    
+    let redirectedPath = PATH_REDIRECTS[cleanPath] || cleanPath;
+    
+    // If it's a cart.php link, ensure it goes to our store
+    if (cleanPath === '/cart.php') {
+      redirectedPath = '/store/ultasecurity';
+    }
+
+    let finalHref = redirectedPath;
+    if (queryPart) finalHref += '?' + queryPart;
+    if (hashPart) finalHref += '#' + hashPart;
+
+    if (finalHref && finalHref !== (window.location.pathname + window.location.search + window.location.hash)) {
       window.location.href = finalHref;
     }
   }, []);

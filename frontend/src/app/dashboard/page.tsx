@@ -58,7 +58,9 @@ export default function DashboardPage() {
       const href = anchor.getAttribute('href');
       if (!href) return;
       if (href.startsWith('http') || href.startsWith('mailto') || href.startsWith('tel') || href === '#') return;
-      if (href.startsWith('/dashboard') || href.startsWith('/login') || href.startsWith('/api')) {
+      
+      // Intercept dashboard, store, login, and api links
+      if (href.startsWith('/dashboard') || href.startsWith('/store') || href.startsWith('/login') || href.startsWith('/api')) {
         if (href.startsWith('/api/auth/logout')) return;
         e.preventDefault();
         const cleanHref = href.split('#')[0];
@@ -77,6 +79,7 @@ export default function DashboardPage() {
       if (e.persisted) window.location.reload();
     };
 
+    document.addEventListener('click', handleClick, true);
     window.addEventListener('popstate', handlePopState);
     window.addEventListener('pageshow', onPageShow);
 

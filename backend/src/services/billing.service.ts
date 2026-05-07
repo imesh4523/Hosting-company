@@ -14,36 +14,111 @@ export const PLANS = [
   { id: "pro",      name: "Pro",      ram: 4, cpu: 2, disk: 80,  bandwidth: 4000,  price: 20, priceId: process.env.STRIPE_PRICE_PRO      ?? "" },
   { id: "business", name: "Business", ram: 8, cpu: 4, disk: 160, bandwidth: 8000,  price: 40, priceId: process.env.STRIPE_PRICE_BUSINESS ?? "" },
 ];
-
 export class BillingService {
-  /** Create Stripe checkout session */
-  async createCheckout(userId: string, planId: string, customerEmail: string) {
-    const plan = PLANS.find(p => p.id === planId);
-    if (!plan) throw new Error(`Plan not found: ${planId}`);
+  /** Get or create Stripe customer */
+  private async getOrCreateCustomer(userId: string, email: string) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user?.stripeCustomerId) return user.stripeCustomerId;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      customer_email: customerEmail,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            recurring: { interval: "month" },
-            product_data: {
-              name: `${plan.name} VPS Plan`,
-              description: `${plan.cpu}CPU · ${plan.ram}GB RAM · ${plan.disk}GB SSD`,
-            },
-            unit_amount: plan.price * 100,
-          },
-          quantity: 1,
-        },
-      ],
-      metadata: { userId, planId },
-      success_url: `${process.env.FRONTEND_URL}/dashboard/billing?success=1`,
-      cancel_url:  `${process.env.FRONTEND_URL}/dashboard/billing?cancelled=1`,
+    const customer = await stripe.customers.create({
+      email,
+      metadata: { userId },
     });
 
-    return { url: session.url };
+    await prisma.user.update({
+      where: { id: userId },
+      data: { stripeCustomerId: customer.id },
+    });
+
+    return customer.id;
+  }
+
+  /** Create a SetupIntent for saving a card */
+  async createSetupIntent(userId: string, email: string) {
+    const customerId = await this.getOrCreateCustomer(userId, email);
+    const setupIntent = await stripe.setupIntents.create({
+      customer: customerId,
+      payment_method_types: ["card"],
+    });
+    return { clientSecret: setupIntent.client_secret };
+  }
+
+  /** List saved payment methods for a user */
+  async listSavedCards(userId: string) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.stripeCustomerId) return [];
+
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: user.stripeCustomerId,
+      type: "card",
+    });
+
+    return paymentMethods.data.map(pm => ({
+      id: pm.id,
+      brand: pm.card?.brand,
+      last4: pm.card?.last4,
+      expMonth: pm.card?.exp_month,
+      expYear: pm.card?.exp_year,
+    }));
+  }
+
+  /** Charge a saved card for 'Add Funds' */
+  async chargeSavedCard(userId: string, paymentMethodId: string, amount: number) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.stripeCustomerId) throw new Error("No Stripe customer found");
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100),
+      currency: "usd",
+      customer: user.stripeCustomerId,
+      payment_method: paymentMethodId,
+      off_session: true,
+      confirm: true,
+      description: `Wallet top-up: $${amount}`,
+      metadata: { userId, type: "wallet_topup" },
+    });
+
+    if (paymentIntent.status === "succeeded") {
+      await this.updateWalletBalance(userId, amount, paymentIntent.id);
+    }
+
+    return paymentIntent;
+  }
+
+  /** Create a PaymentIntent for a new card (Add Funds) */
+  async createPaymentIntent(userId: string, email: string, amount: number) {
+    const customerId = await this.getOrCreateCustomer(userId, email);
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100),
+      currency: "usd",
+      customer: customerId,
+      setup_future_usage: "off_session",
+      metadata: { userId, type: "wallet_topup" },
+    });
+    return { clientSecret: paymentIntent.client_secret };
+  }
+
+  private async updateWalletBalance(userId: string, amount: number, stripeId: string) {
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: userId },
+        data: { walletBalance: { increment: amount } },
+      }),
+      prisma.transaction.create({
+        data: {
+          userId,
+          amount,
+          status: "success",
+          stripeSessionId: stripeId,
+          plan: "wallet_topup",
+        },
+      }),
+    ]);
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    await notify.telegramAdmin(
+      `💰 *Wallet Top-up*\nUser: ${user?.email}\nAmount: $${amount}\nNew Balance: $${user?.walletBalance}`
+    );
   }
 
   /** Handle Stripe webhook events */
@@ -60,24 +135,20 @@ export class BillingService {
     }
 
     switch (event.type) {
+      case "payment_intent.succeeded": {
+        const intent = event.data.object as Stripe.PaymentIntent;
+        if (intent.metadata.type === "wallet_topup") {
+          await this.updateWalletBalance(
+            intent.metadata.userId as string,
+            intent.amount / 100,
+            intent.id
+          );
+        }
+        break;
+      }
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         await this.onCheckoutComplete(session);
-        break;
-      }
-      case "invoice.payment_succeeded": {
-        const invoice = event.data.object as Stripe.Invoice;
-        await this.onPaymentSucceeded(invoice);
-        break;
-      }
-      case "invoice.payment_failed": {
-        const invoice = event.data.object as Stripe.Invoice;
-        await this.onPaymentFailed(invoice);
-        break;
-      }
-      case "customer.subscription.deleted": {
-        const sub = event.data.object as Stripe.Subscription;
-        await this.onSubscriptionCancelled(sub);
         break;
       }
     }
@@ -108,9 +179,6 @@ export class BillingService {
     await notify.telegramAdmin(
       `💳 *Payment Received*\nUser: ${user?.email}\nPlan: ${plan.name}\nAmount: $${plan.price}/mo`
     );
-
-    // Trigger VPS deployment via queue (dispatched separately)
-    console.log(`[Billing] Triggering VPS deploy for user ${userId} plan ${planId}`);
   }
 
   private async onPaymentSucceeded(invoice: Stripe.Invoice) {

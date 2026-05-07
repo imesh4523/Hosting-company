@@ -382,8 +382,15 @@ export default function StoreDynamicPage() {
         if (win.WHMCS && win.WHMCS.http) {
             const originalPost = win.WHMCS.http.post;
             win.WHMCS.http.post = function(url: string, data: any, callback: any, dataType: any) {
-                if (url.includes('cart.php')) url = '/api/fragment?path=' + encodeURIComponent(url);
-                return originalPost.call(this, url, data, callback, dataType);
+                if (url && url.includes('cart.php')) url = '/api/fragment?path=' + encodeURIComponent(url);
+                const wrappedCallback = function(response: any) {
+                    if (response && response.redirect) {
+                        window.location.href = response.redirect;
+                        return;
+                    }
+                    if (callback) callback(response);
+                };
+                return originalPost.call(this, url, data, wrappedCallback, dataType);
             };
         }
 
@@ -396,6 +403,18 @@ export default function StoreDynamicPage() {
                     const proxyUrl = '/api/fragment?path=' + encodeURIComponent(url);
                     if (typeof urlOrSettings === 'string') urlOrSettings = proxyUrl;
                     else urlOrSettings.url = proxyUrl;
+
+                    // Handle potential JSON redirect response from proxy
+                    const originalSuccess = settings?.success || (typeof urlOrSettings === 'object' ? urlOrSettings.success : null);
+                    const wrappedSuccess = function(response: any, status: any, xhr: any) {
+                        if (response && response.redirect) {
+                            window.location.href = response.redirect;
+                            return;
+                        }
+                        if (originalSuccess) originalSuccess(response, status, xhr);
+                    };
+                    if (settings) settings.success = wrappedSuccess;
+                    else if (typeof urlOrSettings === 'object') urlOrSettings.success = wrappedSuccess;
                 }
                 return originalAjax.call(this, urlOrSettings, settings);
             };

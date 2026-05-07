@@ -105,10 +105,11 @@ function fixLinks(html: string): string {
   html = html.replace(/https:\/\/bill\.youuhost\.com\/assets\//g, '/ultahost-assets/assets/');
   html = html.replace(/https:\/\/bill\.youuhost\.com\/modules\//g, '/ultahost-assets/modules/');
 
-  html = html.replace(/https:\/\/bill\.youuhost\.com\//g, '/');
-  html = html.replace(/https:\/\/bill\.youuhost\.com/g, '');
-  html = html.replace(/https:\/\/youuhost\.com\//g, '/');
-  html = html.replace(/https:\/\/youuhost\.com/g, '');
+  // Aggressively strip all legacy domains
+  html = html.replace(/https?:\/\/(?:www\.)?(?:bill\.)?(?:ultahost|youuhost)\.com(?:\/|(?=")|(?='))/g, '/');
+  
+  // Fix protocol-relative links to those domains too
+  html = html.replace(/\/\/(?:www\.)?(?:bill\.)?(?:ultahost|youuhost)\.com(?:\/|(?=")|(?='))/g, '/');
 
   // Fix bare relative asset paths
   html = html.replace(/href="\/templates\//g, 'href="/ultahost-assets/templates/');
@@ -226,18 +227,24 @@ function fixLinks(html: string): string {
 
   // ── 12. Cart PHP rewrites ─────────────────────────────────────────────────
   // Specific checkout/configure actions → cart pages
-  html = html.replace(/href="cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
-  html = html.replace(/href="\/cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
-  html = html.replace(/href="\/cart\.php\?a=confproduct&amp;i=\d+"/g, 'href="/dashboard/cart/configure"');
-  html = html.replace(/href="cart\.php\?a=confproduct&amp;i=\d+"/g, 'href="/dashboard/cart/configure"');
-  // "Order New Services" / "View Available Addons" bare cart.php → go to Store
-  html = html.replace(/href="\/cart\.php\?gid=[^"]*"/g, 'href="/store/linux-vps-hosting"');
-  html = html.replace(/href="cart\.php\?gid=[^"]*"/g, 'href="/store/linux-vps-hosting"');
-  html = html.replace(/href="\/cart\.php"/g, 'href="/store/linux-vps-hosting"');
-  html = html.replace(/href="cart\.php"/g, 'href="/store/linux-vps-hosting"');
+  html = html.replace(/href="(?:\/)?cart\.php\?a=checkout"/g, 'href="/dashboard/cart/checkout"');
+  html = html.replace(/href="(?:\/)?cart\.php\?a=confproduct&amp;i=\d+"/g, 'href="/dashboard/cart/configure"');
+  
+  // "Order Now" buttons (a=add&pid=X) → store configuration
+  html = html.replace(/href="(?:\/)?cart\.php\?a=add&amp;pid=(\d+)([^"]*)"/g, 'href="/store/configure/$1$2"');
+  html = html.replace(/href="(?:\/)?cart\.php\?a=add&pid=(\d+)([^"]*)"/g, 'href="/store/configure/$1$2"');
+
+  // "Order New Services" / "View Available Addons" bare cart.php or with gid → go to Store
+  html = html.replace(/href="(?:\/)?cart\.php\?gid=[^"]*"/g, 'href="/store/ultasecurity"');
+  html = html.replace(/href="(?:\/)?cart\.php"/g, 'href="/store/ultasecurity"');
+  
   // Any remaining cart.php with params → dashboard/cart
-  html = html.replace(/href="\/cart\.php[^"]*"/g, 'href="/dashboard/cart"');
-  html = html.replace(/href="cart\.php[^"]*"/g, 'href="/dashboard/cart"');
+  html = html.replace(/href="(?:\/)?cart\.php([^"]*)"/g, 'href="/dashboard/cart$1"');
+  
+  // ── 12.5 Form action rewrites ─────────────────────────────────────────────
+  html = html.replace(/action="(?:\/)?cart\.php([^"]*)"/g, 'action="/api/fragment?path=cart.php$1"');
+  html = html.replace(/action="(?:\/)?clientarea\.php([^"]*)"/g, 'action="/api/fragment?path=clientarea.php$1"');
+  html = html.replace(/action="(?:\/)?login\.php([^"]*)"/g, 'action="/api/fragment?path=login.php$1"');
 
   // ── 13. User display name ─────────────────────────────────────────────────
   html = html.replace(/Romania Srilanka/g, 'User');
@@ -419,6 +426,26 @@ function fixLinks(html: string): string {
   `;
   html += sidebarStyle;
 
+  // Fix JS location assignments
+  html = html.replace(/window\.location\s*=\s*['"]([^'"]+)['"]/g, (match, p1) => {
+    let clean = p1;
+    if (p1.includes('youuhost.com') || p1.includes('ultahost.com')) {
+      try {
+        const url = new URL(p1.startsWith('http') ? p1 : 'https://bill.ultahost.com/' + p1);
+        clean = url.pathname + url.search + url.hash;
+      } catch (e) {}
+    }
+    
+    // Apply common JS redirects to match our internal routes
+    if (clean.includes('clientarea.php?action=services')) return "window.location='/dashboard/services'";
+    if (clean.includes('clientarea.php?action=domains')) return "window.location='/dashboard/domains'";
+    if (clean.includes('clientarea.php?action=invoices')) return "window.location='/dashboard/invoices'";
+    if (clean.includes('supporttickets.php')) return "window.location='/dashboard/support'";
+    if (clean.includes('cart.php')) return "window.location='/store/ultasecurity'";
+
+    return `window.location='${clean}'`;
+  });
+
   return html;
 }
 
@@ -484,7 +511,8 @@ export async function GET(request: NextRequest) {
     let pageHtml = fs.readFileSync(pageFilePath, 'utf8');
 
     // Look for a local store page
-    if (slug && pageName === 'services' && pageFile === 'services.html') {
+    const possibleStorePages = ['services', 'ssl_certificates', 'store'];
+    if (slug && possibleStorePages.includes(pageName)) {
       // Try exact slug first, then fall back to linux variant for generic category slugs
       const fallbackMap: Record<string, string> = {
         'vps-hosting': 'linux-vps-hosting',
@@ -492,6 +520,8 @@ export async function GET(request: NextRequest) {
         'dedicated-hosting': 'dedicated-hosting',
         'reseller-hosting': 'linux-reseller-hosting',
         'game-servers': 'minecraft-game-server',
+        'shared-hosting': 'shared-hosting',
+        'wordpress-hosting': 'wordpress-hosting'
       };
       const lookupSlug = slug || '';
       const exactPath = path.join(FRAGMENTS_DIR, `store-${lookupSlug}.html`);
@@ -508,7 +538,16 @@ export async function GET(request: NextRequest) {
     // Look for a local cart configuration page
     if (pageName === 'cart_configure' && slug && searchParams.get('subSlug')) {
       const subSlug = searchParams.get('subSlug');
-      const cartHtmlPath = path.join(FRAGMENTS_DIR, `cart-configure-${subSlug}.html`);
+      let cartHtmlPath = path.join(FRAGMENTS_DIR, `cart-configure-${subSlug}.html`);
+      
+      if (!fs.existsSync(cartHtmlPath)) {
+        const files = fs.readdirSync(FRAGMENTS_DIR);
+        const matchedFile = files.find(f => f.startsWith('cart-configure-') && f.includes(subSlug));
+        if (matchedFile) {
+          cartHtmlPath = path.join(FRAGMENTS_DIR, matchedFile);
+        }
+      }
+
       if (fs.existsSync(cartHtmlPath)) {
         pageHtml = fs.readFileSync(cartHtmlPath, 'utf8');
       }
@@ -634,7 +673,8 @@ export async function GET(request: NextRequest) {
       `;
     }
 
-    const isStandalone = ['login', 'register', 'pwreset'].includes(pageName) || searchParams.get('standalone') === '1';
+    const isStorePage = slug && (pageName === 'services' || pageName === 'ssl_certificates' || pageName === 'store');
+    const isStandalone = ['login', 'register', 'pwreset'].includes(pageName) || searchParams.get('standalone') === '1' || isStorePage;
 
     if (isStandalone) {
       pageHtml = fixLinks(pageHtml);
@@ -683,10 +723,29 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: headers,
       body: body,
-      redirect: 'follow'
+      redirect: 'manual'
     });
 
-    const data = await response.text();
+    // Handle redirects manually to keep them internal
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('Location');
+      if (location) {
+        let internalLocation = location;
+        if (location.includes('ultahost.com') || location.includes('youuhost.com')) {
+          const url = new URL(location);
+          internalLocation = url.pathname + url.search + url.hash;
+        }
+        
+        // Return a custom response that our frontend can handle, or just return the location
+        return NextResponse.json({ redirect: internalLocation }, { status: 200 });
+      }
+    }
+
+    let data = await response.text();
+    const contentType = response.headers.get('Content-Type') || '';
+    if (contentType.includes('text/html')) {
+      data = fixLinks(data);
+    }
     const resHeaders = new Headers();
     resHeaders.set('Content-Type', response.headers.get('Content-Type') || 'application/json');
     
