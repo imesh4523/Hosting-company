@@ -79,14 +79,19 @@ export default function StripeAddFunds() {
     };
 
     const handleFormSubmit = useCallback(async (e: Event) => {
+        console.log('Form submit triggered');
         const select = document.getElementById('paymentmethod') as HTMLSelectElement;
-        if (select?.value !== 'stripe') return;
+        if (select?.value !== 'stripe') {
+            console.log('Stripe not selected, skipping');
+            return;
+        }
 
         e.preventDefault();
         e.stopPropagation();
 
         const amountInput = document.getElementById('amount') as HTMLInputElement;
         const amount = parseFloat(amountInput.value);
+        console.log('Amount:', amount);
 
         if (isNaN(amount) || amount < 1) {
             alert('Please enter a valid amount');
@@ -97,9 +102,13 @@ export default function StripeAddFunds() {
         const errorDiv = document.getElementById('stripe-error');
         if (errorDiv) errorDiv.textContent = '';
 
+        // Manually show loader
+        const loader = document.querySelector('.loader-button');
+        if (loader) loader.classList.remove('hidden');
+
         try {
+            console.log('Creating payment intent...');
             const token = localStorage.getItem('token');
-            // 1. Create Intent on backend
             const response = await fetch('/api/payments/create-add-funds-intent', {
                 method: 'POST',
                 headers: { 
@@ -112,22 +121,25 @@ export default function StripeAddFunds() {
                 })
             });
 
-            const { clientSecret, success, message, requiresAction } = await response.json();
-            if (!success) throw new Error(message || 'Failed to create payment intent');
+            const data = await response.json();
+            console.log('Intent response:', data);
+            
+            if (!data.success) throw new Error(data.message || 'Failed to create payment intent');
+
+            const { clientSecret, requiresAction } = data;
 
             let result;
             if (selectedCardId) {
-                // Confirm with saved card
+                console.log('Confirming with saved card...');
                 if (requiresAction) {
                     result = await stripe.confirmCardPayment(clientSecret);
                 } else {
-                    // Success already (confirmed on backend)
                     alert('Funds added successfully!');
                     window.location.reload();
                     return;
                 }
             } else {
-                // Confirm with new card
+                console.log('Confirming with new card...');
                 result = await stripe.confirmCardPayment(clientSecret, {
                     payment_method: {
                         card: elements.getElement('card'),
@@ -135,6 +147,8 @@ export default function StripeAddFunds() {
                     }
                 });
             }
+
+            console.log('Payment result:', result);
 
             if (result.error) {
                 if (errorDiv) errorDiv.textContent = result.error.message;
@@ -147,10 +161,12 @@ export default function StripeAddFunds() {
             if (errorDiv) errorDiv.textContent = err.message;
         } finally {
             setLoading(false);
+            if (loader) loader.classList.add('hidden');
         }
     }, [stripe, elements, selectedCardId]);
 
     useEffect(() => {
+        console.log('Stripe/Elements Effect:', { stripe: !!stripe, elements: !!elements });
         if (stripe && !elements) {
             const el = stripe.elements();
             const card = el.create('card', {
@@ -172,6 +188,7 @@ export default function StripeAddFunds() {
     useEffect(() => {
         const form = document.getElementById('add-funds-form');
         if (form) {
+            console.log('Binding submit listener');
             form.addEventListener('submit', handleFormSubmit);
             return () => form.removeEventListener('submit', handleFormSubmit);
         }
