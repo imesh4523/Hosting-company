@@ -11,7 +11,7 @@ export interface Server {
   id: string; name: string; type: "proxmox" | "digitalocean";
   apiUrl: string; apiUser?: string; region?: string; node?: string;
   maxVMs?: number; notes?: string; status: string; maintenanceMode?: boolean;
-  _count: { vps: number };
+  _count: { vms: number };
   liveNodes?: { node: string; status: string; cpu: number; mem: number; maxmem: number; disk: number; maxdisk: number; uptime: number }[];
   liveStats?: { totalMem: number; usedMem: number; avgCpu: number } | null;
 }
@@ -78,7 +78,7 @@ export default function ServersPage() {
     .sort((a, b) => {
       if (sortBy === "ram")      return (b.liveStats?.usedMem ?? 0) - (a.liveStats?.usedMem ?? 0);
       if (sortBy === "cpu")      return (b.liveStats?.avgCpu  ?? 0) - (a.liveStats?.avgCpu  ?? 0);
-      if (sortBy === "vpsCount") return b._count.vps - a._count.vps;
+      if (sortBy === "vpsCount") return b._count.vms - a._count.vms;
       return a.name.localeCompare(b.name);
     });
 
@@ -106,7 +106,7 @@ export default function ServersPage() {
   const summaryCards = [
     { label: "Total Nodes",   value: servers.length,                        color: "#5145FF" },
     { label: "Online",        value: servers.filter(s => s.status !== "disabled" && s.status !== "offline").length, color: "#10B981" },
-    { label: "Total VPS",     value: servers.reduce((a, s) => a + s._count.vps, 0), color: "#8B5CF6" },
+    { label: "Total VPS",     value: servers.reduce((a, s) => a + s._count.vms, 0), color: "#8B5CF6" },
     { label: "Total RAM",     value: `${totalRAM_GB}GB`,                   color: "#3B82F6" },
     { label: "Avg CPU",       value: `${avgCPU}%`,                         color: avgCPU > 80 ? "#EF4444" : "#F59E0B" },
     { label: "Warnings",      value: warnings,                              color: warnings > 0 ? "#EF4444" : "#9CA3AF" },

@@ -12,7 +12,7 @@ type Plan = {
   storage: string | null;
   bandwidth: string | null;
   category: { name: string };
-  _count?: { vps: number };
+  _count?: { vms: number };
 };
 
 export default function PlansPage() {
@@ -86,7 +86,7 @@ export default function PlansPage() {
                   <td style={{ color: "#374151" }}>{plan.cpu ?? "—"}</td>
                   <td style={{ color: "#374151" }}>{plan.storage ?? "—"}</td>
                   <td style={{ color: "#374151" }}>{plan.bandwidth ?? "—"}</td>
-                  <td><span style={{ fontWeight: 600 }}>{plan._count?.vps ?? 0}</span></td>
+                  <td><span style={{ fontWeight: 600 }}>{plan._count?.vms ?? 0}</span></td>
                   <td>
                     <div style={{ display: "flex", gap: "6px" }}>
                       <button className="btn-outline" style={{ padding: "4px 10px", fontSize: "12px" }}>Edit</button>

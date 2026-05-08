@@ -4,9 +4,10 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const plans = await prisma.plan.findMany({
-      include: { category: true, _count: { select: { vps: true } } },
+      include: { category: true, _count: { select: { vms: true } } },
       orderBy: { priceMonthly: "asc" },
     });
+    
     return NextResponse.json(plans);
   } catch (e) {
     console.error(e);
