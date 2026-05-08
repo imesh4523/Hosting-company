@@ -222,7 +222,7 @@ const StripePaymentMethods: React.FC = () => {
                         });
 
                         if (error) {
-                            if (errorElement) { errorElement.textContent = error.message; errorElement.style.display = 'block'; }
+                            if (errorElement) { errorElement.textContent = error.message || 'An error occurred'; errorElement.style.display = 'block'; }
                             if (btn) (btn as any).disabled = false;
                         } else {
                             const res = await fetch('/api/account/verify-payment-method', {
