@@ -43,9 +43,9 @@ export default async function FraudPage() {
   ];
 
   const summary = [
-    { label: "Auto-Banned",   value: displayData.filter(u => (u as { trustLevel?: string }).trustLevel === "BANNED" || u.status === "banned").length, color: "#EF4444", bg: "#FEE2E2", icon: "/icons/shared-2x.webp" },
-    { label: "Flagged Review", value: displayData.filter(u => (u as { trustLevel?: string }).trustLevel === "FLAGGED").length, color: "#F59E0B", bg: "#FEF3C7", icon: "/icons/ticket.svg", isSvg: true },
-    { label: "Avg Score",     value: Math.round(displayData.reduce((a, u) => a + (u.fraudScore ?? 0), 0) / (displayData.length || 1)), color: "#8B5CF6", bg: "#EDE9FE", icon: "/icons/ssl-2x.webp" },
+    { label: "Auto-Banned",   value: displayData.filter((u: any) => (u as { trustLevel?: string }).trustLevel === "BANNED" || u.status === "banned").length, color: "#EF4444", bg: "#FEE2E2", icon: "/icons/shared-2x.webp" },
+    { label: "Flagged Review", value: displayData.filter((u: any) => (u as { trustLevel?: string }).trustLevel === "FLAGGED").length, color: "#F59E0B", bg: "#FEF3C7", icon: "/icons/ticket.svg", isSvg: true },
+    { label: "Avg Score",     value: Math.round(displayData.reduce((a: number, u: any) => a + (u.fraudScore ?? 0), 0) / (displayData.length || 1)), color: "#8B5CF6", bg: "#EDE9FE", icon: "/icons/ssl-2x.webp" },
     { label: "IP Blacklisted", value: 14, color: "#374151", bg: "#F3F4F6", icon: "/icons/domain-2x.webp" },
   ];
 
@@ -113,7 +113,7 @@ export default async function FraudPage() {
               </tr>
             </thead>
             <tbody>
-              {displayData.map((user, i) => {
+              {displayData.map((user: any, i: number) => {
                 const score = user.fraudScore ?? 0;
                 const reasons = (user as { fraudReasons?: string[] }).fraudReasons ?? [];
                 const isBanned = user.status === "banned" || (user as { trustLevel?: string }).trustLevel === "BANNED";
