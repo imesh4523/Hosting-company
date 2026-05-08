@@ -74,7 +74,7 @@ function RestoreModal({ backup, onClose, onSuccess }: {
 
         <div style={{ marginBottom: "20px" }}>
           <div style={{ fontSize: "13px", fontWeight: 600, color: "#374151", marginBottom: "10px" }}>Restore Type</div>
-          {(["same", "new"] as const).map(type => (
+          {(["same", "new"] as const).map((type: string) => (
             <label key={type} style={{
               display: "flex", alignItems: "flex-start", gap: "10px", padding: "12px 14px",
               border: `2px solid ${restoreType === type ? "#5145FF" : "#E5E7EB"}`,
@@ -242,7 +242,7 @@ export default function BackupsPage() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ background: "#FAFAFA" }}>
-                    {["Customer", "VM", "Size", "Status", "Type", "Created", "Actions"].map(h => (
+                    {["Customer", "VM", "Size", "Status", "Type", "Created", "Actions"].map((h: string) => (
                       <th key={h} style={{ padding: "11px 20px", textAlign: "left", fontSize: "11px", fontWeight: 700, color: "#9CA3AF", letterSpacing: "0.06em" }}>
                         {h.toUpperCase()}
                       </th>
@@ -250,7 +250,7 @@ export default function BackupsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map(b => {
+                  {filtered.map((b: any) => {
                     const sc = STATUS_COLORS[b.status] ?? STATUS_COLORS.pending;
                     return (
                       <tr key={b.id} style={{ borderTop: "1px solid #F9FAFB" }}

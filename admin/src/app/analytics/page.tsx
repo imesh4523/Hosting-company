@@ -11,7 +11,7 @@ import {
 function genEarnings() {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const now = new Date().getMonth();
-  return months.slice(0, now + 1).map((m, i) => ({
+  return months.slice(0, now + 1).map((m: string, i: number) => ({
     month: m,
     revenue: Math.floor(2400 + i * 380 + Math.random() * 500),
     expenses: Math.floor(800 + i * 60 + Math.random() * 200),
@@ -39,7 +39,7 @@ function genPerformance() {
 
 function genRecovery() {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  return days.map(d => ({
+  return days.map((d: string) => ({
     day: d,
     events: Math.floor(Math.random() * 8),
     success: Math.floor(Math.random() * 7),

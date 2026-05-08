@@ -57,7 +57,7 @@ export default function AccountHealthPage() {
     setSetting(id);
     try {
       await fetch(`${BACKEND}/api/admin/migrations/accounts/${id}/set-primary`, { method:"POST" });
-      setAccounts(prev => prev.map(a => ({ ...a, isPrimaryFailover: a.id === id })));
+      setAccounts(prev => prev.map((a: any) => ({ ...a, isPrimaryFailover: a.id === id })));
       showToast("Primary failover account updated");
     } catch { showToast("Failed to update"); }
     setSetting(null);
@@ -78,10 +78,10 @@ export default function AccountHealthPage() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"14px", marginBottom:"22px" }}>
           {[
             { label:"Total Accounts",   value:accounts.length,                                         color:"#5145FF" },
-            { label:"Active",           value:accounts.filter(a=>a.status==="active").length,          color:"#10B981" },
-            { label:"Suspended",        value:accounts.filter(a=>a.status==="suspended").length,       color:"#EF4444" },
-            { label:"Total Droplets",   value:accounts.reduce((s,a)=>s+a.dropletCount,0),             color:"#8B5CF6" },
-          ].map((s,i) => (
+            { label:"Active",           value:accounts.filter((a: any)=>a.status==="active").length,          color:"#10B981" },
+            { label:"Suspended",        value:accounts.filter((a: any)=>a.status==="suspended").length,       color:"#EF4444" },
+            { label:"Total Droplets",   value:accounts.reduce((s: number, a: any)=>s+a.dropletCount,0),             color:"#8B5CF6" },
+          ].map((s: any, i: number) => (
             <div key={i} style={{ background:"#fff", borderRadius:"14px", border:"1px solid #F0F0F0", boxShadow:"0 1px 6px rgba(0,0,0,0.04)", padding:"16px 18px" }}>
               <div style={{ fontSize:"11px", color:"#9CA3AF", fontWeight:600, textTransform:"uppercase", marginBottom:"4px" }}>{s.label}</div>
               <div style={{ fontSize:"26px", fontWeight:700, color:s.color }}>{s.value}</div>
@@ -91,7 +91,7 @@ export default function AccountHealthPage() {
 
         {/* Account cards */}
         <div style={{ display:"flex", flexDirection:"column", gap:"16px" }}>
-          {(loading ? MOCK_ACCOUNTS : accounts).map(acc => {
+          {(loading ? MOCK_ACCOUNTS : accounts).map((acc: any) => {
             const isSuspended = acc.status === "suspended";
             const isActive    = acc.status === "active";
             const statusCfg   = isSuspended
@@ -149,7 +149,7 @@ export default function AccountHealthPage() {
                   <div style={{ marginBottom:"14px" }}>
                     <div style={{ fontSize:"10.5px", color:"#9CA3AF", fontWeight:600, marginBottom:"8px" }}>ACTIVE DROPLETS</div>
                     <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
-                      {acc.droplets.slice(0, 6).map(d => (
+                      {acc.droplets.slice(0, 6).map((d: any) => (
                         <div key={d.id} style={{ background:"#F9FAFB", border:"1px solid #F3F4F6", borderRadius:"7px", padding:"5px 10px", display:"flex", alignItems:"center", gap:"6px" }}>
                           <div style={{ width:"5px", height:"5px", borderRadius:"50%", background:"#10B981" }}/>
                           <span style={{ fontSize:"12px", color:"#374151" }}>{d.name}</span>

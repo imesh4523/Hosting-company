@@ -182,7 +182,7 @@ export default function VPSPage() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ background: "#FAFAFA" }}>
-                    {["VM / Host", "Customer", "IP / Port", "Specs", "Provider", "Status", "Actions"].map(h => (
+                    {["VM / Host", "Customer", "IP / Port", "Specs", "Provider", "Status", "Actions"].map((h: string) => (
                       <th key={h} style={{ padding: "11px 20px", textAlign: "left", fontSize: "11px", fontWeight: 700, color: "#9CA3AF", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
                         {h.toUpperCase()}
                       </th>
@@ -190,7 +190,7 @@ export default function VPSPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {vms.map(vm => {
+                  {vms.map((vm: any) => {
                     const sc = STATUS_COLORS[vm.status] ?? STATUS_COLORS.stopped;
                     return (
                       <tr key={vm.id} style={{ borderTop: "1px solid #F9FAFB" }}

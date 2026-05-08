@@ -113,7 +113,7 @@ export default function AccountsPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "18px" }}>
-            {accounts.map(acc => {
+            {accounts.map((acc: any) => {
               const pct = usagePct(acc.usage, acc.limit);
               const pctColor = pct > 80 ? "#EF4444" : pct > 60 ? "#F59E0B" : "#5145FF";
               return (

@@ -70,7 +70,7 @@ export default function PlansPage() {
                 <tr><td colSpan={9} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>Loading plans…</td></tr>
               ) : plans.length === 0 ? (
                 <tr><td colSpan={9} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No plans yet. Add your first plan.</td></tr>
-              ) : plans.map(plan => (
+              ) : plans.map((plan: any) => (
                 <tr key={plan.id}>
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

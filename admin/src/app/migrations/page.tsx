@@ -113,7 +113,7 @@ function MigrationCard({ m, expanded, onToggle }: { m: Migration; expanded: bool
       {/* Expanded step list */}
       {expanded && (
         <div style={{ padding:"0 20px 16px", borderTop:"1px solid #F9FAFB" }}>
-          {m.steps.map(s => (
+          {m.steps.map((s: any) => (
             <div key={s.step} style={{ display:"flex", alignItems:"center", gap:"10px", padding:"7px 0", borderBottom:"1px solid #F9FAFB" }}>
               <StepDot status={s.status} />
               <div style={{ flex:1 }}>
@@ -193,7 +193,7 @@ export default function MigrationCenterPage() {
 
         {/* Filter */}
         <div style={{ display:"flex", gap:"6px", marginBottom:"18px" }}>
-          {["all","pending","deploying","restoring","completed","failed"].map(f => (
+          {["all","pending","deploying","restoring","completed","failed"].map((f: string) => (
             <button key={f} onClick={() => setFilter(f)} style={{ fontSize:"12px", fontWeight:600, padding:"5px 14px", borderRadius:"99px", border:"none", cursor:"pointer", background: filter===f ? "#5145FF" : "#fff", color: filter===f ? "#fff" : "#6B7280", boxShadow: filter===f ? "0 2px 8px rgba(81,69,255,0.25)" : "none" }}>
               {f.charAt(0).toUpperCase()+f.slice(1)}
             </button>
@@ -203,10 +203,10 @@ export default function MigrationCenterPage() {
 
         {/* Migration cards */}
         {loading
-          ? [1,2].map(i => <div key={i} style={{ height:"100px", background:"#fff", borderRadius:"14px", marginBottom:"14px", animation:"pulse 1.5s ease infinite" }}/>)
+          ? [1,2].map((i: number) => <div key={i} style={{ height:"100px", background:"#fff", borderRadius:"14px", marginBottom:"14px", animation:"pulse 1.5s ease infinite" }}/>)
           : filtered.length === 0
           ? <div style={{ textAlign:"center", padding:"60px", background:"#fff", borderRadius:"14px" }}><div style={{ fontSize:"36px" }}>🔄</div><div style={{ fontSize:"15px", fontWeight:600, color:"#374151", marginTop:"10px" }}>No migrations match this filter</div></div>
-          : filtered.map(m => <MigrationCard key={m.id} m={m} expanded={expanded===m.id} onToggle={() => setExpanded(expanded===m.id ? null : m.id)} />)
+          : filtered.map((m: any) => <MigrationCard key={m.id} m={m} expanded={expanded===m.id} onToggle={() => setExpanded(expanded===m.id ? null : m.id)} />)
         }
       </main>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}} @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}`}</style>

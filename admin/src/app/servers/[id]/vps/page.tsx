@@ -102,23 +102,23 @@ export default function ServerVPSPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#FAFAFA" }}>
-                {["VMID", "Hostname", "Type", "RAM", "CPU", "Uptime", "Status", "Actions"].map(h => (
+                {["VMID", "Hostname", "Type", "RAM", "CPU", "Uptime", "Status", "Actions"].map((h: string) => (
                   <th key={h} style={{ padding: "11px 16px", textAlign: "left", fontSize: "10.5px", fontWeight: 700, color: "#9CA3AF", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                [1,2,3,4].map(i => (
+                [1,2,3,4].map((i: number) => (
                   <tr key={i} style={{ borderTop: "1px solid #F9FAFB" }}>
-                    {[1,2,3,4,5,6,7,8].map(j => (
+                    {[1,2,3,4,5,6,7,8].map((j: number) => (
                       <td key={j} style={{ padding: "14px 16px" }}>
                         <div style={{ height: "12px", background: "#F3F4F6", borderRadius: "6px", animation: "pulse 1.5s ease infinite" }} />
                       </td>
                     ))}
                   </tr>
                 ))
-              ) : filtered.map((vm, i) => {
+              ) : filtered.map((vm: any, i: number) => {
                 const ramPct  = vm.maxmem ? Math.round((vm.mem / vm.maxmem) * 100) : 0;
                 const cpuPct  = Math.round(vm.cpu * 100);
                 const uptimeH = vm.uptime ? `${Math.floor(vm.uptime / 3600)}h` : "—";

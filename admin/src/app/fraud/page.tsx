@@ -105,7 +105,7 @@ export default async function FraudPage() {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "#FAFAFA" }}>
-                {["User", "Email", "Fraud Score", "Risk Factors", "VPS Count", "Status", "Actions"].map(h => (
+                {["User", "Email", "Fraud Score", "Risk Factors", "VPS Count", "Status", "Actions"].map((h: string) => (
                   <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: "10.5px", fontWeight: 700, color: "#9CA3AF", letterSpacing: "0.06em" }}>
                     {h.toUpperCase()}
                   </th>
@@ -190,7 +190,7 @@ export default async function FraudPage() {
         <div style={{ marginTop: "20px", background: "#fff", borderRadius: "14px", border: "1px solid #F0F0F0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", padding: "20px 22px" }}>
           <div style={{ fontSize: "15px", fontWeight: 700, color: "#111827", marginBottom: "14px" }}>IP Blacklist</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {["45.227.255.81", "103.94.185.12", "185.220.101.45", "198.96.155.3", "23.129.64.214", "178.165.72.177", "89.234.157.254", "46.165.230.5", "171.25.193.9", "192.42.116.16", "77.247.181.165", "5.188.10.179", "176.10.104.240", "109.70.100.28"].map(ip => (
+            {["45.227.255.81", "103.94.185.12", "185.220.101.45", "198.96.155.3", "23.129.64.214", "178.165.72.177", "89.234.157.254", "46.165.230.5", "171.25.193.9", "192.42.116.16", "77.247.181.165", "5.188.10.179", "176.10.104.240", "109.70.100.28"].map((ip: string) => (
               <div key={ip} style={{
                 display: "flex", alignItems: "center", gap: "7px",
                 background: "#FEF2F2", border: "1px solid #FECACA",

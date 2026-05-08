@@ -96,7 +96,7 @@ function TicketModal({ ticket, onClose, onRefresh }: { ticket: Ticket; onClose: 
 
         {/* Status Changer */}
         <div style={{ display: "flex", gap: "6px", marginBottom: "16px" }}>
-          {["open", "pending", "resolved", "closed"].map(s => (
+          {["open", "pending", "resolved", "closed"].map((s: string) => (
             <button key={s} onClick={() => changeStatus(s)} disabled={changingStatus || currentStatus === s}
               style={{
                 padding: "4px 12px", borderRadius: "99px", fontSize: "11.5px", fontWeight: 600, cursor: "pointer",
@@ -113,7 +113,7 @@ function TicketModal({ ticket, onClose, onRefresh }: { ticket: Ticket; onClose: 
         <div style={{ flex: 1, overflowY: "auto", marginBottom: "16px", display: "flex", flexDirection: "column", gap: "12px", paddingRight: "4px" }}>
           {messages.length === 0 ? (
             <div style={{ textAlign: "center", color: "#9CA3AF", padding: "30px", fontSize: "13px" }}>No messages yet</div>
-          ) : messages.map(msg => (
+          ) : messages.map((msg: any) => (
             <div key={msg.id} style={{
               alignSelf: msg.sender === "admin" ? "flex-end" : "flex-start",
               maxWidth: "80%",
@@ -180,8 +180,8 @@ export default function SupportPage() {
 
   useEffect(() => { fetchTickets(); }, [fetchTickets]);
 
-  const openCount = tickets.filter(t => t.status === "open").length;
-  const pendingCount = tickets.filter(t => t.status === "pending").length;
+  const openCount = tickets.filter((t: any) => t.status === "open").length;
+  const pendingCount = tickets.filter((t: any) => t.status === "pending").length;
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#F8F9FA" }}>
@@ -216,8 +216,8 @@ export default function SupportPage() {
             { label: "Total", value: tickets.length, icon: "💬" },
             { label: "Open", value: openCount, icon: "🔴" },
             { label: "Pending", value: pendingCount, icon: "🟡" },
-            { label: "Resolved", value: tickets.filter(t => t.status === "resolved").length, icon: "✅" },
-          ].map((s, i) => (
+            { label: "Resolved", value: tickets.filter((t: any) => t.status === "resolved").length, icon: "✅" },
+          ].map((s: any, i: number) => (
             <div key={i} className="card" style={{ padding: "16px 18px", display: "flex", alignItems: "center", gap: "12px" }}>
               <div style={{ fontSize: "24px" }}>{s.icon}</div>
               <div>
@@ -246,7 +246,7 @@ export default function SupportPage() {
                 <tr><td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>Loading tickets…</td></tr>
               ) : tickets.length === 0 ? (
                 <tr><td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No tickets found</td></tr>
-              ) : tickets.map(ticket => {
+              ) : tickets.map((ticket: any) => {
                 const sc = STATUS_COLORS[ticket.status] ?? STATUS_COLORS.open;
                 const pc = PRIORITY_COLORS[ticket.priority] ?? PRIORITY_COLORS.low;
                 return (

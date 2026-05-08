@@ -107,7 +107,7 @@ export default function ServerCard({ server, isSelected, onClick, onEdit, onDisa
       {/* Node pills */}
       {server.liveNodes && server.liveNodes.length > 0 && (
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "14px" }}>
-          {server.liveNodes.map(n => (
+          {server.liveNodes.map((n: any) => (
             <div key={n.node} style={{ display: "flex", alignItems: "center", gap: "5px", background: "#F9FAFB", border: "1px solid #F3F4F6", borderRadius: "7px", padding: "4px 9px" }}>
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: n.status === "online" ? "#10B981" : "#EF4444" }} />
               <span style={{ fontSize: "11px", color: "#374151", fontWeight: 500 }}>{n.node}</span>

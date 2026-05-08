@@ -65,7 +65,7 @@ export default function DisableServerModal({ server, servers, onClose, onConfirm
               <label style={{ fontSize: "12px", fontWeight: 600, color: "#374151", display: "block", marginBottom: "5px" }}>Target Server</label>
               <select value={target} onChange={e => setTarget(e.target.value)} style={{ width: "100%", padding: "8px 12px", border: "1px solid #E5E7EB", borderRadius: "8px", fontSize: "13px", background: "#FAFAFA", outline: "none" }}>
                 <option value="">Select target server…</option>
-                {otherServers.map(s => (
+                {otherServers.map((s: any) => (
                   <option key={s.id} value={s.id}>{s.name} ({s._count.vps}/{s.maxVMs ?? 50} VPS)</option>
                 ))}
               </select>

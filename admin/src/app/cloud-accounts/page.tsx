@@ -142,7 +142,7 @@ export default function CloudAccountsPage() {
             </tr>
           </thead>
           <tbody>
-            {accounts.map(acc => (
+            {accounts.map((acc: any) => (
               <tr key={acc.id} style={{ borderBottom: "1px solid #F3F4F6" }}>
                 <td style={{ padding: "20px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -192,7 +192,7 @@ export default function CloudAccountsPage() {
             <div style={{ marginBottom: "15px" }}>
               <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>Provider:</label>
               <select style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #D1D5DB", outline: "none" }}>
-                {PROVIDERS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                {PROVIDERS.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </div>
 

@@ -69,7 +69,7 @@ export default function ServersPage() {
   }, [loading, servers.length]);
 
   // ─── Filter + Sort ─────────────────────────────────────────────────────────
-  const regions   = [...new Set(servers.map(s => s.region).filter(Boolean))] as string[];
+  const regions   = [...new Set(servers.map((s: any) => s.region).filter(Boolean))] as string[];
   const filtered  = servers
     .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || (s.region ?? "").toLowerCase().includes(search.toLowerCase()))
     .filter(s => filterType   === "all" || s.type   === filterType)
@@ -91,7 +91,7 @@ export default function ServersPage() {
         body: JSON.stringify({ enabled }),
       });
     } catch {}
-    setServers(prev => prev.map(x => x.id === s.id ? { ...x, maintenanceMode: enabled } : x));
+    setServers(prev => prev.map((x: any) => x.id === s.id ? { ...x, maintenanceMode: enabled } : x));
     showToast(`Maintenance mode ${enabled ? "enabled" : "disabled"} for ${s.name}`);
   };
 
@@ -149,7 +149,7 @@ export default function ServersPage() {
 
         {/* Summary cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: "12px", marginBottom: "20px" }}>
-          {summaryCards.map((s, i) => (
+          {summaryCards.map((s: any, i: number) => (
             <div key={i} style={{ background: "#fff", borderRadius: "12px", border: "1px solid #F0F0F0", boxShadow: "0 1px 6px rgba(0,0,0,0.04)", padding: "14px 16px" }}>
               <div style={{ fontSize: "11px", color: "#9CA3AF", fontWeight: 600, marginBottom: "4px", textTransform: "uppercase" }}>{s.label}</div>
               <div style={{ fontSize: "22px", fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -166,11 +166,11 @@ export default function ServersPage() {
           {[
             { label: "Type",   val: filterType,   set: setFilterType,   opts: [["all","All Types"],["proxmox","Proxmox"],["digitalocean","DigitalOcean"]] },
             { label: "Status", val: filterStatus,  set: setFilterStatus,  opts: [["all","All Status"],["active","Online"],["warning","Warning"],["disabled","Offline"]] },
-            { label: "Region", val: filterRegion,  set: setFilterRegion,  opts: [["all","All Regions"], ...regions.map(r => [r,r])] },
+            { label: "Region", val: filterRegion,  set: setFilterRegion,  opts: [["all","All Regions"], ...regions.map((r: string) => [r,r])] },
             { label: "Sort",   val: sortBy,        set: setSortBy,        opts: [["name","Name"],["ram","RAM Usage"],["cpu","CPU"],["vpsCount","VPS Count"]] },
-          ].map(f => (
+          ].map((f: any) => (
             <select key={f.label} value={f.val} onChange={e => f.set(e.target.value)} style={{ padding: "7px 10px", border: "1px solid #E5E7EB", borderRadius: "8px", fontSize: "13px", background: "#FAFAFA", color: "#374151", cursor: "pointer", outline: "none" }}>
-              {f.opts.map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              {f.opts.map(([v,l]: any) => <option key={v} value={v}>{l}</option>)}
             </select>
           ))}
           {(search || filterType !== "all" || filterStatus !== "all" || filterRegion !== "all") && (
@@ -186,7 +186,7 @@ export default function ServersPage() {
         {/* Server grid */}
         {loading ? (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "18px" }}>
-            {[1,2,3,4].map(i => (
+            {[1,2,3,4].map((i: number) => (
               <div key={i} style={{ background: "#fff", borderRadius: "14px", border: "1px solid #F0F0F0", height: "220px", animation: "pulse 1.5s ease infinite" }} />
             ))}
           </div>
@@ -198,7 +198,7 @@ export default function ServersPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "18px" }}>
-            {filtered.map(server => (
+            {filtered.map((server: any) => (
               <ServerCard
                 key={server.id}
                 server={server}

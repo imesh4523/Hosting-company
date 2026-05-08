@@ -105,7 +105,7 @@ export default function ServerDetailPanel({ server, onClose, onEdit, showToast }
             <div style={{ marginBottom: "20px" }}>
               <div style={{ fontSize: "11px", fontWeight: 700, color: "#9CA3AF", letterSpacing: "0.06em", marginBottom: "10px" }}>PROXMOX NODES</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {server.liveNodes.map(node => {
+                {server.liveNodes.map((node: any) => {
                   const nCpu = Math.round(node.cpu * 100);
                   const nRam = Math.round(node.mem / 1073741824);
                   const nMaxRam = Math.round(node.maxmem / 1073741824);
