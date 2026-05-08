@@ -15,7 +15,7 @@ export async function GET() {
         suspended: true,
         createdAt: true,
         _count: {
-          select: { vps: true, invoices: true, tickets: true },
+          select: { vms: true, invoices: true, tickets: true },
         },
       },
       orderBy: { createdAt: "desc" },

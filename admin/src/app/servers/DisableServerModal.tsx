@@ -48,13 +48,13 @@ export default function DisableServerModal({ server, servers, onClose, onConfirm
             <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#FEF3C7", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>⚠️</div>
             <div>
               <div style={{ fontSize: "15px", fontWeight: 700, color: "#111827" }}>Disable {server.name}?</div>
-              <div style={{ fontSize: "12px", color: "#9CA3AF" }}>This server has {server._count.vps} active VPS instances</div>
+              <div style={{ fontSize: "12px", color: "#9CA3AF" }}>This server has {server._count.vms} active VPS instances</div>
             </div>
           </div>
         </div>
 
         <div style={{ padding: "20px 24px" }}>
-          <div style={{ fontSize: "13px", color: "#374151", marginBottom: "14px", fontWeight: 500 }}>Choose what to do with the {server._count.vps} VPS instances:</div>
+          <div style={{ fontSize: "13px", color: "#374151", marginBottom: "14px", fontWeight: 500 }}>Choose what to do with the {server._count.vms} VPS instances:</div>
 
           {radio("keep",    "Keep VPS running",      "Mark server as disabled in panel only — VPS continue running")}
           {radio("suspend", "Suspend all VPS",        "Stop all VPS on this server immediately")}

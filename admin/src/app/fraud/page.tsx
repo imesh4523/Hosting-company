@@ -6,7 +6,7 @@ async function getFraudData() {
     const users = await prisma.user.findMany({
       where: { fraudScore: { gte: 30 } },
       orderBy: { fraudScore: "desc" },
-      include: { _count: { select: { vps: true } } },
+      include: { _count: { select: { vms: true } } },
     });
     return users;
   } catch {
@@ -148,7 +148,7 @@ export default async function FraudPage() {
                       </div>
                     </td>
                     <td style={{ padding: "14px 18px" }}>
-                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>{user._count.vps}</span>
+                      <span style={{ fontSize: "13px", fontWeight: 600, color: "#111827" }}>{user._count.vms}</span>
                     </td>
                     <td style={{ padding: "14px 18px" }}>
                       <span style={{
