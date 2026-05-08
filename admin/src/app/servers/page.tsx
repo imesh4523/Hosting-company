@@ -60,10 +60,10 @@ export default function ServersPage() {
   useEffect(() => {
     if (!loading && servers.length === 0) {
       setServers([
-        { id: "s1", name: "SGP1-Proxmox",  type: "proxmox",      apiUrl: "https://10.12.0.1:8006", region: "Singapore", status: "active",  maintenanceMode: false, _count: { vps: 31 }, liveNodes: [{ node: "pve-node-1", status: "online", cpu: 0.38, mem: 34359738368, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 86400 }, { node: "pve-node-2", status: "online", cpu: 0.52, mem: 49392123904, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 82000 }], liveStats: { totalMem: 137438953472, usedMem: 83751862272, avgCpu: 45 } },
-        { id: "s2", name: "US-DO-Primary", type: "digitalocean",  apiUrl: "https://api.digitalocean.com", region: "New York", status: "active",  maintenanceMode: false, _count: { vps: 24 }, liveStats: null },
-        { id: "s3", name: "EU-AMS3",       type: "proxmox",      apiUrl: "https://10.20.0.1:8006", region: "Amsterdam", status: "warning", maintenanceMode: false, _count: { vps: 18 }, liveStats: { totalMem: 68719476736, usedMem: 66571993088, avgCpu: 94 } },
-        { id: "s4", name: "SGP2-Backup",   type: "proxmox",      apiUrl: "https://10.12.0.2:8006", region: "Singapore", status: "active",  maintenanceMode: true,  _count: { vps: 5  }, liveStats: { totalMem: 68719476736, usedMem: 12884901888, avgCpu: 18 } },
+        { id: "s1", name: "SGP1-Proxmox",  type: "proxmox",      apiUrl: "https://10.12.0.1:8006", region: "Singapore", status: "active",  maintenanceMode: false, _count: { vms: 31 }, liveNodes: [{ node: "pve-node-1", status: "online", cpu: 0.38, mem: 34359738368, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 86400 }, { node: "pve-node-2", status: "online", cpu: 0.52, mem: 49392123904, maxmem: 68719476736, disk: 0, maxdisk: 0, uptime: 82000 }], liveStats: { totalMem: 137438953472, usedMem: 83751862272, avgCpu: 45 } },
+        { id: "s2", name: "US-DO-Primary", type: "digitalocean",  apiUrl: "https://api.digitalocean.com", region: "New York", status: "active",  maintenanceMode: false, _count: { vms: 24 }, liveStats: null },
+        { id: "s3", name: "EU-AMS3",       type: "proxmox",      apiUrl: "https://10.20.0.1:8006", region: "Amsterdam", status: "warning", maintenanceMode: false, _count: { vms: 18 }, liveStats: { totalMem: 68719476736, usedMem: 66571993088, avgCpu: 94 } },
+        { id: "s4", name: "SGP2-Backup",   type: "proxmox",      apiUrl: "https://10.12.0.2:8006", region: "Singapore", status: "active",  maintenanceMode: true,  _count: { vms: 5  }, liveStats: { totalMem: 68719476736, usedMem: 12884901888, avgCpu: 18 } },
       ]);
     }
   }, [loading, servers.length]);
