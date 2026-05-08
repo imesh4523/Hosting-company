@@ -74,7 +74,7 @@ function RestoreModal({ backup, onClose, onSuccess }: {
 
         <div style={{ marginBottom: "20px" }}>
           <div style={{ fontSize: "13px", fontWeight: 600, color: "#374151", marginBottom: "10px" }}>Restore Type</div>
-          {(["same", "new"] as const).map((type: string) => (
+          {(["same", "new"] as const).map((type: "same" | "new") => (
             <label key={type} style={{
               display: "flex", alignItems: "flex-start", gap: "10px", padding: "12px 14px",
               border: `2px solid ${restoreType === type ? "#5145FF" : "#E5E7EB"}`,
