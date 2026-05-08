@@ -5,13 +5,13 @@ async function getRecoveryData() {
   try {
     const [logs, successCount, failedCount, vpsCount] = await Promise.all([
       prisma.recoveryLog.findMany({
-        include: { vps: { select: { name: true, ipAddress: true } } },
+        include: { vps: { select: { name: true, ip: true } } },
         orderBy: { createdAt: "desc" },
         take: 50,
       }),
       prisma.recoveryLog.count({ where: { status: "success" } }),
       prisma.recoveryLog.count({ where: { status: "failed" } }),
-      prisma.vPS.count({ where: { status: "active" } }),
+      prisma.vM.count({ where: { status: "active" } }),
     ]);
     return { logs, successCount, failedCount, vpsCount };
   } catch {
@@ -84,7 +84,7 @@ export default async function RecoveryPage() {
                       <span style={{ fontWeight: 500, color: "#111827" }}>{log.vps.name}</span>
                     </div>
                   </td>
-                  <td><span style={{ fontFamily: "monospace", fontSize: "12.5px", color: "#6B7280" }}>{log.vps.ipAddress ?? "â€”"}</span></td>
+                  <td><span style={{ fontFamily: "monospace", fontSize: "12.5px", color: "#6B7280" }}>{log.vps.ip ?? "â€”"}</span></td>
                   <td>
                     <span style={{ background: "#EEF0FF", color: "#5145FF", padding: "3px 10px", borderRadius: "6px", fontSize: "12px", fontWeight: 500 }}>
                       {log.action.replace("_", " ")}
