@@ -107,7 +107,7 @@ function BalanceModal({ user, onClose, onSuccess }: { user: User; onClose: () =>
         </div>
 
         <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-          {(["add", "deduct"] as const).map((op: string) => (
+          {(["add", "deduct"] as const).map((op: "add" | "deduct") => (
             <button key={op} onClick={() => setOperation(op)} style={{
               flex: 1, padding: "10px", borderRadius: "8px", fontWeight: 600, fontSize: "13.5px", cursor: "pointer",
               border: `2px solid ${operation === op ? (op === "add" ? "#10B981" : "#EF4444") : "#E5E7EB"}`,
