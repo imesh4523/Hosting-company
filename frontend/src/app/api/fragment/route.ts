@@ -25,7 +25,6 @@ const fragmentMap: Record<string, string> = {
   'ticket_new': 'ticket-new.html',
   'ticket_view': 'ticket-view.html',
   'billing_invoices': 'billing-invoices.html',
-  'domains': 'domains.html',
   'knowledgebase': 'knowledgebase.html',
   'kb': 'knowledgebase.html',
   // Other main nav
