@@ -547,7 +547,7 @@ export async function GET(request: NextRequest) {
       
       if (!fs.existsSync(cartHtmlPath)) {
         const files = fs.readdirSync(FRAGMENTS_DIR);
-        const matchedFile = files.find(f => f.startsWith('cart-configure-') && f.includes(subSlug));
+        const matchedFile = files.find(f => f.startsWith('cart-configure-') && subSlug && f.includes(subSlug));
         if (matchedFile) {
           cartHtmlPath = path.join(FRAGMENTS_DIR, matchedFile);
         }
