@@ -20,7 +20,7 @@ export class NotificationService {
   }
 
   // ─── Email via Resend ─────────────────────────────────────────────────────────
-  private async sendEmail(to: string, subject: string, html: string): Promise<void> {
+  async sendEmail(to: string, subject: string, html: string): Promise<void> {
     if (!this.resendKey) return;
     try {
       await axios.post(

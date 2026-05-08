@@ -12,11 +12,7 @@ router.post('/register', register);
 router.post('/login', login);
 router.get('/methods', getAuthMethods);
 
-// 2FA Routes
-router.post('/2fa/setup', authenticate, TwoFactorController.setup);
-router.post('/2fa/verify', authenticate, TwoFactorController.verifyAndEnable);
-router.post('/2fa/disable', authenticate, TwoFactorController.disable);
-router.post('/2fa/login', TwoFactorController.verifyLogin);
+// 2FA functionality removed per user request
 
 // Google OAuth
 router.get('/google', async (req, res, next) => {

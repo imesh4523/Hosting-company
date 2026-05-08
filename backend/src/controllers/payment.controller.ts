@@ -28,7 +28,7 @@ export class PaymentController {
 
       // Create a PaymentIntent with the order amount and currency
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round((order.totalPrice || 0) * 100), // in cents
+        amount: Math.round((order.amount || 0) * 100), // in cents
         currency: 'usd',
         automatic_payment_methods: {
           enabled: true,
@@ -66,7 +66,7 @@ export class PaymentController {
       if (!customerId) {
         const customer = await stripe.customers.create({
           email: user?.email || '',
-          name: user?.name || user?.firstName + ' ' + user?.lastName || 'User',
+          name: user?.name || 'User',
           metadata: { userId }
         });
         customerId = customer.id;
@@ -168,7 +168,7 @@ export class PaymentController {
         // 1. Update user balance
         await prisma.user.update({
           where: { id: userId },
-          data: { balance: { increment: amount } }
+          data: { walletBalance: { increment: amount } }
         });
 
         // 2. Record transaction

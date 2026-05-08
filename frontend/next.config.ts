@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
@@ -17,7 +19,7 @@ const nextConfig: NextConfig = {
       { source: '/login.php', destination: '/login' },
       {
         source: '/xhr.php',
-        destination: 'http://localhost:5000/api/xhr.php',
+        destination: `${BACKEND_URL}/api/xhr.php`,
       },
       {
         source: '/templates/:path*',
@@ -33,7 +35,7 @@ const nextConfig: NextConfig = {
       },
       // Broken links from audit - fix all 10
       // 1. Logout route → backend
-      { source: '/api/auth/logout', destination: 'http://localhost:5000/api/auth/logout' },
+      { source: '/api/auth/logout', destination: `${BACKEND_URL}/api/auth/logout` },
       // Support PHP files
       // 5. index.php portal home → dashboard
       { source: '/index.php', destination: '/dashboard' },
@@ -55,7 +57,7 @@ const nextConfig: NextConfig = {
       { source: '/clientarea.php', has: [{ type: 'query', key: 'action', value: 'services' }], destination: '/dashboard/services' },
       { source: '/clientarea.php', has: [{ type: 'query', key: 'action', value: 'domains' }], destination: '/dashboard/domains' },
       { source: '/clientarea.php', destination: '/dashboard' },
-      { source: '/api/:path*', destination: 'http://localhost:5000/api/:path*' },
+      { source: '/api/:path*', destination: `${BACKEND_URL}/api/:path*` },
       { source: '/dashboard/assets/:path*', destination: 'https://bill.ultahost.com/assets/:path*' },
     ];
   },

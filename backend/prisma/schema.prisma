@@ -645,3 +645,12 @@ model PaymentSettings {
   updatedAt           DateTime @updatedAt
 }
 
+model News {
+  id        String   @id @default(uuid())
+  title     String
+  content   String?  @db.Text
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

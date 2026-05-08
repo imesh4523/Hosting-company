@@ -49,7 +49,7 @@ export class TicketController {
       const userId = (req.user as any).id;
 
       const ticket = await prisma.supportTicket.findUnique({
-        where: { id, userId },
+        where: { id: id as string, userId },
         include: { messages: { orderBy: { createdAt: 'asc' } } }
       });
 
@@ -69,12 +69,12 @@ export class TicketController {
       const { message } = req.body;
       const userId = (req.user as any).id;
 
-      const ticket = await prisma.supportTicket.findUnique({ where: { id, userId } });
+      const ticket = await prisma.supportTicket.findUnique({ where: { id: id as string, userId } });
       if (!ticket) return res.status(404).json({ success: false, message: 'Ticket not found' });
 
       const reply = await prisma.ticketMessage.create({
         data: {
-          ticketId: id,
+          ticketId: id as string,
           sender: 'user',
           message
         }
@@ -82,7 +82,7 @@ export class TicketController {
 
       // Update ticket status/updatedAt
       await prisma.supportTicket.update({
-        where: { id },
+        where: { id: id as string },
         data: { status: 'open', updatedAt: new Date() }
       });
 

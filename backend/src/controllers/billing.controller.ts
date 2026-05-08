@@ -22,7 +22,7 @@ export class BillingController {
       const userId = (req.user as any).id;
 
       const invoice = await prisma.invoice.findUnique({
-        where: { id, userId },
+        where: { id: id as string, userId },
         include: { transactions: true }
       });
 

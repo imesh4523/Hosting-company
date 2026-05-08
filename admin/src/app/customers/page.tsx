@@ -1,109 +1,215 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 type User = {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-  fraudScore: number;
-  trustLevel: string;
-  suspended: boolean;
-  createdAt: string;
-  _count?: { vps: number; invoices: number; tickets: number };
+  id: string; name: string | null; email: string; role: string;
+  fraudScore: number; trustLevel: string; suspended: boolean;
+  balance: number; walletBalance: number; createdAt: string;
+  _count?: { vms: number; invoices: number; tickets: number };
 };
 
-function FraudBadge({ score }: { score: number }) {
-  if (score < 0.3) return <span className="badge badge-success">● Safe ({(score * 100).toFixed(0)})</span>;
-  if (score < 0.6) return <span className="badge badge-warning">● Medium ({(score * 100).toFixed(0)})</span>;
-  return <span className="badge badge-danger">● High Risk ({(score * 100).toFixed(0)})</span>;
+function Toast({ msg, type, onClose }: { msg: string; type: "success" | "error"; onClose: () => void }) {
+  useEffect(() => { const t = setTimeout(onClose, 3500); return () => clearTimeout(t); }, [onClose]);
+  return (
+    <div style={{
+      position: "fixed", bottom: "24px", right: "24px", zIndex: 9999,
+      background: type === "success" ? "#10B981" : "#EF4444", color: "#fff",
+      padding: "12px 20px", borderRadius: "10px", fontSize: "13.5px", fontWeight: 600,
+      boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+    }}>
+      {type === "success" ? "✅" : "❌"} {msg}
+    </div>
+  );
 }
 
-function TrustBadge({ level }: { level: string }) {
-  const map: Record<string, string> = {
-    trusted: "badge-success",
-    new: "badge-info",
-    flagged: "badge-warning",
-    banned: "badge-danger",
+function BanModal({ user, onClose, onSuccess }: { user: User; onClose: () => void; onSuccess: () => void }) {
+  const [reason, setReason] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    if (!reason.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/ban`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      const data = await res.json();
+      if (data.success) { onSuccess(); onClose(); }
+    } finally { setLoading(false); }
   };
-  return <span className={`badge ${map[level] ?? "badge-info"}`}>{level.charAt(0).toUpperCase() + level.slice(1)}</span>;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: "440px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+          <div style={{ fontSize: "17px", fontWeight: 700, color: "#EF4444" }}>🚫 Ban User</div>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: "22px", cursor: "pointer", color: "#9CA3AF" }}>×</button>
+        </div>
+        <div style={{ background: "#FEF2F2", border: "1px solid #FEE2E2", borderRadius: "8px", padding: "12px", marginBottom: "16px", fontSize: "13px", color: "#DC2626" }}>
+          Banning <strong>{user.email}</strong> will immediately suspend all their VPS instances and prevent login.
+        </div>
+        <div style={{ marginBottom: "18px" }}>
+          <label style={{ fontSize: "13px", fontWeight: 600, color: "#374151", display: "block", marginBottom: "6px" }}>Ban Reason</label>
+          <textarea value={reason} onChange={e => setReason(e.target.value)} placeholder="e.g. Fraudulent activity, abuse…"
+            style={{ width: "100%", height: "80px", padding: "10px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", fontSize: "13px", resize: "none", outline: "none", boxSizing: "border-box" }} />
+        </div>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={onClose} style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#fff", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+          <button onClick={submit} disabled={loading || !reason.trim()} style={{
+            flex: 1, padding: "10px", borderRadius: "8px", border: "none",
+            background: loading || !reason.trim() ? "#9CA3AF" : "#EF4444", color: "#fff", fontWeight: 600, cursor: "pointer",
+          }}>
+            {loading ? "Banning…" : "Ban User"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BalanceModal({ user, onClose, onSuccess }: { user: User; onClose: () => void; onSuccess: () => void }) {
+  const [operation, setOperation] = useState<"add" | "deduct">("add");
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async () => {
+    if (!amount || parseFloat(amount) <= 0) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}/balance`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: parseFloat(amount), note, operation }),
+      });
+      const data = await res.json();
+      if (data.success) { onSuccess(); onClose(); }
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: "440px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px" }}>
+          <div style={{ fontSize: "17px", fontWeight: 700, color: "#111827" }}>💰 Manage Balance</div>
+          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: "22px", cursor: "pointer", color: "#9CA3AF" }}>×</button>
+        </div>
+
+        <div style={{ background: "#F8F9FA", borderRadius: "10px", padding: "14px", marginBottom: "18px" }}>
+          <div style={{ fontSize: "12px", color: "#9CA3AF", fontWeight: 600 }}>CURRENT BALANCE</div>
+          <div style={{ fontSize: "28px", fontWeight: 700, color: "#111827", marginTop: "4px" }}>
+            ${(user.walletBalance ?? 0).toFixed(2)}
+          </div>
+          <div style={{ fontSize: "12px", color: "#9CA3AF", marginTop: "2px" }}>{user.email}</div>
+        </div>
+
+        <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+          {(["add", "deduct"] as const).map(op => (
+            <button key={op} onClick={() => setOperation(op)} style={{
+              flex: 1, padding: "10px", borderRadius: "8px", fontWeight: 600, fontSize: "13.5px", cursor: "pointer",
+              border: `2px solid ${operation === op ? (op === "add" ? "#10B981" : "#EF4444") : "#E5E7EB"}`,
+              background: operation === op ? (op === "add" ? "#D1FAE5" : "#FEE2E2") : "#fff",
+              color: operation === op ? (op === "add" ? "#059669" : "#DC2626") : "#6B7280",
+            }}>
+              {op === "add" ? "➕ Add Funds" : "➖ Deduct"}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ marginBottom: "12px" }}>
+          <label style={{ fontSize: "13px", fontWeight: 600, color: "#374151", display: "block", marginBottom: "6px" }}>Amount (USD)</label>
+          <input type="number" min="0.01" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
+            style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", fontSize: "16px", fontWeight: 600, outline: "none", boxSizing: "border-box" }} />
+        </div>
+
+        <div style={{ marginBottom: "18px" }}>
+          <label style={{ fontSize: "13px", fontWeight: 600, color: "#374151", display: "block", marginBottom: "6px" }}>Note (optional)</label>
+          <input value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. Refund for downtime, promotional credit…"
+            style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: "1px solid #E5E7EB", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+        </div>
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button onClick={onClose} style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #E5E7EB", background: "#fff", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
+          <button onClick={submit} disabled={loading || !amount || parseFloat(amount) <= 0} style={{
+            flex: 1, padding: "10px", borderRadius: "8px", border: "none",
+            background: loading ? "#9CA3AF" : (operation === "add" ? "#10B981" : "#EF4444"),
+            color: "#fff", fontWeight: 600, cursor: "pointer",
+          }}>
+            {loading ? "Processing…" : `${operation === "add" ? "Add" : "Deduct"} $${amount || "0"}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function CustomersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [editUser, setEditUser] = useState<User | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+  const [banTarget, setBanTarget] = useState<User | null>(null);
+  const [balanceTarget, setBalanceTarget] = useState<User | null>(null);
+  const [unbanLoading, setUnbanLoading] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetch("/api/users")
-      .then(r => r.json())
-      .then(data => { setUsers(data); setLoading(false); })
-      .catch(() => setLoading(false));
+  const fetchUsers = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      if (data.success) setUsers(data.users);
+    } finally { setLoading(false); }
   }, []);
+
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
+
+  const unban = async (userId: string) => {
+    setUnbanLoading(userId);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/unban`, { method: "PUT" });
+      const data = await res.json();
+      if (data.success) { setToast({ msg: "User unbanned", type: "success" }); fetchUsers(); }
+      else setToast({ msg: data.error, type: "error" });
+    } finally { setUnbanLoading(null); }
+  };
 
   const filtered = users.filter(u =>
     u.email.toLowerCase().includes(search.toLowerCase()) ||
     (u.name ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
-  async function saveEdit() {
-    if (!editUser) return;
-    setSaving(true);
-    await fetch(`/api/users/${editUser.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: editUser.name,
-        trustLevel: editUser.trustLevel,
-        suspended: editUser.suspended,
-        fraudScore: editUser.fraudScore,
-      }),
-    });
-    setSaving(false);
-    setEditUser(null);
-    // Refresh
-    fetch("/api/users").then(r => r.json()).then(setUsers);
-  }
-
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#F8F9FA" }}>
       <Sidebar />
+      {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
+      {banTarget && <BanModal user={banTarget} onClose={() => setBanTarget(null)} onSuccess={() => { setToast({ msg: "User banned successfully", type: "success" }); fetchUsers(); }} />}
+      {balanceTarget && <BalanceModal user={balanceTarget} onClose={() => setBalanceTarget(null)} onSuccess={() => { setToast({ msg: "Balance updated!", type: "success" }); fetchUsers(); }} />}
 
       <main style={{ flex: 1, padding: "28px 32px" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
           <div>
-            <h1 className="section-title">Customer Management</h1>
-            <p className="section-subtitle">Manage users, fraud scores, and trust levels</p>
+            <h1 style={{ fontSize: "21px", fontWeight: 700, color: "#111827", letterSpacing: "-0.4px" }}>Customer Management</h1>
+            <p style={{ fontSize: "13.5px", color: "#6B7280", marginTop: "3px" }}>Ban, unban, and manage user balances.</p>
           </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <input
-              className="input-field"
-              style={{ width: "220px" }}
-              placeholder="Search by name or email…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
+          <input className="input-field" style={{ width: "240px" }} placeholder="Search by name or email…"
+            value={search} onChange={e => setSearch(e.target.value)} />
         </div>
 
-        {/* Stats Row */}
+        {/* Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px", marginBottom: "22px" }}>
           {[
-            { label: "Total Customers", value: users.length, icon: "icon-blue" },
-            { label: "Trusted Users", value: users.filter(u => u.trustLevel === "trusted").length, icon: "icon-green" },
-            { label: "Flagged", value: users.filter(u => u.trustLevel === "flagged").length, icon: "icon-orange" },
-            { label: "Suspended", value: users.filter(u => u.suspended).length, icon: "icon-red" },
+            { label: "Total Customers", value: users.length, icon: "👥" },
+            { label: "Trusted", value: users.filter(u => u.trustLevel === "trusted").length, icon: "✅" },
+            { label: "Flagged", value: users.filter(u => u.trustLevel === "flagged").length, icon: "⚠️" },
+            { label: "Suspended", value: users.filter(u => u.suspended).length, icon: "🚫" },
           ].map((s, i) => (
             <div key={i} className="card" style={{ padding: "16px 18px", display: "flex", alignItems: "center", gap: "12px" }}>
-              <span className={`icon-box icon-box-md ${s.icon}`}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
-                </svg>
-              </span>
+              <div style={{ width: "42px", height: "42px", borderRadius: "10px", background: "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
+                {s.icon}
+              </div>
               <div>
                 <div style={{ fontSize: "22px", fontWeight: 700, color: "#111827" }}>{s.value}</div>
                 <div style={{ fontSize: "12px", color: "#9CA3AF" }}>{s.label}</div>
@@ -119,9 +225,8 @@ export default function CustomersPage() {
               <tr>
                 <th>Customer</th>
                 <th>Trust Level</th>
-                <th>Fraud Score</th>
-                <th>VPS</th>
-                <th>Invoices</th>
+                <th>VMS</th>
+                <th>Balance</th>
                 <th>Status</th>
                 <th>Joined</th>
                 <th>Actions</th>
@@ -129,160 +234,70 @@ export default function CustomersPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>Loading customers…</td></tr>
+                <tr><td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>Loading customers…</td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={8} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No customers found</td></tr>
-              ) : (
-                filtered.map(user => (
-                  <tr key={user.id}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        <div style={{
-                          width: "32px", height: "32px", borderRadius: "50%",
-                          background: "#EEF0FF", color: "#5145FF",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: "13px", fontWeight: 600, flexShrink: 0,
-                        }}>
-                          {(user.name ?? user.email)[0].toUpperCase()}
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: 500, color: "#111827" }}>{user.name ?? "—"}</div>
-                          <div style={{ fontSize: "12px", color: "#9CA3AF" }}>{user.email}</div>
-                        </div>
+                <tr><td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No customers found</td></tr>
+              ) : filtered.map(user => (
+                <tr key={user.id}>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#EEF0FF", color: "#5145FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 600, flexShrink: 0 }}>
+                        {(user.name ?? user.email)[0].toUpperCase()}
                       </div>
-                    </td>
-                    <td><TrustBadge level={user.trustLevel} /></td>
-                    <td><FraudBadge score={user.fraudScore} /></td>
-                    <td><span style={{ fontWeight: 600 }}>{user._count?.vps ?? 0}</span></td>
-                    <td><span style={{ fontWeight: 600 }}>{user._count?.invoices ?? 0}</span></td>
-                    <td>
-                      {user.suspended
-                        ? <span className="badge badge-danger">Suspended</span>
-                        : <span className="badge badge-success">Active</span>
-                      }
-                    </td>
-                    <td style={{ color: "#9CA3AF", fontSize: "12.5px" }}>
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-                    <td>
-                      <button
-                        className="btn-outline"
-                        style={{ padding: "5px 12px", fontSize: "12.5px" }}
-                        onClick={() => setEditUser(user)}
-                      >
-                        Edit
+                      <div>
+                        <div style={{ fontWeight: 500, color: "#111827" }}>{user.name ?? "—"}</div>
+                        <div style={{ fontSize: "12px", color: "#9CA3AF" }}>{user.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span style={{
+                      padding: "3px 10px", borderRadius: "99px", fontSize: "11.5px", fontWeight: 600,
+                      background: user.trustLevel === "trusted" ? "#D1FAE5" : user.trustLevel === "flagged" ? "#FEF3C7" : user.trustLevel === "banned" ? "#FEE2E2" : "#F3F4F6",
+                      color: user.trustLevel === "trusted" ? "#059669" : user.trustLevel === "flagged" ? "#D97706" : user.trustLevel === "banned" ? "#DC2626" : "#6B7280",
+                    }}>
+                      {user.trustLevel}
+                    </span>
+                  </td>
+                  <td><span style={{ fontWeight: 600 }}>{user._count?.vms ?? 0}</span></td>
+                  <td><span style={{ fontWeight: 600, color: "#059669" }}>${(user.walletBalance ?? 0).toFixed(2)}</span></td>
+                  <td>
+                    {user.suspended
+                      ? <span className="badge badge-danger">Banned</span>
+                      : <span className="badge badge-success">Active</span>}
+                  </td>
+                  <td style={{ color: "#9CA3AF", fontSize: "12.5px" }}>{new Date(user.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <div style={{ display: "flex", gap: "5px" }}>
+                      <button onClick={() => setBalanceTarget(user)} style={{
+                        padding: "5px 10px", borderRadius: "6px", border: "none",
+                        background: "#D1FAE5", color: "#059669", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                      }}>
+                        Balance
                       </button>
-                    </td>
-                  </tr>
-                ))
-              )}
+                      {user.suspended ? (
+                        <button onClick={() => unban(user.id)} disabled={unbanLoading === user.id} style={{
+                          padding: "5px 10px", borderRadius: "6px", border: "none",
+                          background: "#EEF0FF", color: "#5145FF", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                        }}>
+                          {unbanLoading === user.id ? "…" : "Unban"}
+                        </button>
+                      ) : (
+                        <button onClick={() => setBanTarget(user)} style={{
+                          padding: "5px 10px", borderRadius: "6px", border: "none",
+                          background: "#FEE2E2", color: "#DC2626", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                        }}>
+                          Ban
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </main>
-
-      {/* ── Edit User Modal ── */}
-      {editUser && (
-        <div className="modal-overlay" onClick={() => setEditUser(null)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "22px" }}>
-              <div>
-                <div style={{ fontSize: "17px", fontWeight: 700, color: "#111827" }}>Edit Customer</div>
-                <div style={{ fontSize: "12.5px", color: "#9CA3AF", marginTop: "2px" }}>{editUser.email}</div>
-              </div>
-              <button onClick={() => setEditUser(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#9CA3AF", fontSize: "22px", lineHeight: 1 }}>×</button>
-            </div>
-
-            {/* Fraud Score Display */}
-            <div style={{ background: "#F8F9FA", borderRadius: "10px", padding: "14px 16px", marginBottom: "18px" }}>
-              <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "6px", fontWeight: 500 }}>FRAUD RISK ASSESSMENT</div>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ fontSize: "30px", fontWeight: 700, color: editUser.fraudScore < 0.3 ? "#10B981" : editUser.fraudScore < 0.6 ? "#F59E0B" : "#EF4444" }}>
-                  {(editUser.fraudScore * 100).toFixed(0)}
-                  <span style={{ fontSize: "16px", color: "#9CA3AF" }}>/100</span>
-                </div>
-                <FraudBadge score={editUser.fraudScore} />
-              </div>
-              <div style={{ marginTop: "8px", height: "6px", background: "#E5E7EB", borderRadius: "99px", overflow: "hidden" }}>
-                <div style={{
-                  height: "100%", width: `${editUser.fraudScore * 100}%`, borderRadius: "99px",
-                  background: editUser.fraudScore < 0.3 ? "#10B981" : editUser.fraudScore < 0.6 ? "#F59E0B" : "#EF4444"
-                }} />
-              </div>
-            </div>
-
-            {/* Fields */}
-            <div style={{ display: "grid", gap: "14px" }}>
-              <div>
-                <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151", display: "block", marginBottom: "6px" }}>Display Name</label>
-                <input
-                  className="input-field"
-                  value={editUser.name ?? ""}
-                  onChange={e => setEditUser({ ...editUser, name: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151", display: "block", marginBottom: "6px" }}>Trust Level</label>
-                <select
-                  className="input-field"
-                  value={editUser.trustLevel}
-                  onChange={e => setEditUser({ ...editUser, trustLevel: e.target.value })}
-                >
-                  <option value="new">New</option>
-                  <option value="trusted">Trusted</option>
-                  <option value="flagged">Flagged</option>
-                  <option value="banned">Banned</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: "13px", fontWeight: 500, color: "#374151", display: "block", marginBottom: "6px" }}>
-                  Fraud Score: {(editUser.fraudScore * 100).toFixed(0)}/100
-                </label>
-                <input
-                  type="range" min={0} max={1} step={0.01}
-                  value={editUser.fraudScore}
-                  onChange={e => setEditUser({ ...editUser, fraudScore: parseFloat(e.target.value) })}
-                  style={{ width: "100%", accentColor: "#5145FF" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#F8F9FA", padding: "12px 14px", borderRadius: "8px" }}>
-                <div>
-                  <div style={{ fontSize: "13.5px", fontWeight: 500, color: "#111827" }}>Suspend Account</div>
-                  <div style={{ fontSize: "12px", color: "#9CA3AF" }}>Block user from accessing services</div>
-                </div>
-                <button
-                  onClick={() => setEditUser({ ...editUser, suspended: !editUser.suspended })}
-                  style={{
-                    width: "42px", height: "24px", borderRadius: "99px", border: "none", cursor: "pointer",
-                    background: editUser.suspended ? "#EF4444" : "#E5E7EB",
-                    position: "relative", transition: "background 0.2s",
-                  }}
-                >
-                  <span style={{
-                    position: "absolute", top: "3px",
-                    left: editUser.suspended ? "21px" : "3px",
-                    width: "18px", height: "18px", borderRadius: "50%",
-                    background: "white", transition: "left 0.2s",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                  }} />
-                </button>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div style={{ display: "flex", gap: "10px", marginTop: "22px" }}>
-              <button className="btn-outline" style={{ flex: 1 }} onClick={() => setEditUser(null)}>Cancel</button>
-              <button className="btn-primary" style={{ flex: 1 }} onClick={saveEdit} disabled={saving}>
-                {saving ? "Saving…" : "Save Changes"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

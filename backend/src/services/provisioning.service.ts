@@ -27,15 +27,19 @@ export class ProvisioningService {
       });
 
       // Optionally create a VM record in the database
-      await prisma.vM.create({
-        data: {
-          name: `${order.plan.name}-${Math.floor(Math.random() * 1000)}`,
-          status: 'running',
-          userId: order.userId,
-          planId: order.planId,
-          // Add IP, etc.
-        }
-      });
+      const defaultAccount = await prisma.cloudAccount.findFirst({ where: { status: "active" } });
+      if (defaultAccount) {
+        await prisma.vM.create({
+          data: {
+            name: `${order.plan.name}-${Math.floor(Math.random() * 1000)}`,
+            status: "provisioning",
+            userId: order.userId,
+            planId: order.planId,
+            cloudAccountId: defaultAccount.id,
+            provider: defaultAccount.provider,
+          },
+        });
+      }
 
       console.log(`[Provisioning] Order ${orderId} is now active.`);
     } catch (error: any) {

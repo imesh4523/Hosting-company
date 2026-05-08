@@ -61,11 +61,38 @@ export const getMyVPS = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
     const vms = await prisma.vM.findMany({
       where: { userId },
-      include: { account: true },
+      include: { 
+        account: true,
+        plan: {
+          select: { name: true, priceMonthly: true }
+        }
+      },
     });
     res.json(vms);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching VM list' });
+  }
+};
+
+export const getVPSDetails = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = (req as any).user.id;
+    const vm = await prisma.vM.findFirst({
+      where: { id: id as string, userId },
+      include: { 
+        account: true,
+        plan: true
+      },
+    });
+
+    if (!vm) {
+      return res.status(404).json({ message: 'VM not found' });
+    }
+
+    res.json(vm);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching VM details' });
   }
 };
 

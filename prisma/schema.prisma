@@ -40,6 +40,8 @@ model User {
   twoFactorSecret  String?     // AES Encrypted
   twoFactorBackupCodes String[] @default([])
 
+  walletBalance   Float       @default(0.0)
+
   vms           VM[]
   invoices      Invoice[]
   tickets       SupportTicket[]
@@ -50,6 +52,9 @@ model User {
   vmHistory     VMHistory[]
   oauthAccounts   UserOAuth[]
   domains       Domain[]
+  backups       Backup[]
+  customDomains CustomDomain[]
+  auditLogs     AuditLog[]
   
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -157,12 +162,20 @@ model VM {
   serverId        String?     // If linked to a local Proxmox server
   
   name            String
+  hostname        String?
   ip              String?
+  sshPort         Int         @default(22)
   status          String      @default("provisioning") // active/suspended/migrated/deleted
   planId          String?
   plan            Plan?       @relation(fields: [planId], references: [id])
   region          String?
   
+  // Specs
+  ram             Int         @default(1)   // GB
+  cpu             Int         @default(1)   // cores
+  disk            Int         @default(20)  // GB
+  bandwidth       Int         @default(1000) // GB/month
+
   // Auth
   username        String      @default("root")
   rootPassword    String?     // AES encrypted
@@ -180,6 +193,8 @@ model VM {
   accountHistory  VMAccountHistory[]
   vmHistory       VMHistory[]
   recoveryLogs    RecoveryLog[]
+  backups         Backup[]
+  customDomains   CustomDomain[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
@@ -455,4 +470,91 @@ model Domain {
   nextDueDate   DateTime
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model News {
+  id        String   @id @default(uuid())
+  title     String
+  content   String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Backup ────────────────────────────────────────────────────────────────
+model Backup {
+  id            String   @id @default(uuid())
+  userId        String
+  vmId          String
+  snapshotId    String?
+  b2Path        String?
+  gdrivePath    String?
+  sizeGb        Float    @default(0)
+  status        String   @default("pending") // pending/completed/failed
+  type          String   @default("auto")    // auto/manual
+  user          User     @relation(fields: [userId], references: [id])
+  vm            VM       @relation(fields: [vmId], references: [id])
+  createdAt     DateTime @default(now())
+  restoredAt    DateTime?
+}
+
+// ─── Custom Domains ────────────────────────────────────────────────────────
+model CustomDomain {
+  id            String   @id @default(uuid())
+  userId        String
+  vmId          String
+  domain        String   @unique
+  containerPort Int      @default(80)
+  sslActive     Boolean  @default(false)
+  cfDnsId       String?
+  verifiedAt    DateTime?
+  user          User     @relation(fields: [userId], references: [id])
+  vm            VM       @relation(fields: [vmId], references: [id])
+  createdAt     DateTime @default(now())
+}
+
+// ─── Alerts ────────────────────────────────────────────────────────────────
+model Alert {
+  id          String   @id @default(uuid())
+  type        String   // vps_down/account_suspended/credits_low/payment_failed/fraud_detected/backup_failed/migration_started/migration_done
+  severity    String   @default("info") // info/warning/critical/emergency
+  message     String
+  metadata    Json?
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime @default(now())
+}
+
+// ─── Audit Log ────────────────────────────────────────────────────────────
+model AuditLog {
+  id        String   @id @default(uuid())
+  adminId   String
+  action    String
+  target    String?
+  details   Json?
+  ip        String?
+  admin     User     @relation(fields: [adminId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+// ─── Platform Settings ─────────────────────────────────────────────────────
+model Settings {
+  id                    String  @id @default("singleton")
+  maintenanceMode       Boolean @default(false)
+  maintenanceMessage    String?
+  telegramBotToken      String?
+  telegramAdminChatId   String?
+  backupSchedule        String  @default("0 2 * * *")
+  backupRetentionDays   Int     @default(7)
+  fraudAutobanScore     Int     @default(80)
+  resendApiKey          String?
+  cloudflareApiKey      String?
+  cloudflareZoneId      String?
+  ipqsApiKey            String?
+  domain                String  @default("yourdomain.com")
+  b2KeyId               String?
+  b2AppKey              String?
+  b2BucketName          String?
+  updatedAt             DateTime @updatedAt
 }

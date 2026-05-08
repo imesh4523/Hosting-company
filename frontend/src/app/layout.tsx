@@ -36,6 +36,18 @@ export default function RootLayout({
           window.addEventListener('pageshow', function(e) {
             if (e.persisted) window.location.reload();
           });
+          window.writeCookie = function(days) {
+            var date = new Date();
+            days = days || 1;
+            date.setTime(+date + (days * 86400000));
+            document.cookie = 'RS_Promotion=1; expires=' + date.toGMTString() + '; path=/';
+            var el = document.getElementById('Promotion');
+            if (el) el.style.display = 'none';
+          };
+          window.getCookie = function(name) {
+            var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return v ? v[2] : null;
+          };
         ` }} />
       </body>
     </html>
