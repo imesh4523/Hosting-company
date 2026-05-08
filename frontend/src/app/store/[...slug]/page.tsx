@@ -264,8 +264,8 @@ export default function StoreDynamicPage() {
                 if (continueBtn) {
                     try {
                         const url = new URL(continueBtn.href, window.location.origin);
-                        if (url.searchParams.get('price') !== cleanPrice) {
-                            url.searchParams.set('price', cleanPrice);
+                        if (url.searchParams.get('price') !== cleanPriceUSD) {
+                            url.searchParams.set('price', cleanPriceUSD);
                             if (item.name) {
                                 const cycleName = item.name.split('$')[0].trim().toLowerCase();
                                 url.searchParams.set('cycle', cycleName);
