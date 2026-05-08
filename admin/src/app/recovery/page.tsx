@@ -74,7 +74,7 @@ export default async function RecoveryPage() {
             <tbody>
               {logs.length === 0 ? (
                 <tr><td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No recovery logs yet</td></tr>
-              ) : logs.map(log => (
+              ) : logs.map((log: any) => (
                 <tr key={log.id}>
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
