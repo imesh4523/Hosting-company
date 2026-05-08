@@ -63,7 +63,7 @@ export default async function AffiliatesPage() {
             <tbody>
               {affiliates.length === 0 ? (
                 <tr><td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No affiliates yet</td></tr>
-              ) : affiliates.map(aff => (
+              ) : affiliates.map((aff: any) => (
                 <tr key={aff.id}>
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

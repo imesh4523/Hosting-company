@@ -73,11 +73,11 @@ export default async function BillingPage() {
             <tbody>
               {invoices.length === 0 ? (
                 <tr><td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No invoices yet</td></tr>
-              ) : invoices.map(inv => (
+              ) : invoices.map((inv: any) => (
                 <tr key={inv.id}>
                   <td><span style={{ fontFamily: "monospace", fontSize: "12px", background: "#F3F4F6", padding: "2px 8px", borderRadius: "4px" }}>#{inv.id.slice(0, 8)}</span></td>
                   <td>
-                    <div style={{ fontSize: "13.5px", fontWeight: 500 }}>{inv.user.name ?? "â€”"}</div>
+                    <div style={{ fontSize: "13.5px", fontWeight: 500 }}>{inv.user.name ?? "—"}</div>
                     <div style={{ fontSize: "11.5px", color: "#9CA3AF" }}>{inv.user.email}</div>
                   </td>
                   <td><span style={{ fontWeight: 700, color: "#111827", fontSize: "15px" }}>${inv.amount.toFixed(2)}</span></td>

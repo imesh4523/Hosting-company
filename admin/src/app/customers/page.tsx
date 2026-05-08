@@ -237,7 +237,7 @@ export default function CustomersPage() {
                 <tr><td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>Loading customers…</td></tr>
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={7} style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>No customers found</td></tr>
-              ) : filtered.map(user => (
+              ) : filtered.map((user: any) => (
                 <tr key={user.id}>
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
