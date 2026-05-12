@@ -6,8 +6,8 @@ async function getDashboardMetrics() {
   try {
     const [totalUsers, activeVPS, openTickets, totalRevenue, recoveryLogs] = await Promise.all([
       prisma.user.count({ where: { role: "customer" } }),
-      prisma.vM.count({ where: { status: "active" } }),
-      prisma.supportTicket.count({ where: { status: "open" } }),
+      (prisma as any).vPSInstance.count({ where: { status: "active" } }),
+      (prisma as any).ticket.count({ where: { status: "open" } }),
       prisma.transaction.aggregate({ where: { status: "success" }, _sum: { amount: true } }),
       prisma.recoveryLog.count({ where: { status: "success" } }),
     ]);

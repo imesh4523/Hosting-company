@@ -19,7 +19,7 @@ async function main() {
   });
 
   // ── Step 1: Load the store page ────────────────────────────────────────────
-  await page.goto('http://localhost:3000/store/ultasecurity', {
+  await page.goto('http://localhost:3000/store/youuhostsecurity', {
     waitUntil: 'networkidle2', timeout: 30000
   });
   await new Promise(r => setTimeout(r, 3000));

@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 
 type User = {
   id: string; name: string | null; email: string; role: string;
-  fraudScore: number; trustLevel: string; suspended: boolean;
+  fraudScore: number; status: string;
   balance: number; walletBalance: number; createdAt: string;
-  _count?: { vms: number; invoices: number; tickets: number };
+  _count?: { VPSInstance: number; invoices: number; Ticket: number };
 };
 
 function Toast({ msg, type, onClose }: { msg: string; type: "success" | "error"; onClose: () => void }) {
@@ -202,9 +202,9 @@ export default function CustomersPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px", marginBottom: "22px" }}>
           {[
             { label: "Total Customers", value: users.length, icon: "👥" },
-            { label: "Trusted", value: users.filter(u => u.trustLevel === "trusted").length, icon: "✅" },
-            { label: "Flagged", value: users.filter(u => u.trustLevel === "flagged").length, icon: "⚠️" },
-            { label: "Suspended", value: users.filter(u => u.suspended).length, icon: "🚫" },
+            { label: "Active", value: users.filter(u => u.status === "active").length, icon: "✅" },
+            { label: "Flagged", value: users.filter(u => u.fraudScore > 50).length, icon: "⚠️" },
+            { label: "Suspended", value: users.filter(u => u.status === "banned").length, icon: "🚫" },
           ].map((s, i) => (
             <div key={i} className="card" style={{ padding: "16px 18px", display: "flex", alignItems: "center", gap: "12px" }}>
               <div style={{ width: "42px", height: "42px", borderRadius: "10px", background: "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
@@ -253,16 +253,16 @@ export default function CustomersPage() {
                   <td>
                     <span style={{
                       padding: "3px 10px", borderRadius: "99px", fontSize: "11.5px", fontWeight: 600,
-                      background: user.trustLevel === "trusted" ? "#D1FAE5" : user.trustLevel === "flagged" ? "#FEF3C7" : user.trustLevel === "banned" ? "#FEE2E2" : "#F3F4F6",
-                      color: user.trustLevel === "trusted" ? "#059669" : user.trustLevel === "flagged" ? "#D97706" : user.trustLevel === "banned" ? "#DC2626" : "#6B7280",
+                      background: user.status === "active" ? "#D1FAE5" : user.status === "flagged" ? "#FEF3C7" : user.status === "banned" ? "#FEE2E2" : "#F3F4F6",
+                      color: user.status === "active" ? "#059669" : user.status === "flagged" ? "#D97706" : user.status === "banned" ? "#DC2626" : "#6B7280",
                     }}>
-                      {user.trustLevel}
+                      {user.status}
                     </span>
                   </td>
-                  <td><span style={{ fontWeight: 600 }}>{user._count?.vms ?? 0}</span></td>
+                  <td><span style={{ fontWeight: 600 }}>{user._count?.VPSInstance ?? 0}</span></td>
                   <td><span style={{ fontWeight: 600, color: "#059669" }}>${(user.walletBalance ?? 0).toFixed(2)}</span></td>
                   <td>
-                    {user.suspended
+                    {user.status === "banned"
                       ? <span className="badge badge-danger">Banned</span>
                       : <span className="badge badge-success">Active</span>}
                   </td>
@@ -275,7 +275,7 @@ export default function CustomersPage() {
                       }}>
                         Balance
                       </button>
-                      {user.suspended ? (
+                      {user.status === "banned" ? (
                         <button onClick={() => unban(user.id)} disabled={unbanLoading === user.id} style={{
                           padding: "5px 10px", borderRadius: "6px", border: "none",
                           background: "#EEF0FF", color: "#5145FF", fontSize: "12px", fontWeight: 600, cursor: "pointer",

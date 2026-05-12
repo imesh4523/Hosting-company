@@ -19,7 +19,7 @@ const CATEGORY_SLUGS = [
   'email-hosting', 'radio-hosting',
   'game-servers', 'minecraft-game-server', '7-days-to-die-game-server', 'rust-game-server', 'counter-strike-go-game-server', 'valheim-game-server',
   'mac-mini-hosting', 'mac-studio-hosting', 'mac-pro-hosting', 'dmca-ignored-vps', 'dmca-ignored-dedicated',
-  'ultasecurity', 'ssl-certificates', 'codeguard', 'website-backup', 'marketgoo', 'sitelock', 'website-security', 'website-builder'
+  'youuhostsecurity', 'ssl-certificates', 'codeguard', 'website-backup', 'marketgoo', 'sitelock', 'website-security', 'website-builder'
 ];
 
 function fetchHtml(url) {

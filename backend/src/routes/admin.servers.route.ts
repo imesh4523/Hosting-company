@@ -36,8 +36,8 @@ function proxmoxFor(server: { apiUrl: string; apiUser?: string | null; apiKey?: 
 // ─── GET /api/admin/servers ─────────────────────────────────────────────────
 router.get("/", async (_req: Request, res: Response) => {
   try {
-    const servers = await prisma.server.findMany({
-      include: { _count: { select: { vms: true } } },
+    const servers = await (prisma as any).cloudAccount.findMany({
+      include: { _count: { select: { VPSInstance: true } } },
       orderBy: { createdAt: "asc" },
     });
 
@@ -71,11 +71,11 @@ router.get("/", async (_req: Request, res: Response) => {
 // ─── GET /api/admin/servers/:id ─────────────────────────────────────────────
 router.get("/:id", async (req: Request, res: Response) => {
   try {
-    const server = await prisma.server.findUnique({
+    const server = await (prisma as any).cloudAccount.findUnique({
       where: { id: req.params.id as string },
       include: {
-        vms: {
-          include: { user: { select: { id: true, name: true, email: true } } },
+        VPSInstance: {
+          include: { User: { select: { id: true, name: true, email: true } } },
         },
       },
     });
@@ -105,7 +105,7 @@ router.post("/", async (req: Request, res: Response) => {
   if (!name || !type || !apiUrl) { res.status(400).json({ error: "Missing required fields" }); return; }
 
   try {
-    const server = await prisma.server.create({
+    const server = await (prisma as any).cloudAccount.create({
       data: {
         name,
         type,
@@ -129,7 +129,7 @@ router.post("/", async (req: Request, res: Response) => {
 router.put("/:id", async (req: Request, res: Response) => {
   const { name, apiUrl, apiUser, apiKey, region, node, maxVMs, notes, status, maintenanceMode } = req.body;
   try {
-    const server = await prisma.server.update({
+    const server = await (prisma as any).cloudAccount.update({
       where: { id: req.params.id as string },
       data: {
         ...(name            && { name }),
@@ -153,7 +153,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 // ─── POST /api/admin/servers/:id/test ───────────────────────────────────────
 router.post("/:id/test", async (req: Request, res: Response) => {
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
+    const server = await (prisma as any).cloudAccount.findUnique({ where: { id: req.params.id as string } });
     if (!server) { res.status(404).json({ error: "Server not found" }); return; }
 
     const px = proxmoxFor(server);
@@ -180,7 +180,7 @@ router.post("/test-credentials", async (req: Request, res: Response) => {
 // ─── GET /api/admin/servers/:id/vms ─────────────────────────────────────────
 router.get("/:id/vms", async (req: Request, res: Response) => {
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
+    const server = await (prisma as any).cloudAccount.findUnique({ where: { id: req.params.id as string } });
     if (!server || server.type !== "proxmox") { res.json({ vms: [] }); return; }
 
     const px = proxmoxFor(server);
@@ -196,7 +196,7 @@ router.get("/:id/vms", async (req: Request, res: Response) => {
 router.post("/:id/vm/:vmId/start", async (req: Request, res: Response) => {
   const { node, type } = req.body;
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
+    const server = await (prisma as any).cloudAccount.findUnique({ where: { id: req.params.id as string } });
     if (!server) { res.status(404).json({ error: "Server not found" }); return; }
     const px = proxmoxFor(server);
     const task = await px.startVM(node as string, parseInt((req.params.vmId as string) ?? "0"), (type as "qemu" | "lxc") ?? "lxc");
@@ -210,7 +210,7 @@ router.post("/:id/vm/:vmId/start", async (req: Request, res: Response) => {
 router.post("/:id/vm/:vmId/stop", async (req: Request, res: Response) => {
   const { node, type } = req.body;
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
+    const server = await (prisma as any).cloudAccount.findUnique({ where: { id: req.params.id as string } });
     if (!server) { res.status(404).json({ error: "Server not found" }); return; }
     const px = proxmoxFor(server);
     const task = await px.stopVM(node as string, parseInt((req.params.vmId as string) ?? "0"), (type as "qemu" | "lxc") ?? "lxc");
@@ -226,18 +226,18 @@ router.post("/:id/disable", async (req: Request, res: Response) => {
   // action: "keep" | "migrate" | "suspend"
   try {
     if (action === "suspend") {
-      await prisma.vM.updateMany({
-        where: { serverId: req.params.id as string },
+      await (prisma as any).vPSInstance.updateMany({
+        where: { cloudAccountId: req.params.id as string },
         data:  { status: "suspended" },
       });
     } else if (action === "migrate" && targetServerId) {
       // Move all VPS to target server
-      await prisma.vM.updateMany({
-        where: { serverId: req.params.id as string },
-        data:  { serverId: String(targetServerId) },
+      await (prisma as any).vPSInstance.updateMany({
+        where: { cloudAccountId: req.params.id as string },
+        data:  { cloudAccountId: String(targetServerId) },
       });
     }
-    const server = await prisma.server.update({
+    const server = await (prisma as any).cloudAccount.update({
       where: { id: req.params.id as string },
       data:  { status: "disabled" },
     });
@@ -251,7 +251,7 @@ router.post("/:id/disable", async (req: Request, res: Response) => {
 router.post("/:id/maintenance", async (req: Request, res: Response) => {
   const { enabled } = req.body;
   try {
-    const server = await prisma.server.update({
+    const server = await (prisma as any).cloudAccount.update({
       where: { id: req.params.id as string },
       data:  { maintenanceMode: enabled },
     });
@@ -270,7 +270,7 @@ router.post("/:id/maintenance", async (req: Request, res: Response) => {
 // Real-time stats for polling
 router.get("/:id/stats", async (req: Request, res: Response) => {
   try {
-    const server = await prisma.server.findUnique({ where: { id: req.params.id as string } });
+    const server = await (prisma as any).cloudAccount.findUnique({ where: { id: req.params.id as string } });
     if (!server || server.type !== "proxmox") { res.json({ nodes: [] }); return; }
 
     const px    = proxmoxFor(server);

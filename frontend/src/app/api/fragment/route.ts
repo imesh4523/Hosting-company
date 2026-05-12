@@ -240,8 +240,8 @@ function fixLinks(html: string): string {
   html = html.replace(/href="(?:\/)?cart\.php\?a=add&pid=(\d+)([^"]*)"/g, 'href="/store/configure/$1$2"');
 
   // "Order New Services" / "View Available Addons" bare cart.php or with gid → go to Store
-  html = html.replace(/href="(?:\/)?cart\.php\?gid=[^"]*"/g, 'href="/store/ultasecurity"');
-  html = html.replace(/href="(?:\/)?cart\.php"/g, 'href="/store/ultasecurity"');
+  html = html.replace(/href="(?:\/)?cart\.php\?gid=[^"]*"/g, 'href="/store/youuhostsecurity"');
+  html = html.replace(/href="(?:\/)?cart\.php"/g, 'href="/store/youuhostsecurity"');
   
   // Any remaining cart.php with params → dashboard/cart
   html = html.replace(/href="(?:\/)?cart\.php([^"]*)"/g, 'href="/dashboard/cart$1"');
@@ -303,8 +303,8 @@ function fixLinks(html: string): string {
   html = html.replace(/<i class="ls ls-basket"><\/i>/g, '<i class="fas fa-shopping-basket"></i>');
 
   // ── 21. Empty Cart 'Start Shopping' link ──────────────────────────────────
-  html = html.replace(/(<a[^>]+href=")[^"]*dashboard\/cart([^"]*"[^>]*>)\s*Start Shopping\s*<\/a>/gi, '$1http://localhost:3000/store/ultasecurity$2Start Shopping</a>');
-  html = html.replace(/(<a[^>]+href=")[^"]*cart\.php([^"]*"[^>]*>)\s*Start Shopping\s*<\/a>/gi, '$1http://localhost:3000/store/ultasecurity$2Start Shopping</a>');
+  html = html.replace(/(<a[^>]+href=")[^"]*dashboard\/cart([^"]*"[^>]*>)\s*Start Shopping\s*<\/a>/gi, '$1http://localhost:3000/store/youuhostsecurity$2Start Shopping</a>');
+  html = html.replace(/(<a[^>]+href=")[^"]*cart\.php([^"]*"[^>]*>)\s*Start Shopping\s*<\/a>/gi, '$1http://localhost:3000/store/youuhostsecurity$2Start Shopping</a>');
 
   // ── 22. Fix sidebar sub-items styling ──────────────────────────────────────
   const sidebarStyle = `
@@ -446,7 +446,7 @@ function fixLinks(html: string): string {
     if (clean.includes('clientarea.php?action=domains')) return "window.location='/dashboard/domains'";
     if (clean.includes('clientarea.php?action=invoices')) return "window.location='/dashboard/invoices'";
     if (clean.includes('supporttickets.php')) return "window.location='/dashboard/support'";
-    if (clean.includes('cart.php')) return "window.location='/store/ultasecurity'";
+    if (clean.includes('cart.php')) return "window.location='/store/youuhostsecurity'";
 
     return `window.location='${clean}'`;
   });
@@ -463,245 +463,260 @@ function buildFullPage(navHtml: string, pageHtml: string): string {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const name = searchParams.get('name') || 'main';
+  try {
+    const { searchParams } = new URL(request.url);
+    const name = searchParams.get('name') || 'main';
 
-  // ── nav: sidebar only ────────────────────────────────────────────────────
-  if (name === 'nav') {
-    const filePath = path.join(FRAGMENTS_DIR, 'nav.html');
-    if (!fs.existsSync(filePath)) {
-      return NextResponse.json({ error: 'nav.html not found' }, { status: 404 });
-    }
-    let html = fs.readFileSync(filePath, 'utf8');
-    html = fixLinks(html);
-    const splitPoint = html.indexOf('<div class="app-main');
-    const navOnly = splitPoint !== -1 ? html.substring(0, splitPoint) : html;
-    return new NextResponse(navOnly, { headers: { 'Content-Type': 'text/html' } });
-  }
+    console.log(`[Fragment API] Request for: ${name}`);
 
-  // ── header: top bar ──────────────────────────────────────────────────────
-  if (name === 'header') {
-    const filePath = path.join(FRAGMENTS_DIR, 'nav.html');
-    if (!fs.existsSync(filePath)) {
-      return NextResponse.json({ error: 'nav.html not found' }, { status: 404 });
-    }
-    let html = fs.readFileSync(filePath, 'utf8');
-    html = fixLinks(html);
-    const appMainStart = html.indexOf('<div class="app-main');
-    const mainContentStart = html.indexOf('<div class="main-content');
-    if (appMainStart !== -1 && mainContentStart !== -1) {
-      return new NextResponse(html.substring(appMainStart, mainContentStart), { headers: { 'Content-Type': 'text/html' } });
-    }
-    return new NextResponse('', { headers: { 'Content-Type': 'text/html' } });
-  }
-
-  // ── fullpage: sidebar + page content ─────────────────────────────────────
-  if (name === 'fullpage') {
-    const pageName = searchParams.get('page') || 'main';
-    const slug = searchParams.get('slug');
-    const navPath = path.join(FRAGMENTS_DIR, 'nav.html');
-    const pageFile = fragmentMap[pageName];
-
-    if (!pageFile) {
-      return NextResponse.json({ error: `Fragment '${pageName}' not mapped` }, { status: 404 });
-    }
-    if (!fs.existsSync(navPath)) {
-      return NextResponse.json({ error: 'nav.html not found' }, { status: 404 });
-    }
-    const pageFilePath = path.join(FRAGMENTS_DIR, pageFile);
-    if (!fs.existsSync(pageFilePath)) {
-      return NextResponse.json({ error: `Page file '${pageFile}' not found` }, { status: 404 });
-    }
-    const navHtml = fs.readFileSync(navPath, 'utf8');
-    let pageHtml = fs.readFileSync(pageFilePath, 'utf8');
-
-    // Look for a local store page
-    const possibleStorePages = ['services', 'ssl_certificates', 'store'];
-    if (slug && possibleStorePages.includes(pageName)) {
-      // Try exact slug first, then fall back to linux variant for generic category slugs
-      const fallbackMap: Record<string, string> = {
-        'vps-hosting': 'linux-vps-hosting',
-        'vds-hosting': 'linux-vds-hosting',
-        'dedicated-hosting': 'dedicated-hosting',
-        'reseller-hosting': 'linux-reseller-hosting',
-        'game-servers': 'minecraft-game-server',
-        'shared-hosting': 'shared-hosting',
-        'wordpress-hosting': 'wordpress-hosting'
-      };
-      const lookupSlug = slug || '';
-      const exactPath = path.join(FRAGMENTS_DIR, `store-${lookupSlug}.html`);
-      const fallbackSlug = fallbackMap[lookupSlug];
-      const fallbackPath = fallbackSlug ? path.join(FRAGMENTS_DIR, `store-${fallbackSlug}.html`) : null;
-
-      if (fs.existsSync(exactPath)) {
-        pageHtml = fs.readFileSync(exactPath, 'utf8');
-      } else if (fallbackPath && fs.existsSync(fallbackPath)) {
-        pageHtml = fs.readFileSync(fallbackPath, 'utf8');
+    // ── nav: sidebar only ────────────────────────────────────────────────────
+    if (name === 'nav') {
+      const filePath = path.join(FRAGMENTS_DIR, 'nav.html');
+      if (!fs.existsSync(filePath)) {
+        console.error(`[Fragment API] nav.html not found at ${filePath}`);
+        return NextResponse.json({ error: 'nav.html not found' }, { status: 404 });
       }
+      let html = fs.readFileSync(filePath, 'utf8');
+      html = fixLinks(html);
+      const splitPoint = html.indexOf('<div class="app-main');
+      const navOnly = splitPoint !== -1 ? html.substring(0, splitPoint) : html;
+      return new NextResponse(navOnly, { headers: { 'Content-Type': 'text/html' } });
     }
 
-    // Look for a local cart configuration page
-    if (pageName === 'cart_configure' && slug && searchParams.get('subSlug')) {
-      const subSlug = searchParams.get('subSlug');
-      let cartHtmlPath = path.join(FRAGMENTS_DIR, `cart-configure-${subSlug}.html`);
-      
-      if (!fs.existsSync(cartHtmlPath)) {
-        const files = fs.readdirSync(FRAGMENTS_DIR);
-        const matchedFile = files.find(f => f.startsWith('cart-configure-') && subSlug && f.includes(subSlug));
-        if (matchedFile) {
-          cartHtmlPath = path.join(FRAGMENTS_DIR, matchedFile);
+    // ── header: top bar ──────────────────────────────────────────────────────
+    if (name === 'header') {
+      const filePath = path.join(FRAGMENTS_DIR, 'nav.html');
+      if (!fs.existsSync(filePath)) {
+        return NextResponse.json({ error: 'nav.html not found' }, { status: 404 });
+      }
+      let html = fs.readFileSync(filePath, 'utf8');
+      html = fixLinks(html);
+      const appMainStart = html.indexOf('<div class="app-main');
+      const mainContentStart = html.indexOf('<div class="main-content');
+      if (appMainStart !== -1 && mainContentStart !== -1) {
+        return new NextResponse(html.substring(appMainStart, mainContentStart), { headers: { 'Content-Type': 'text/html' } });
+      }
+      return new NextResponse('', { headers: { 'Content-Type': 'text/html' } });
+    }
+
+    // ── fullpage: sidebar + page content ─────────────────────────────────────
+    if (name === 'fullpage') {
+      const pageName = searchParams.get('page') || 'main';
+      const slug = searchParams.get('slug');
+      const navPath = path.join(FRAGMENTS_DIR, 'nav.html');
+      const pageFile = fragmentMap[pageName];
+
+      if (!pageFile) {
+        console.warn(`[Fragment API] Page '${pageName}' not mapped in fragmentMap`);
+        return NextResponse.json({ error: `Fragment '${pageName}' not mapped` }, { status: 404 });
+      }
+      if (!fs.existsSync(navPath)) {
+        return NextResponse.json({ error: 'nav.html not found' }, { status: 404 });
+      }
+      const pageFilePath = path.join(FRAGMENTS_DIR, pageFile);
+      if (!fs.existsSync(pageFilePath)) {
+        console.warn(`[Fragment API] Page file '${pageFile}' not found at ${pageFilePath}`);
+        return NextResponse.json({ error: `Page file '${pageFile}' not found` }, { status: 404 });
+      }
+      const navHtml = fs.readFileSync(navPath, 'utf8');
+      let pageHtml = fs.readFileSync(pageFilePath, 'utf8');
+
+      // Look for a local store page
+      const possibleStorePages = ['services', 'ssl_certificates', 'store'];
+      if (slug && possibleStorePages.includes(pageName)) {
+        const lookupSlug = slug || '';
+        const exactPath = path.join(FRAGMENTS_DIR, `store-${lookupSlug}.html`);
+        
+        console.log(`[Fragment API] Looking for store fragment: store-${lookupSlug}.html`);
+
+        if (fs.existsSync(exactPath)) {
+          pageHtml = fs.readFileSync(exactPath, 'utf8');
+        } else {
+          // Fallback logic
+          const fallbackMap: Record<string, string> = {
+            'vps-hosting': 'linux-vps-hosting',
+            'vds-hosting': 'linux-vds-hosting',
+            'dedicated-hosting': 'dedicated-hosting',
+            'reseller-hosting': 'linux-reseller-hosting',
+            'game-servers': 'minecraft-game-server',
+            'shared-hosting': 'shared-hosting',
+            'wordpress-hosting': 'wordpress-hosting'
+          };
+          const fallbackSlug = fallbackMap[lookupSlug];
+          const fallbackPath = fallbackSlug ? path.join(FRAGMENTS_DIR, `store-${fallbackSlug}.html`) : null;
+          if (fallbackPath && fs.existsSync(fallbackPath)) {
+            pageHtml = fs.readFileSync(fallbackPath, 'utf8');
+          }
         }
       }
 
-      if (fs.existsSync(cartHtmlPath)) {
-        pageHtml = fs.readFileSync(cartHtmlPath, 'utf8');
+      // Look for a local cart configuration page
+      if (pageName === 'cart_configure' && slug && searchParams.get('subSlug')) {
+        const subSlug = searchParams.get('subSlug');
+        let cartHtmlPath = path.join(FRAGMENTS_DIR, `cart-configure-${subSlug}.html`);
+        
+        if (!fs.existsSync(cartHtmlPath)) {
+          const files = fs.readdirSync(FRAGMENTS_DIR);
+          const matchedFile = files.find(f => f.startsWith('cart-configure-') && subSlug && f.includes(subSlug));
+          if (matchedFile) {
+            cartHtmlPath = path.join(FRAGMENTS_DIR, matchedFile);
+          }
+        }
+
+        if (fs.existsSync(cartHtmlPath)) {
+          pageHtml = fs.readFileSync(cartHtmlPath, 'utf8');
+        }
       }
+
+      if (pageName === 'cart_checkout') {
+        let product = searchParams.get('product') || 'MacOS VPS Hosting';
+        let price = searchParams.get('price') || '20.50';
+        const isEmpty = searchParams.get('empty') === '1' || !searchParams.get('product');
+
+        if (isEmpty) price = '0.00';
+        const gatewayCharge = isEmpty ? '0.00' : '0.62';
+        const total = isEmpty ? '0.00' : (parseFloat(price) + 0.62).toFixed(2);
+
+        pageHtml = `
+        <div class="main-header">
+            <div class="container">
+                <h1 class="main-header-title" style="font-size:36px; font-weight:bold; margin-bottom:30px;">Review & Checkout</h1>
+            </div>
+        </div>
+        <div class="main-body">
+            <div class="container">
+                <div class="main-content">
+                    <div class="row">
+                        <div class="col-md-8">
+                            ${isEmpty ? `
+                            <div class="panel panel-default text-center" style="border-radius:10px; border:1px solid #eee; padding:50px 20px; margin-bottom:30px;">
+                                <i class="fas fa-shopping-cart" style="font-size:64px; color:#ddd; margin-bottom:20px;"></i>
+                                <h2 style="font-size:24px; font-weight:bold; color:#333; margin-top:0; margin-bottom:10px;">Your Cart is Empty</h2>
+                                <p style="color:#666; font-size:16px; margin-bottom:30px;">You have no items in your shopping cart.</p>
+                                <a href="/store/vps-hosting" class="btn btn-primary btn-lg" style="background:#555bff; border:none; border-radius:25px; padding:12px 30px; font-weight:bold;">Return to Store</a>
+                            </div>
+                            ` : `
+                            <div class="panel panel-default" style="border-radius:10px; border:1px solid #eee; padding:0; overflow:hidden; margin-bottom:30px;">
+                                <table class="table" style="margin:0;">
+                                    <thead style="background:#f8f9fa;">
+                                        <tr>
+                                            <th style="padding:15px 20px; font-weight:normal; color:#666; border-bottom:1px solid #eee;">Product/Options</th>
+                                            <th style="padding:15px 20px; font-weight:normal; color:#666; border-bottom:1px solid #eee; text-align:right;">Price/Cycle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="padding:25px 20px; border-bottom:1px solid #eee;">
+                                                <strong style="font-size:16px; display:block; margin-bottom:5px;">${product}</strong>
+                                                <a href="#" style="color:#555bff; font-size:14px; text-decoration:none;">srv560484038.host</a>
+                                                
+                                                <div style="margin-top:15px; font-size:13px; color:#666; line-height:1.8;">
+                                                    Server Location: <strong style="color:#333;">Frankfurt, Germany</strong><br/>
+                                                    Guest OS Version: <strong style="color:#333;">Ventura</strong><br/>
+                                                    Additional Disk: <strong style="color:#333;">0 x $0.11USD</strong><br/>
+                                                    Additional IPv4 Addresses: <strong style="color:#333;">0 x $5.00USD</strong><br/>
+                                                    Additional CPU: <strong style="color:#333;">0 x $10.00USD</strong><br/>
+                                                    Guest OS Family: <strong style="color:#333;">macOS</strong>
+                                                </div>
+                                            </td>
+                                            <td style="padding:25px 20px; border-bottom:1px solid #eee; text-align:right;">
+                                                <div style="display:inline-block; border:1px solid #ddd; border-radius:20px; padding:8px 15px; font-weight:bold;">$${price}USD/mo ▼</div>
+                                                <div style="margin-top:15px; color:#999; font-size:18px;">
+                                                    <a href="/store/vps-hosting" style="color:inherit; text-decoration:none;"><i class="fas fa-pencil-alt" style="margin-right:15px; cursor:pointer;"></i></a>
+                                                    <a href="/store/checkout?empty=1" style="color:inherit; text-decoration:none;"><i class="fas fa-trash" style="cursor:pointer;"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div style="padding:15px 20px; background:#fff; display:flex; justify-content:space-between; align-items:center;">
+                                    <a href="/store/vps-hosting" class="btn btn-default" style="border-radius:20px; padding:8px 20px; border:1px solid #ddd; color:#333; text-decoration:none; font-weight:500;">← Continue Shopping</a>
+                                    <a href="/store/checkout?empty=1" class="btn btn-default" style="border-radius:20px; padding:8px 20px; border:1px solid #ddd; color:#333; text-decoration:none; font-weight:500;"><i class="fas fa-trash"></i> Empty Cart</a>
+                                </div>
+                            </div>
+                            
+                            <h3 style="margin-top:30px; font-size:22px; font-weight:normal; margin-bottom:20px;">Promotion</h3>
+                            <div style="background:#555bff; border-radius:10px; padding:25px; display:flex; gap:15px; align-items:center;">
+                                <div style="flex:1; background:white; border-radius:5px; display:flex; align-items:center; padding:0 15px;">
+                                    <i class="fas fa-tag" style="color:#555bff; margin-right:10px;"></i>
+                                    <input type="text" placeholder="Enter promo code if you have one" style="border:none; outline:none; width:100%; padding:15px 0;">
+                                </div>
+                                <button style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:5px; padding:15px 25px; font-weight:bold; cursor:pointer;">Validate Code</button>
+                            </div>
+                            `}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="panel panel-default" style="background:#fafbfc; border:1px solid #eee; border-radius:10px; padding:30px; position:sticky; top:20px;">
+                                <h3 style="margin-top:0; font-size:24px; margin-bottom:30px; font-weight:normal;">Order Summary</h3>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#666; font-size:14px;">
+                                    <span>Subtotal</span>
+                                    <span>$${price}USD</span>
+                                </div>
+                                <hr style="border-top:1px solid #eaeaea; margin:15px 0;">
+                                <div style="margin-bottom:15px; color:#666; font-size:14px;">Totals</div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#666; font-size:14px;">
+                                    <span>Monthly</span>
+                                    <span>$${price}USD</span>
+                                </div>
+                                <hr style="border-top:1px solid #eaeaea; margin:15px 0;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:30px; color:#666; font-size:14px;">
+                                    <span>Gateway Charge</span>
+                                    <span>$${gatewayCharge}USD</span>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:flex-end;">
+                                    <span style="color:#666; font-size:14px; padding-bottom:5px;">Total Due Today</span>
+                                    <strong style="font-size:32px; color:#111;">$${total} <span style="font-size:16px;">USD</span></strong>
+                                </div>
+                                ${isEmpty ? `
+                                <button disabled class="btn btn-block" style="background:#ccc; border:none; border-radius:8px; padding:15px; font-weight:bold; font-size:16px; margin-top:20px; width:100%; color:white; cursor:not-allowed;">
+                                    ➔ Checkout
+                                </button>
+                                ` : `
+                                <a href="/login" class="btn btn-primary btn-block" style="background:#555bff; border:none; border-radius:8px; padding:15px; font-weight:bold; font-size:16px; margin-top:20px; display:flex; justify-content:center; align-items:center; text-decoration:none; color:white;">
+                                    ➔ Checkout
+                                </a>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+      }
+
+      const isStorePage = slug && (pageName === 'services' || pageName === 'ssl_certificates' || pageName === 'store');
+      const isStandalone = ['login', 'register', 'pwreset'].includes(pageName) || searchParams.get('standalone') === '1' || isStorePage;
+
+      if (isStandalone) {
+        pageHtml = fixLinks(pageHtml);
+        return new NextResponse(pageHtml, { headers: { 'Content-Type': 'text/html' } });
+      }
+
+      const combined = buildFullPage(navHtml, pageHtml);
+      return new NextResponse(combined, { headers: { 'Content-Type': 'text/html' } });
     }
 
-    if (pageName === 'cart_checkout') {
-      let product = searchParams.get('product');
-      let price = searchParams.get('price') || '20.50';
-      const isEmpty = searchParams.get('empty') === '1' || !product;
-
-      if (!product) product = 'MacOS VPS Hosting'; // Fallback name just in case it's used elsewhere
-
-      if (isEmpty) price = '0.00';
-      const gatewayCharge = isEmpty ? '0.00' : '0.62';
-      const total = isEmpty ? '0.00' : (parseFloat(price) + 0.62).toFixed(2);
-
-      pageHtml = `
-      <div class="main-header">
-          <div class="container">
-              <h1 class="main-header-title" style="font-size:36px; font-weight:bold; margin-bottom:30px;">Review & Checkout</h1>
-          </div>
-      </div>
-      <div class="main-body">
-          <div class="container">
-              <div class="main-content">
-                  <div class="row">
-                      <div class="col-md-8">
-                          ${isEmpty ? `
-                          <div class="panel panel-default text-center" style="border-radius:10px; border:1px solid #eee; padding:50px 20px; margin-bottom:30px;">
-                              <i class="fas fa-shopping-cart" style="font-size:64px; color:#ddd; margin-bottom:20px;"></i>
-                              <h2 style="font-size:24px; font-weight:bold; color:#333; margin-top:0; margin-bottom:10px;">Your Cart is Empty</h2>
-                              <p style="color:#666; font-size:16px; margin-bottom:30px;">You have no items in your shopping cart.</p>
-                              <a href="/store/vps-hosting" class="btn btn-primary btn-lg" style="background:#555bff; border:none; border-radius:25px; padding:12px 30px; font-weight:bold;">Return to Store</a>
-                          </div>
-                          ` : `
-                          <div class="panel panel-default" style="border-radius:10px; border:1px solid #eee; padding:0; overflow:hidden; margin-bottom:30px;">
-                              <table class="table" style="margin:0;">
-                                  <thead style="background:#f8f9fa;">
-                                      <tr>
-                                          <th style="padding:15px 20px; font-weight:normal; color:#666; border-bottom:1px solid #eee;">Product/Options</th>
-                                          <th style="padding:15px 20px; font-weight:normal; color:#666; border-bottom:1px solid #eee; text-align:right;">Price/Cycle</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      <tr>
-                                          <td style="padding:25px 20px; border-bottom:1px solid #eee;">
-                                              <strong style="font-size:16px; display:block; margin-bottom:5px;">${product}</strong>
-                                              <a href="#" style="color:#555bff; font-size:14px; text-decoration:none;">srv560484038.host</a>
-                                              
-                                              <div style="margin-top:15px; font-size:13px; color:#666; line-height:1.8;">
-                                                  Server Location: <strong style="color:#333;">Frankfurt, Germany</strong><br/>
-                                                  Guest OS Version: <strong style="color:#333;">Ventura</strong><br/>
-                                                  Additional Disk: <strong style="color:#333;">0 x $0.11USD</strong><br/>
-                                                  Additional IPv4 Addresses: <strong style="color:#333;">0 x $5.00USD</strong><br/>
-                                                  Additional CPU: <strong style="color:#333;">0 x $10.00USD</strong><br/>
-                                                  Guest OS Family: <strong style="color:#333;">macOS</strong>
-                                              </div>
-                                          </td>
-                                          <td style="padding:25px 20px; border-bottom:1px solid #eee; text-align:right;">
-                                              <div style="display:inline-block; border:1px solid #ddd; border-radius:20px; padding:8px 15px; font-weight:bold;">$${price}USD/mo ▼</div>
-                                              <div style="margin-top:15px; color:#999; font-size:18px;">
-                                                  <a href="/store/vps-hosting" style="color:inherit; text-decoration:none;"><i class="fas fa-pencil-alt" style="margin-right:15px; cursor:pointer;"></i></a>
-                                                  <a href="/store/checkout?empty=1" style="color:inherit; text-decoration:none;"><i class="fas fa-trash" style="cursor:pointer;"></i></a>
-                                              </div>
-                                          </td>
-                                      </tr>
-                                  </tbody>
-                              </table>
-                              <div style="padding:15px 20px; background:#fff; display:flex; justify-content:space-between; align-items:center;">
-                                  <a href="/store/vps-hosting" class="btn btn-default" style="border-radius:20px; padding:8px 20px; border:1px solid #ddd; color:#333; text-decoration:none; font-weight:500;">← Continue Shopping</a>
-                                  <a href="/store/checkout?empty=1" class="btn btn-default" style="border-radius:20px; padding:8px 20px; border:1px solid #ddd; color:#333; text-decoration:none; font-weight:500;"><i class="fas fa-trash"></i> Empty Cart</a>
-                              </div>
-                          </div>
-                          
-                          <h3 style="margin-top:30px; font-size:22px; font-weight:normal; margin-bottom:20px;">Promotion</h3>
-                          <div style="background:#555bff; border-radius:10px; padding:25px; display:flex; gap:15px; align-items:center;">
-                              <div style="flex:1; background:white; border-radius:5px; display:flex; align-items:center; padding:0 15px;">
-                                  <i class="fas fa-tag" style="color:#555bff; margin-right:10px;"></i>
-                                  <input type="text" placeholder="Enter promo code if you have one" style="border:none; outline:none; width:100%; padding:15px 0;">
-                              </div>
-                              <button style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:5px; padding:15px 25px; font-weight:bold; cursor:pointer;">Validate Code</button>
-                          </div>
-                          `}
-                      </div>
-                      
-                      <div class="col-md-4">
-                          <div class="panel panel-default" style="background:#fafbfc; border:1px solid #eee; border-radius:10px; padding:30px; position:sticky; top:20px;">
-                              <h3 style="margin-top:0; font-size:24px; margin-bottom:30px; font-weight:normal;">Order Summary</h3>
-                              <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#666; font-size:14px;">
-                                  <span>Subtotal</span>
-                                  <span>$${price}USD</span>
-                              </div>
-                              <hr style="border-top:1px solid #eaeaea; margin:15px 0;">
-                              <div style="margin-bottom:15px; color:#666; font-size:14px;">Totals</div>
-                              <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#666; font-size:14px;">
-                                  <span>Monthly</span>
-                                  <span>$${price}USD</span>
-                              </div>
-                              <hr style="border-top:1px solid #eaeaea; margin:15px 0;">
-                              <div style="display:flex; justify-content:space-between; margin-bottom:30px; color:#666; font-size:14px;">
-                                  <span>Gateway Charge</span>
-                                  <span>$${gatewayCharge}USD</span>
-                              </div>
-                              <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:flex-end;">
-                                  <span style="color:#666; font-size:14px; padding-bottom:5px;">Total Due Today</span>
-                                  <strong style="font-size:32px; color:#111;">$${total} <span style="font-size:16px;">USD</span></strong>
-                              </div>
-                              ${isEmpty ? `
-                              <button disabled class="btn btn-block" style="background:#ccc; border:none; border-radius:8px; padding:15px; font-weight:bold; font-size:16px; margin-top:20px; width:100%; color:white; cursor:not-allowed;">
-                                  ➔ Checkout
-                              </button>
-                              ` : `
-                              <a href="/login" class="btn btn-primary btn-block" style="background:#555bff; border:none; border-radius:8px; padding:15px; font-weight:bold; font-size:16px; margin-top:20px; display:flex; justify-content:center; align-items:center; text-decoration:none; color:white;">
-                                  ➔ Checkout
-                              </a>
-                              `}
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-      `;
+    // ── legacy: direct fragment name ─────────────────────────────────────────
+    const fileName = fragmentMap[name];
+    if (!fileName) {
+      console.warn(`[Fragment API] Fragment '${name}' not mapped`);
+      return NextResponse.json({ error: `Fragment '${name}' not found` }, { status: 404 });
     }
-
-    const isStorePage = slug && (pageName === 'services' || pageName === 'ssl_certificates' || pageName === 'store');
-    const isStandalone = ['login', 'register', 'pwreset'].includes(pageName) || searchParams.get('standalone') === '1' || isStorePage;
-
-    if (isStandalone) {
-      pageHtml = fixLinks(pageHtml);
-      return new NextResponse(pageHtml, { headers: { 'Content-Type': 'text/html' } });
+    const filePath = path.join(FRAGMENTS_DIR, fileName);
+    if (!fs.existsSync(filePath)) {
+      console.warn(`[Fragment API] File not found at ${filePath}`);
+      return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
+    let html = fs.readFileSync(filePath, 'utf8');
+    html = fixLinks(html);
+    return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } });
 
-    const combined = buildFullPage(navHtml, pageHtml);
-    return new NextResponse(combined, { headers: { 'Content-Type': 'text/html' } });
+  } catch (error: any) {
+    console.error('[Fragment API] CRITICAL ERROR:', error);
+    return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
   }
-
-  // ── legacy: direct fragment name ─────────────────────────────────────────
-  const fileName = fragmentMap[name];
-  if (!fileName) {
-    return NextResponse.json({ error: `Fragment '${name}' not found` }, { status: 404 });
-  }
-  const filePath = path.join(FRAGMENTS_DIR, fileName);
-  if (!fs.existsSync(filePath)) {
-    return NextResponse.json({ error: 'File not found' }, { status: 404 });
-  }
-  let html = fs.readFileSync(filePath, 'utf8');
-  html = fixLinks(html);
-  return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } });
 }
 
 export async function POST(request: NextRequest) {

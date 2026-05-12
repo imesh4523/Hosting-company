@@ -130,7 +130,7 @@ export default function AuthSettingsPage() {
             onIdChange={(v: string) => setSettings({...settings, googleClientId: v})}
             onSecretChange={(v: string) => setSettings({...settings, googleSecret: v})}
             onTest={() => testConnection('google')}
-            guide={`🌐 GOOGLE SETUP GUIDE:\n1. Go to Google Cloud Console (console.cloud.google.com)\n2. Create a New Project and select it.\n3. Navigate to "APIs & Services" > "OAuth consent screen". Configure it as "External".\n4. Go to "Credentials" > "Create Credentials" > "OAuth client ID".\n5. Select "Web application" as the type.\n6. Under "Authorized redirect URIs", add:\n   👉 ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/google/callback\n7. Copy the Client ID and Secret and paste them above.`}
+            guide={`🌐 GOOGLE SETUP GUIDE:\n1. Go to Google Cloud Console (console.cloud.google.com)\n2. Create a New Project and select it.\n3. Navigate to "APIs & Services" > "OAuth consent screen". Configure it as "External".\n4. Go to "Credentials" > "Create Credentials" > "OAuth client ID".\n5. Select "Web application" as the type.\n6. Under "Authorized redirect URIs", add:\n   👉 ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/auth/google/callback\n7. Copy the Client ID and Secret and paste them above.`}
             testStatus={testResult?.provider === 'google' ? testResult : null}
           />
 
@@ -145,7 +145,7 @@ export default function AuthSettingsPage() {
             onIdChange={(v: string) => setSettings({...settings, facebookAppId: v})}
             onSecretChange={(v: string) => setSettings({...settings, facebookSecret: v})}
             onTest={() => testConnection('facebook')}
-            guide={`🌐 FACEBOOK SETUP GUIDE:\n1. Go to Meta for Developers (developers.facebook.com).\n2. "My Apps" > "Create App" > "Allow people to log in with their Facebook account".\n3. In the App Dashboard, go to "Use cases" > "Authentication and account creation" > "Edit".\n4. Under "Facebook Login" settings, find "Valid OAuth Redirect URIs" and add:\n   👉 ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/facebook/callback\n5. Go to "App Settings" > "Basic" to find your App ID and App Secret.`}
+            guide={`🌐 FACEBOOK SETUP GUIDE:\n1. Go to Meta for Developers (developers.facebook.com).\n2. "My Apps" > "Create App" > "Allow people to log in with their Facebook account".\n3. In the App Dashboard, go to "Use cases" > "Authentication and account creation" > "Edit".\n4. Under "Facebook Login" settings, find "Valid OAuth Redirect URIs" and add:\n   👉 ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/auth/facebook/callback\n5. Go to "App Settings" > "Basic" to find your App ID and App Secret.`}
             testStatus={testResult?.provider === 'facebook' ? testResult : null}
           />
 
@@ -160,7 +160,7 @@ export default function AuthSettingsPage() {
             onIdChange={(v: string) => setSettings({...settings, githubClientId: v})}
             onSecretChange={(v: string) => setSettings({...settings, githubSecret: v})}
             onTest={() => testConnection('github')}
-            guide={`🌐 GITHUB SETUP GUIDE:\n1. Go to your GitHub Settings > "Developer settings" > "OAuth Apps".\n2. Click "New OAuth App".\n3. Set "Homepage URL" to your frontend URL.\n4. Set "Authorization callback URL" to:\n   👉 ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/github/callback\n5. Click "Register application", then "Generate a new client secret".`}
+            guide={`🌐 GITHUB SETUP GUIDE:\n1. Go to your GitHub Settings > "Developer settings" > "OAuth Apps".\n2. Click "New OAuth App".\n3. Set "Homepage URL" to your frontend URL.\n4. Set "Authorization callback URL" to:\n   👉 ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/auth/github/callback\n5. Click "Register application", then "Generate a new client secret".`}
             testStatus={testResult?.provider === 'github' ? testResult : null}
           />
         </div>

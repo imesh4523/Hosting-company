@@ -48,6 +48,24 @@ export default function RootLayout({
             var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
             return v ? v[2] : null;
           };
+          
+          // Polyfills for Lagom theme dependencies
+          window.enquire = window.enquire || { 
+            register: function() { return this; }, 
+            unregister: function() { return this; },
+            setup: function() { return this; }
+          };
+          
+          // Ensure jQuery is safe
+          (function fixJQuery() {
+            if (window.jQuery) {
+              window.jQuery.fn.luScrollTo = window.jQuery.fn.luScrollTo || function() { return this; };
+              window.jQuery.fn.modal = window.jQuery.fn.modal || function() { return this; };
+              window.jQuery.fn.tooltip = window.jQuery.fn.tooltip || function() { return this; };
+            } else {
+              setTimeout(fixJQuery, 100);
+            }
+          })();
         ` }} />
       </body>
     </html>

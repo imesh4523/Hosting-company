@@ -38,7 +38,7 @@ export default function StoreDynamicPage() {
   };
 
   const fragmentMapping: Record<string, string> = {
-    'ultasecurity':                       'ssl_certificates',
+    'youuhostsecurity':                       'ssl_certificates',
     'vps-hosting':                        'services',
     'vps-basic':                          'cart_configure',
     'checkout':                           'cart_checkout',

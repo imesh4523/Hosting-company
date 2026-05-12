@@ -22,7 +22,7 @@ const PAGES_TO_SCRAPE = [
   { file: 'knowledgebase.html', url: '/knowledgebase.php' },
   { file: 'downloads.html', url: '/downloads.php' },
   { file: 'network-status.html', url: '/serverstatus.php' },
-  { file: 'ssl-certificates.html', url: '/store/ultasecurity' },
+  { file: 'ssl-certificates.html', url: '/store/youuhostsecurity' },
   { file: 'website-backup.html', url: '/store/codeguard' },
   { file: 'website-security.html', url: '/store/sitelock' },
   { file: 'seo-tools.html', url: '/store/marketgoo' },

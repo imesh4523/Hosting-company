@@ -6,651 +6,530 @@ datasource db {
   provider = "postgresql"
 }
 
-// ─── Users ─────────────────────────────────────────────────────────────────
 model User {
-  id            String          @id @default(uuid())
-  email         String          @unique
-  name          String?
-  password      String
-  role          String          @default("customer")
-  status        String          @default("active")
-  suspended     Boolean         @default(false)
-  fraudScore    Float           @default(0.0)
-  trustLevel    String          @default("new")
-  lastLoginIp   String?
-  banReason     String?
-  activeVpsId   String?
-  avatar          String?
-  emailVerified   Boolean     @default(false)
-  githubToken     String?
-
-  // Account Details
-  company         String?
-  phone           String?
-  address1        String?
-  address2        String?
-  city            String?
-  state           String?
-  postcode        String?
-  country         String?
-
-  // Stripe & Billing
-  stripeCustomerId String?    @unique
-  walletBalance    Float      @default(0.0)
-
-  // Security
-  twoFactorEnabled Boolean    @default(false)
-  twoFactorSecret  String?
-
-  vms           VM[]
-  invoices      Invoice[]
-  tickets       SupportTicket[]
-  affiliate     Affiliate?
-  ipLogs        UserIPLog[]
-  fraudLogs     FraudLog[]
-  migrations    Migration[]
-  vmHistory     VMHistory[]
-  oauthAccounts   UserOAuth[]
-  deployedApps    DeployedApp[]
-  userCards       UserCard[]
-  
-  // Dashboard Account Features
-  subUsers      SubUser[]
-  contacts      Contact[]
-  emailLogs     EmailLog[]
-  orders        Order[]
-  domains       Domain[]
-  
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id                   String         @id @default(uuid())
+  name                 String
+  email                String         @unique
+  password             String?
+  role                 String         @default("customer")
+  status               String         @default("active")
+  emailVerified        Boolean        @default(false)
+  twoFactorSecret      String?
+  twoFactorEnabled     Boolean        @default(false)
+  avatar               String?
+  fraudScore           Int            @default(0)
+  balance              Float          @default(0)
+  stripeCustomerId     String?
+  defaultPaymentMethod String?
+  autoRecharge         Boolean        @default(true)
+  autoRechargeAmount   Float          @default(10)
+  autoRechargeBelow    Float          @default(3)
+  createdAt            DateTime       @default(now())
+  bannedAt             DateTime?
+  bannedReason         String?
+  AuditLog             AuditLog[]
+  Backup               Backup[]
+  CustomDomain         CustomDomain[]
+  deployedApps         DeployedApp[]
+  fraudLogs            FraudLog[]
+  Payment              Payment[]
+  Ticket               Ticket[]
+  UsageRecord          UsageRecord[]
+  oauthAccounts        UserOAuth[]
+  VPSInstance          VPSInstance[]
+  subUsers             SubUser[]      @relation("UserToSubUser")
+  contacts             Contact[]
+  emailLogs            EmailLog[]
+  cards                UserCard[]
+  orders               Order[]
+  transactions         Transaction[]
+  invoices             Invoice[]
 }
 
-// ─── Cloud Accounts ────────────────────────────────────────────────────────
 model CloudAccount {
-  id              String      @id @default(uuid())
-  name            String      // "DO-Trial-1", "Vultr-Main"
-  provider        String      // digitalocean/vultr/linode/aws/azure/upcloud/kamatera
-  
-  // Credentials (encrypted AES-256)
-  credentials     Json        
-  
-  // Credit info
-  credits         Float       @default(0)
-  creditExpiry    DateTime?   
-  daysRemaining   Int?        
-  balance         Float       @default(0)
-  
-  // Resource limits
-  vmLimit         Int         @default(10)
-  vmCount         Int         @default(0)
-  
-  // Status
-  status          String      @default("active") // active/suspended/credits_low/credits_expired
-  suspendReason   String?
-  
-  region          String      @default("global")
-  notes           String?
-  lastChecked     DateTime?
-  
-  vms             VM[]
-  migrations      Migration[]
-  migrationsTo    Migration[] @relation("MigrationToAccount")
-  snapshots       Snapshot[]
-  vmHistory       VMHistory[]
-  creditHistory   CreditHistory[]
-  
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id            String          @id @default(uuid())
+  name          String
+  provider      String
+  credentials   Json
+  status        String          @default("active")
+  credits       Float           @default(0)
+  creditExpiry  DateTime?
+  daysRemaining Int?
+  balance       Float           @default(0)
+  vmLimit       Int             @default(10)
+  vmCount       Int             @default(0)
+  region        String          @default("sgp")
+  isProxmox     Boolean         @default(false)
+  proxmoxNode   String?
+  lastChecked   DateTime?
+  suspendedAt   DateTime?
+  suspendReason String?
+  createdAt     DateTime        @default(now())
+  creditHistory CreditHistory[]
+  migrations    Migration[]
+  snapshots     Snapshot[]
+  VPSInstance   VPSInstance[]
 }
 
 model AuthSettings {
-  id              String  @id @default(cuid())
-  googleEnabled   Boolean @default(false)
+  id              String   @id @default("singleton")
+  googleEnabled   Boolean  @default(false)
   googleClientId  String?
-  googleSecret    String? // encrypted
-  
-  facebookEnabled Boolean @default(false)
+  googleSecret    String?
+  facebookEnabled Boolean  @default(false)
   facebookAppId   String?
-  facebookSecret  String? // encrypted
-  
-  githubEnabled   Boolean @default(false)
+  facebookSecret  String?
+  githubEnabled   Boolean  @default(false)
   githubClientId  String?
-  githubSecret    String? // encrypted
-  
-  emailEnabled    Boolean @default(true)
+  githubSecret    String?
+  emailEnabled    Boolean  @default(true)
   updatedAt       DateTime @updatedAt
 }
 
 model UserOAuth {
-  id           String @id @default(cuid())
-  userId       String
-  provider     String // google/facebook/github
-  providerId   String // provider's user ID
-  email        String
-  name         String
-  avatar       String?
-  accessToken  String? // encrypted
-  createdAt    DateTime @default(now())
-  
-  user         User @relation(fields: [userId], references: [id])
-  
+  id         String   @id @default(cuid())
+  userId     String
+  provider   String
+  providerId String
+  email      String
+  name       String
+  avatar     String?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+
   @@unique([provider, providerId])
 }
 
 model CreditHistory {
-  id            String   @id @default(uuid())
+  id            String       @id @default(uuid())
   accountId     String
   credits       Float
   balance       Float
   daysRemaining Int?
-  checkedAt     DateTime @default(now())
-  
+  checkedAt     DateTime     @default(now())
   account       CloudAccount @relation(fields: [accountId], references: [id])
 }
 
-// ─── VM Management ──────────────────────────────────────────────────────────
-model VM {
-  id              String      @id @default(uuid())
-  cloudAccountId  String      
-  provider        String      
-  providerId      String?     @unique // e.g. DO droplet ID or AWS instance ID
-  userId          String
-  serverId        String?     // If linked to a local Proxmox server
-  
-  name            String
-  ip              String?
-  status          String      @default("provisioning") // active/suspended/migrated/deleted
-  planId          String?
-  plan            Plan?       @relation(fields: [planId], references: [id])
-  region          String?
-  
-  // Auth
-  username        String      @default("root")
-  rootPassword    String?     // AES encrypted
-  
-  // Timeline
-  suspendedAt     DateTime?
-  migratedAt      DateTime?
-  migratedTo      String?     // new VM id
-  
-  user            User        @relation(fields: [userId], references: [id])
-  account         CloudAccount @relation(fields: [cloudAccountId], references: [id])
-  server          Server?     @relation(fields: [serverId], references: [id])
-  snapshots       Snapshot[]
-  migrations      Migration[]
-  accountHistory  VMAccountHistory[]
-  vmHistory       VMHistory[]
-  recoveryLogs    RecoveryLog[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-}
-
-model VMAccountHistory {
-  id          String   @id @default(uuid())
-  vmId        String
-  accountId   String
-  provider    String
-  ip          String?
-  startedAt   DateTime @default(now())
-  endedAt     DateTime? 
-  reason      String?   
-  
-  vm          VM       @relation(fields: [vmId], references: [id])
-}
-
-// ─── Snapshots ─────────────────────────────────────────────────────────────
 model Snapshot {
-  id              String      @id @default(uuid())
-  vmId            String
-  cloudAccountId  String
-  userId          String
-  providerSnapshotId String?  @unique
-  b2FileId        String?
-  name            String
-  sizeGb          Float       @default(0)
-  status          String      @default("pending") // pending/ready/failed
-  type            String      @default("auto")    // auto/manual/pre-migration
-  restoredAt      DateTime?
-  restoredTo      String?
-  expiresAt       DateTime?
- 
-  vm              VM           @relation(fields: [vmId], references: [id])
-  account         CloudAccount @relation(fields: [cloudAccountId], references: [id])
-  migrations      Migration[]
-  createdAt       DateTime     @default(now())
+  id             String       @id @default(uuid())
+  vpsId          String
+  cloudAccountId String
+  userId         String
+  providerSnapId String?
+  b2FileId       String?
+  gdriveFileId   String?
+  name           String
+  sizeGb         Float        @default(0)
+  status         String       @default("pending")
+  type           String       @default("auto")
+  storagePath    String?
+  createdAt      DateTime     @default(now())
+  expiresAt      DateTime?
+  restoredAt     DateTime?
+  restoredTo     String?
+  account        CloudAccount @relation(fields: [cloudAccountId], references: [id])
+  VPSInstance    VPSInstance  @relation(fields: [vpsId], references: [id])
 }
 
-// ─── VM History (every event) ──────────────────────────────────────────────
-model VMHistory {
-  id              String      @id @default(uuid())
-  vmId            String
-  userId          String
-  event           String
-  fromAccountId   String?
-  toAccountId     String?
-  fromIp          String?
-  toIp            String?
-  snapshotId      String?
-  reason          String?
-  triggeredBy     String      @default("auto") // auto/admin/user
-  adminId         String?
-  metadata        Json?
-  duration        Int?        
-
-  vm              VM           @relation(fields: [vmId], references: [id])
-  user            User         @relation(fields: [userId], references: [id])
-  fromAccount     CloudAccount? @relation(fields: [fromAccountId], references: [id])
-  createdAt       DateTime     @default(now())
-}
-
-// ─── Migrations ────────────────────────────────────────────────────────────
 model Migration {
-  id              String          @id @default(uuid())
-  userId          String
-  vmId            String
-  fromAccountId   String
-  toAccountId     String
-  fromVpsId       String          // Original VM ID
-  toVpsId         String?         // Target VM ID
-  snapshotId      String?
-  fromIp          String?
-  toIp            String?
-  status          String          @default("pending")
-  trigger         String
-  retryCount      Int             @default(0)
-  startedAt       DateTime        @default(now())
-  completedAt     DateTime?
-  failedAt        DateTime?
-  failReason      String?
-  notifiedUser    Boolean         @default(false)
-  downtimeMinutes Int?
-
-  user            User            @relation(fields: [userId], references: [id])
-  vm              VM              @relation(fields: [vmId], references: [id])
-  fromAccount     CloudAccount    @relation(fields: [fromAccountId], references: [id])
-  toAccount       CloudAccount    @relation("MigrationToAccount", fields: [toAccountId], references: [id])
-  snapshot        Snapshot?       @relation(fields: [snapshotId], references: [id])
-  steps           MigrationStep[]
-  createdAt       DateTime        @default(now())
-}
-
-// ─── Migration Steps ───────────────────────────────────────────────────────
-model MigrationStep {
-  id            String      @id @default(uuid())
-  migrationId   String
-  step          Int
-  name          String
-  status        String      @default("pending") // pending/running/done/failed/skipped
-  startedAt     DateTime?
+  id            String          @id @default(uuid())
+  userId        String
+  vpsId         String
+  fromAccountId String
+  toAccountId   String
+  fromIp        String
+  toIp          String?
+  snapshotId    String?
+  status        String          @default("pending")
+  trigger       String
+  currentStep   Int             @default(0)
+  totalSteps    Int             @default(10)
+  startedAt     DateTime        @default(now())
   completedAt   DateTime?
-  error         String?
-  metadata      Json?
-
-  migration     Migration   @relation(fields: [migrationId], references: [id])
+  failedAt      DateTime?
+  failReason    String?
+  retryCount    Int             @default(0)
+  notifiedUser  Boolean         @default(false)
+  downtime      Int?
+  fromAccount   CloudAccount    @relation(fields: [fromAccountId], references: [id])
+  VPSInstance   VPSInstance     @relation(fields: [vpsId], references: [id])
+  steps         MigrationStep[]
 }
 
-// ─── Servers (Proxmox nodes) ────────────────────────────────────────────────
-model Server {
-  id              String    @id @default(uuid())
-  name            String
-  type            String    @default("proxmox") // proxmox/digitalocean
-  apiUrl          String
-  apiUser         String?
-  apiKey          String?
-  region          String?
-  node            String?
-  maxVMs          Int       @default(50)
-  status          String    @default("active")
-  maintenanceMode Boolean   @default(false)
-  notes           String?
-
-  vms             VM[]
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
-
-// ─── Plans ─────────────────────────────────────────────────────────────────
-model PlanCategory {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  plans       Plan[]
-  createdAt   DateTime @default(now())
+model MigrationStep {
+  id          String    @id @default(uuid())
+  migrationId String
+  step        Int
+  name        String
+  status      String    @default("pending")
+  startedAt   DateTime?
+  completedAt DateTime?
+  error       String?
+  metadata    Json?
+  migration   Migration @relation(fields: [migrationId], references: [id])
 }
 
 model Plan {
-  id            String       @id @default(uuid())
-  name          String
-  categoryId    String
-  category      PlanCategory @relation(fields: [categoryId], references: [id])
-  priceMonthly  Float
-  priceYearly   Float?
-  ram           String?
-  cpu           String?
-  storage       String?
-  bandwidth     String?
-  doSize        String?      // DO slug e.g. "s-1vcpu-2gb"
-  vms           VM[]
-  orders        Order[]
-  createdAt     DateTime     @default(now())
-}
-
-// ─── Billing ───────────────────────────────────────────────────────────────
-model Invoice {
-  id            String        @id @default(uuid())
-  userId        String
-  user          User          @relation(fields: [userId], references: [id])
-  amount        Float
-  status        String        @default("pending")
-  plan          String?
-  stripeSessionId String?
-  provider      String        @default("stripe")
-  dueDate       DateTime      @default(now())
-  transactions  Transaction[]
-  createdAt     DateTime      @default(now())
-}
-
-model Order {
-  id              String    @id @default(uuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id])
-  planId          String
-  plan            Plan      @relation(fields: [planId], references: [id])
-  amount          Float
-  currency        String    @default("USD")
-  status          String    @default("pending") // pending/paid/provisioning/active/failed
-  paymentMethod   String    @default("stripe")
-  billingCycle    String    @default("monthly")
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-}
-
-model Transaction {
-  id              String    @id @default(uuid())
-  userId          String?
-  invoiceId       String?
-  invoice         Invoice?  @relation(fields: [invoiceId], references: [id])
-  amount          Float
-  method          String    @default("stripe")
-  status          String    @default("success")
-  stripeSessionId String?
-  plan            String?
-  createdAt       DateTime  @default(now())
-}
-
-// ─── Support ───────────────────────────────────────────────────────────────
-model SupportTicket {
-  id          String          @id @default(uuid())
-  userId      String
-  user        User            @relation(fields: [userId], references: [id])
-  subject     String
-  status      String          @default("open")
-  priority    String          @default("medium")
-  messages    TicketMessage[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id          String   @id @default(uuid())
+  name        String
+  ram         Int
+  cpu         Int
+  disk        Int
+  bandwidth   Int
+  price       Float
+  hourlyPrice Float
+  active      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  orders      Order[]
 }
 
 model TicketMessage {
-  id          String        @id @default(uuid())
-  ticketId    String
-  ticket      SupportTicket @relation(fields: [ticketId], references: [id])
-  sender      String
-  message     String
-  createdAt   DateTime      @default(now())
+  id        String   @id @default(uuid())
+  ticketId  String
+  senderId  String
+  isAdmin   Boolean  @default(false)
+  message   String
+  createdAt DateTime @default(now())
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }
 
-// ─── Affiliate ─────────────────────────────────────────────────────────────
-model Affiliate {
-  id          String    @id @default(uuid())
-  userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id])
-  code        String    @unique
-  commission  Float     @default(0.0)
-  payouts     Payout[]
-  createdAt   DateTime  @default(now())
-}
-
-model Payout {
-  id          String    @id @default(uuid())
-  affiliateId String
-  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
-  amount      Float
-  status      String    @default("pending")
-  createdAt   DateTime  @default(now())
-}
-
-// ─── Fraud Detection ───────────────────────────────────────────────────────
 model FraudLog {
-  id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  score       Float
-  reasons     String[]
-  action      String
-  createdAt   DateTime  @default(now())
-}
-
-// ─── Recovery ──────────────────────────────────────────────────────────────
-model RecoveryLog {
-  id          String    @id @default(uuid())
-  vpsId       String
-  vps         VM       @relation(fields: [vpsId], references: [id])
-  action      String
-  status      String
-  message     String?
-  createdAt   DateTime  @default(now())
-}
-
-// ─── Analytics ─────────────────────────────────────────────────────────────
-model SystemMetric {
-  id          String    @id @default(uuid())
-  type        String
-  value       Float
-  timestamp   DateTime  @default(now())
-}
-
-model UserIPLog {
-  id            String    @id @default(uuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  ipAddress     String
-  country       String?
-  city          String?
-  isSuspicious  Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-}
-// ─── DigitalOcean App Platform ──────────────────────────────────────────────
-model DOAppAccount {
-  id              String   @id @default(uuid())
-  name            String   // "DO-App-1"
-  apiKey          String   // encrypted
-  status          String   @default("active") // active/suspended
-  appsCount       Int      @default(0)
-  appsLimit       Int      @default(5)
-  region          String   @default("sgp")
-  suspendedAt     DateTime?
-  createdAt       DateTime @default(now())
-
-  apps            DeployedApp[]
+  id        String   @id @default(uuid())
+  userId    String
+  reason    String
+  points    Int
+  score     Int
+  action    String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model DeployedApp {
-  id              String   @id @default(uuid())
-  userId          String
-  doAccountId     String
-  doAppId         String   // DO App Platform ID
-  
-  // Repo info
-  repoUrl         String
-  repoBranch      String   @default("main")
-  repoProvider    String   @default("github") // github/gitlab
-  
-  // Detected config
-  framework       String   // nodejs/docker/python
-  buildCommand    String?
-  runCommand      String?
-  port            Int      @default(8080)
-  
-  // Deployment info
-  status          String   @default("queued") 
-  // queued/building/deploying/running/failed/suspended
-  
-  // URLs
-  doUrl           String?  // DO provided URL
-  customSubdomain String?  // appname-userid.yourdomain.com
-  
-  // Database
-  dbUrl           String?  // encrypted
-  
-  // Env vars
-  envVars         Json?
-  
-  createdAt       DateTime @default(now())
-  deployedAt      DateTime?
-  failedAt        DateTime?
-  
-  deployments     Deployment[]
-  account         DOAppAccount @relation(fields: [doAccountId], references: [id])
-  user            User @relation(fields: [userId], references: [id])
+  id             String       @id @default(uuid())
+  userId         String
+  cloudAccountId String
+  doAppId        String?
+  repoUrl        String
+  repoBranch     String       @default("main")
+  framework      String
+  buildCommand   String?
+  runCommand     String?
+  port           Int          @default(8080)
+  status         String       @default("queued")
+  doUrl          String?
+  subdomain      String?
+  fullUrl        String?
+  envVars        Json?
+  dbUrl          String?
+  createdAt      DateTime     @default(now())
+  deployedAt     DateTime?
+  user           User         @relation(fields: [userId], references: [id])
+  deployments    Deployment[]
 }
 
 model Deployment {
-  id              String   @id @default(uuid())
-  appId           String
-  doDeploymentId  String
-  status          String   // pending/running/success/failed
-  
-  // Logs
-  buildLogs       String?  @db.Text
-  errorLogs       String?  @db.Text
-  
-  // AI Analysis
-  errorAnalysis   String?  // AI analyzed error
-  suggestedFix    String?  // AI suggested fix
-  
-  startedAt       DateTime @default(now())
-  completedAt     DateTime?
-  
-  app             DeployedApp @relation(fields: [appId], references: [id])
+  id             String      @id @default(uuid())
+  appId          String
+  doDeploymentId String?
+  status         String
+  buildLogs      String?
+  errorLogs      String?
+  errorAnalysis  String?
+  suggestedFix   String?
+  startedAt      DateTime    @default(now())
+  completedAt    DateTime?
+  app            DeployedApp @relation(fields: [appId], references: [id])
 }
 
-model SubDomain {
-  id          String   @id @default(uuid())
-  appId       String   @unique
-  subdomain   String   @unique
-  // format: appname-userid.yourdomain.com
-  fullUrl     String
-  sslActive   Boolean  @default(false)
-  createdAt   DateTime @default(now())
+model Alert {
+  id         String    @id
+  type       String
+  severity   String    @default("info")
+  message    String
+  metadata   Json?
+  resolved   Boolean   @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt  DateTime  @default(now())
 }
 
-// --- Dashboard Account Management ------------------------------------------
+model AuditLog {
+  id        String   @id
+  adminId   String
+  action    String
+  target    String?
+  details   Json?
+  ip        String?
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [adminId], references: [id])
+}
+
+model Backup {
+  id          String      @id
+  userId      String
+  vpsId       String
+  snapshotId  String?
+  b2Path      String?
+  gdrivePath  String?
+  sizeGb      Float       @default(0)
+  status      String      @default("pending")
+  type        String      @default("auto")
+  createdAt   DateTime    @default(now())
+  restoredAt  DateTime?
+  User        User        @relation(fields: [userId], references: [id])
+  VPSInstance VPSInstance @relation(fields: [vpsId], references: [id])
+}
+
+model BrandingSettings {
+  id             String   @id @default("singleton")
+  platformName   String   @default("YouuHost")
+  websiteUrl     String   @default("https://youuhost.com")
+  supportEmail   String   @default("support@youuhost.com")
+  telegramLink   String   @default("t.me/youuhost")
+  welcomeMessage String   @default("Your VPS is ready!")
+  asciiColor     String   @default("cyan")
+  updatedAt      DateTime
+}
+
+model CustomDomain {
+  id            String      @id
+  userId        String
+  vpsId         String
+  domain        String      @unique
+  containerPort Int
+  sslActive     Boolean     @default(false)
+  cfDnsId       String?
+  verifiedAt    DateTime?
+  createdAt     DateTime    @default(now())
+  User          User        @relation(fields: [userId], references: [id])
+  VPSInstance   VPSInstance @relation(fields: [vpsId], references: [id])
+}
+
+model Payment {
+  id            String    @id
+  userId        String
+  amount        Float
+  currency      String    @default("USD")
+  status        String
+  provider      String
+  providerPayId String?
+  type          String    @default("topup")
+  description   String?
+  vpsId         String?
+  refundedAt    DateTime?
+  refundAmount  Float?
+  createdAt     DateTime  @default(now())
+  User          User      @relation(fields: [userId], references: [id])
+}
+
+model Settings {
+  id                  String   @id @default("singleton")
+  maintenanceMode     Boolean  @default(false)
+  maintenanceMessage  String?
+  telegramBotToken    String?
+  telegramAdminChatId String?
+  backupSchedule      String   @default("0 2 * * *")
+  backupRetentionDays Int      @default(7)
+  fraudAutobanScore   Int      @default(80)
+  minBalance          Float    @default(3)
+  autoRechargeAmount  Float    @default(10)
+  domain              String   @default("youuhost.com")
+  stripeSecretKey     String?
+  stripePublicKey     String?
+  stripeWebhookSecret String?
+  paypalClientId      String?
+  paypalSecret        String?
+  cloudflareApiKey    String?
+  cloudflareZoneId    String?
+  ipqsApiKey          String?
+  resendApiKey        String?
+  b2KeyId             String?
+  b2AppKey            String?
+  b2BucketName        String?
+  updatedAt           DateTime
+}
+
+model Ticket {
+  id        String          @id
+  userId    String
+  subject   String
+  status    String          @default("open")
+  priority  String          @default("medium")
+  createdAt DateTime        @default(now())
+  updatedAt DateTime
+  User      User            @relation(fields: [userId], references: [id])
+  messages  TicketMessage[]
+}
+
+model UsageRecord {
+  id          String      @id
+  userId      String
+  vpsId       String
+  hours       Float       @default(1)
+  cost        Float
+  billedAt    DateTime    @default(now())
+  User        User        @relation(fields: [userId], references: [id])
+  VPSInstance VPSInstance @relation(fields: [vpsId], references: [id])
+}
+
+model VPSHistory {
+  id            String      @id
+  vpsId         String
+  userId        String
+  event         String
+  fromAccountId String?
+  toAccountId   String?
+  fromIp        String?
+  toIp          String?
+  reason        String?
+  triggeredBy   String
+  adminId       String?
+  metadata      Json?
+  createdAt     DateTime    @default(now())
+  VPSInstance   VPSInstance @relation(fields: [vpsId], references: [id])
+}
+
+model VPSInstance {
+  id              String         @id
+  userId          String
+  cloudAccountId  String
+  providerId      String
+  vmId            String?
+  proxmoxNode     String?
+  name            String
+  hostname        String
+  ip              String
+  sshPort         Int
+  username        String         @default("root")
+  password        String
+  rootPassword    String
+  status          String         @default("active")
+  plan            String
+  ram             Int
+  cpu             Int
+  disk            Int
+  bandwidth       Int
+  os              String         @default("ubuntu-22.04")
+  region          String
+  price           Float
+  hourlyPrice     Float
+  brandingApplied Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  suspendedAt     DateTime?
+  migratedAt      DateTime?
+  migratedTo      String?
+  Backup          Backup[]
+  CustomDomain    CustomDomain[]
+  Migration       Migration[]
+  Snapshot        Snapshot[]
+  UsageRecord     UsageRecord[]
+  VPSHistory      VPSHistory[]
+  recoveryLogs    RecoveryLog[]
+  CloudAccount    CloudAccount   @relation(fields: [cloudAccountId], references: [id])
+  User            User           @relation(fields: [userId], references: [id])
+}
 
 model SubUser {
-  id              String   @id @default(uuid())
-  parentId        String
-  email           String   @unique
-  name            String
-  permissions     Json     // Array of permissions e.g. ["manage_billing", "manage_servers"]
-  status          String   @default("pending") // pending/active
-  inviteToken     String?  @unique
-  invitedAt       DateTime @default(now())
-  joinedAt        DateTime?
-  
-  parent          User     @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  parentId    String
+  email       String   @unique
+  name        String
+  permissions Json
+  status      String   @default("pending")
+  inviteToken String?  @unique
+  invitedAt   DateTime @default(now())
+  joinedAt    DateTime?
+  parent      User     @relation("UserToSubUser", fields: [parentId], references: [id], onDelete: Cascade)
 }
 
 model Contact {
-  id              String   @id @default(uuid())
-  userId          String
-  firstName       String
-  lastName        String
-  email           String
-  company         String?
-  address1        String?
-  address2        String?
-  city            String?
-  state           String?
-  postcode        String?
-  country         String?
-  phone           String?
-  
-  isBilling       Boolean  @default(false)
-  isTechnical     Boolean  @default(false)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// ─── Domains ──────────────────────────────────────────────────────────────
-model Domain {
-  id              String    @id @default(uuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id])
-  domainName      String    @unique
-  status          String    @default("pending") // pending/active/expired/transferred
-  registrationDate DateTime  @default(now())
-  expiryDate      DateTime
-  nextDueDate     DateTime
-  registrar       String    @default("resellerid")
-  dnsManagement   Boolean   @default(false)
-  emailForwarding Boolean   @default(false)
-  idProtection    Boolean   @default(false)
-  nameservers     String[]  @default(["ns1.youuhost.com", "ns2.youuhost.com"])
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id          String   @id @default(uuid())
+  userId      String
+  firstName   String
+  lastName    String
+  email       String
+  company     String?
+  address1    String?
+  address2    String?
+  city        String?
+  state       String?
+  postcode    String?
+  country     String?
+  phone       String?
+  isBilling   Boolean  @default(false)
+  isTechnical Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailLog {
-  id              String   @id @default(uuid())
-  userId          String
-  subject         String
-  content         String   @db.Text
-  status          String   @default("sent") // sent/failed
-  sentAt          DateTime @default(now())
-  
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String   @id @default(uuid())
+  userId  String
+  subject String
+  content String
+  status  String   @default("sent")
+  sentAt  DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserCard {
-  id            String   @id @default(uuid())
-  userId        String
-  stripePmId    String   @unique
-  fingerprint   String   
-  brand         String?
-  last4         String
-  expMonth      Int
-  expYear      Int
-  isFlagged     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  userId      String
+  stripePmId  String   @unique
+  fingerprint String
+  brand       String?
+  last4       String
+  expMonth    Int
+  expYear     Int
+  isFlagged   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([fingerprint])
 }
 
-model PaymentSettings {
-  id                  String   @id @default(uuid())
-  stripeEnabled       Boolean  @default(false)
-  stripePublicKey     String?
-  stripeSecretKey     String?  // encrypted
-  stripeWebhookSecret String?  // encrypted
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-}
-
-model News {
+model Order {
   id        String   @id @default(uuid())
-  title     String
-  content   String?  @db.Text
-  date      DateTime @default(now())
+  userId    String
+  planId    String
+  amount    Float
+  status    String   @default("pending")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  plan      Plan     @relation(fields: [planId], references: [id])
 }
 
+model Transaction {
+  id              String   @id @default(uuid())
+  userId          String
+  amount          Float
+  type            String   @default("credit")
+  status          String   @default("success")
+  method          String
+  stripeSessionId String?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+model RecoveryLog {
+  id        String      @id @default(uuid())
+  vpsId     String
+  action    String
+  status    String
+  message   String?
+  createdAt DateTime    @default(now())
+  vps       VPSInstance @relation(fields: [vpsId], references: [id])
+}
+
+model Invoice {
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Float
+  status    String   @default("unpaid")
+  dueDate   DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}

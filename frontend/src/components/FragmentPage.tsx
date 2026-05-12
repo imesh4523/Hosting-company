@@ -148,7 +148,7 @@ export default function FragmentPage({ fragmentName, slug, subSlug }: FragmentPa
     
     // If it's a cart.php link, ensure it goes to our store
     if (cleanPath === '/cart.php') {
-      redirectedPath = '/store/ultasecurity';
+      redirectedPath = '/store/youuhostsecurity';
     }
 
     let finalHref = redirectedPath;

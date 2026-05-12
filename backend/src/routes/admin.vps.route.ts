@@ -47,22 +47,30 @@ router.get("/", async (req: Request, res: Response) => {
     }
 
     const [vms, total] = await Promise.all([
-      prisma.vM.findMany({
+      (prisma as any).vPSInstance.findMany({
         where,
         include: {
-          user: { select: { id: true, name: true, email: true } },
-          account: { select: { id: true, name: true, provider: true } },
-          plan: { select: { name: true } },
+          User: { select: { id: true, name: true, email: true } },
+          CloudAccount: { select: { id: true, name: true, provider: true } },
         },
         orderBy: { createdAt: "desc" },
         skip,
         take: parseInt(limit),
       }),
-      prisma.vM.count({ where }),
+      (prisma as any).vPSInstance.count({ where }),
     ]);
 
-    res.json({ success: true, vms, total, page: parseInt(page), limit: parseInt(limit) });
+    // Map to keep frontend compatibility
+    const mappedVms = vms.map((v: any) => ({
+      ...v,
+      user: v.User,
+      account: v.CloudAccount,
+      plan: { name: v.plan }
+    }));
+
+    res.json({ success: true, vms: mappedVms, total, page: parseInt(page), limit: parseInt(limit) });
   } catch (err) {
+    console.error("Admin VPS list error:", err);
     res.status(500).json({ success: false, error: (err as Error).message });
   }
 });
@@ -70,19 +78,30 @@ router.get("/", async (req: Request, res: Response) => {
 // GET /api/admin/vps/:id — single VPS detail
 router.get("/:id", async (req: Request, res: Response) => {
   try {
-    const vm = await prisma.vM.findUnique({
+    const vm = await (prisma as any).vPSInstance.findUnique({
       where: { id: req.params.id as string },
       include: {
-        user: { select: { id: true, name: true, email: true, balance: true } },
-        account: true,
-        plan: true,
-        snapshots: { orderBy: { createdAt: "desc" }, take: 10 },
-        migrations: { orderBy: { startedAt: "desc" }, take: 5 },
-        vmHistory: { orderBy: { createdAt: "desc" }, take: 20 },
+        User: { select: { id: true, name: true, email: true, balance: true } },
+        CloudAccount: true,
+        Snapshot: { orderBy: { createdAt: "desc" }, take: 10 },
+        Migration: { orderBy: { startedAt: "desc" }, take: 5 },
+        VPSHistory: { orderBy: { createdAt: "desc" }, take: 20 },
       },
     });
     if (!vm) { res.status(404).json({ success: false, error: "VM not found" }); return; }
-    res.json({ success: true, vm });
+    
+    // Map for frontend
+    const mappedVm = {
+      ...vm,
+      user: vm.User,
+      account: vm.CloudAccount,
+      snapshots: vm.Snapshot,
+      migrations: vm.Migration,
+      vmHistory: vm.VPSHistory,
+      plan: { name: vm.plan }
+    };
+
+    res.json({ success: true, vm: mappedVm });
   } catch (err) {
     res.status(500).json({ success: false, error: (err as Error).message });
   }
@@ -91,17 +110,20 @@ router.get("/:id", async (req: Request, res: Response) => {
 // POST /api/admin/vps/:id/start
 router.post("/:id/start", async (req: Request, res: Response) => {
   try {
-    const vm = await prisma.vM.findUnique({ where: { id: req.params.id as string }, include: { account: true } });
+    const vm = await (prisma as any).vPSInstance.findUnique({ 
+      where: { id: req.params.id as string }, 
+      include: { CloudAccount: true } 
+    });
     if (!vm) { res.status(404).json({ success: false, error: "VM not found" }); return; }
 
-    const creds = vm.account.credentials as Record<string, string>;
+    const creds = vm.CloudAccount.credentials as Record<string, string>;
     const decrypted = Object.fromEntries(Object.entries(creds).map(([k, v]) => [k, decrypt(v)]));
-    const provider = CloudProviderFactory.create(vm.provider, decrypted);
+    const provider = CloudProviderFactory.create(vm.CloudAccount.provider, decrypted);
     await provider.startVM(vm.providerId!);
 
-    await prisma.vM.update({ where: { id: vm.id }, data: { status: "active" } });
-    await prisma.vMHistory.create({
-      data: { vmId: vm.id, userId: vm.userId, event: "started", triggeredBy: "admin" },
+    await (prisma as any).vPSInstance.update({ where: { id: vm.id }, data: { status: "active" } });
+    await (prisma as any).vPSHistory.create({
+      data: { vpsId: vm.id, userId: vm.userId, event: "started", triggeredBy: "admin" },
     });
     await logAudit((req as any).user?.id ?? "system", "vps_start", vm.id, { vmName: vm.name }, req.ip ?? "");
     res.json({ success: true, message: "VM started" });
@@ -113,17 +135,20 @@ router.post("/:id/start", async (req: Request, res: Response) => {
 // POST /api/admin/vps/:id/stop
 router.post("/:id/stop", async (req: Request, res: Response) => {
   try {
-    const vm = await prisma.vM.findUnique({ where: { id: req.params.id as string }, include: { account: true } });
+    const vm = await (prisma as any).vPSInstance.findUnique({ 
+      where: { id: req.params.id as string }, 
+      include: { CloudAccount: true } 
+    });
     if (!vm) { res.status(404).json({ success: false, error: "VM not found" }); return; }
 
-    const creds = vm.account.credentials as Record<string, string>;
+    const creds = vm.CloudAccount.credentials as Record<string, string>;
     const decrypted = Object.fromEntries(Object.entries(creds).map(([k, v]) => [k, decrypt(v)]));
-    const provider = CloudProviderFactory.create(vm.provider, decrypted);
+    const provider = CloudProviderFactory.create(vm.CloudAccount.provider, decrypted);
     await provider.stopVM(vm.providerId!);
 
-    await prisma.vM.update({ where: { id: vm.id }, data: { status: "stopped" } });
-    await prisma.vMHistory.create({
-      data: { vmId: vm.id, userId: vm.userId, event: "stopped", triggeredBy: "admin" },
+    await (prisma as any).vPSInstance.update({ where: { id: vm.id }, data: { status: "stopped" } });
+    await (prisma as any).vPSHistory.create({
+      data: { vpsId: vm.id, userId: vm.userId, event: "stopped", triggeredBy: "admin" },
     });
     await logAudit((req as any).user?.id ?? "system", "vps_stop", vm.id, { vmName: vm.name }, req.ip ?? "");
     res.json({ success: true, message: "VM stopped" });
@@ -135,16 +160,19 @@ router.post("/:id/stop", async (req: Request, res: Response) => {
 // POST /api/admin/vps/:id/restart
 router.post("/:id/restart", async (req: Request, res: Response) => {
   try {
-    const vm = await prisma.vM.findUnique({ where: { id: req.params.id as string }, include: { account: true } });
+    const vm = await (prisma as any).vPSInstance.findUnique({ 
+      where: { id: req.params.id as string }, 
+      include: { CloudAccount: true } 
+    });
     if (!vm) { res.status(404).json({ success: false, error: "VM not found" }); return; }
 
-    const creds = vm.account.credentials as Record<string, string>;
+    const creds = vm.CloudAccount.credentials as Record<string, string>;
     const decrypted = Object.fromEntries(Object.entries(creds).map(([k, v]) => [k, decrypt(v)]));
-    const provider = CloudProviderFactory.create(vm.provider, decrypted);
+    const provider = CloudProviderFactory.create(vm.CloudAccount.provider, decrypted);
     await provider.restartVM(vm.providerId!);
 
-    await prisma.vMHistory.create({
-      data: { vmId: vm.id, userId: vm.userId, event: "restarted", triggeredBy: "admin" },
+    await (prisma as any).vPSHistory.create({
+      data: { vpsId: vm.id, userId: vm.userId, event: "restarted", triggeredBy: "admin" },
     });
     await logAudit((req as any).user?.id ?? "system", "vps_restart", vm.id, { vmName: vm.name }, req.ip ?? "");
     res.json({ success: true, message: "VM restarted" });
@@ -156,7 +184,7 @@ router.post("/:id/restart", async (req: Request, res: Response) => {
 // POST /api/admin/vps/:id/reset-password
 router.post("/:id/reset-password", async (req: Request, res: Response) => {
   try {
-    const vm = await prisma.vM.findUnique({ where: { id: req.params.id as string } });
+    const vm = await (prisma as any).vPSInstance.findUnique({ where: { id: req.params.id as string } });
     if (!vm) { res.status(404).json({ success: false, error: "VM not found" }); return; }
 
     const newPassword = crypto.randomBytes(12).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
@@ -165,9 +193,9 @@ router.post("/:id/reset-password", async (req: Request, res: Response) => {
     const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
     const encrypted = iv.toString("hex") + ":" + cipher.update(newPassword, "utf8", "hex") + cipher.final("hex");
 
-    await prisma.vM.update({ where: { id: vm.id }, data: { rootPassword: encrypted } });
-    await prisma.vMHistory.create({
-      data: { vmId: vm.id, userId: vm.userId, event: "password_reset", triggeredBy: "admin" },
+    await (prisma as any).vPSInstance.update({ where: { id: vm.id }, data: { rootPassword: encrypted } });
+    await (prisma as any).vPSHistory.create({
+      data: { vpsId: vm.id, userId: vm.userId, event: "password_reset", triggeredBy: "admin" },
     });
     await logAudit((req as any).user?.id ?? "system", "vps_reset_password", vm.id, { vmName: vm.name }, req.ip ?? "");
     res.json({ success: true, newPassword });
@@ -179,17 +207,20 @@ router.post("/:id/reset-password", async (req: Request, res: Response) => {
 // DELETE /api/admin/vps/:id
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
-    const vm = await prisma.vM.findUnique({ where: { id: req.params.id as string }, include: { account: true } });
+    const vm = await (prisma as any).vPSInstance.findUnique({ 
+      where: { id: req.params.id as string }, 
+      include: { CloudAccount: true } 
+    });
     if (!vm) { res.status(404).json({ success: false, error: "VM not found" }); return; }
 
     try {
-      const creds = vm.account.credentials as Record<string, string>;
+      const creds = vm.CloudAccount.credentials as Record<string, string>;
       const decrypted = Object.fromEntries(Object.entries(creds).map(([k, v]) => [k, decrypt(v)]));
-      const provider = CloudProviderFactory.create(vm.provider, decrypted);
+      const provider = CloudProviderFactory.create(vm.CloudAccount.provider, decrypted);
       if (vm.providerId) await provider.deleteVM(vm.providerId);
     } catch {}
 
-    await prisma.vM.update({ where: { id: vm.id }, data: { status: "deleted" } });
+    await (prisma as any).vPSInstance.update({ where: { id: vm.id }, data: { status: "deleted" } });
     await logAudit((req as any).user?.id ?? "system", "vps_delete", vm.id, { vmName: vm.name, userEmail: "" }, req.ip ?? "");
     res.json({ success: true, message: "VM deleted" });
   } catch (err) {
@@ -200,22 +231,25 @@ router.delete("/:id", async (req: Request, res: Response) => {
 // POST /api/admin/vps/:id/snapshot
 router.post("/:id/snapshot", async (req: Request, res: Response) => {
   try {
-    const vm = await prisma.vM.findUnique({ where: { id: req.params.id as string }, include: { account: true } });
+    const vm = await (prisma as any).vPSInstance.findUnique({ 
+      where: { id: req.params.id as string }, 
+      include: { CloudAccount: true } 
+    });
     if (!vm) { res.status(404).json({ success: false, error: "VM not found" }); return; }
 
     const name = `admin-snap-${Date.now()}`;
-    const creds = vm.account.credentials as Record<string, string>;
+    const creds = vm.CloudAccount.credentials as Record<string, string>;
     const decrypted = Object.fromEntries(Object.entries(creds).map(([k, v]) => [k, decrypt(v)]));
-    const provider = CloudProviderFactory.create(vm.provider, decrypted);
+    const provider = CloudProviderFactory.create(vm.CloudAccount.provider, decrypted);
     const snap = await provider.createSnapshot(vm.providerId!, name);
 
-    await prisma.snapshot.create({
+    await (prisma as any).snapshot.create({
       data: {
-        vmId: vm.id,
+        vpsId: vm.id,
         cloudAccountId: vm.cloudAccountId,
         userId: vm.userId,
         name,
-        providerSnapshotId: snap.id,
+        providerSnapId: snap.id,
         status: "ready",
         type: "manual",
       },

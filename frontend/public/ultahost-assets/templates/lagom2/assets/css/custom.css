@@ -1790,26 +1790,96 @@ body.page-reseller .tab-pane#log .dataTables_wrapper .dataTable .dataTables_empt
 	}
 }
 
+/* AI Powered Badge (Gemini Style) - Definitive Pop-out & Scroll Fix */
+aside.app-nav, 
+.sidebar-nav, 
+.app-nav-menu,
+#main-menu {
+    overflow: visible !important;
+}
 
+/* Move scrollbar to the right and hide it to allow pop-out on parents */
+.menu-primary {
+    overflow-y: auto !important;
+    overflow-x: visible !important;
+    max-height: calc(100vh - 100px) !important;
+    width: calc(100% + 60px) !important;
+    padding-right: 60px !important;
+    
+    /* Hide Scrollbar */
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+}
 
+.menu-primary::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari and Opera */
+}
 
+#main-menu .menu-primary li#Primary_Navbar-App_Deploy,
+#main-menu .menu-primary li#Primary_Navbar-App_Deploy a {
+    overflow: visible !important;
+    position: relative !important;
+    z-index: 9999 !important;
+}
 
+/* Badge Background and Text (Stationary - Pop-out Restored) */
+#main-menu .menu-primary li#Primary_Navbar-App_Deploy a::after {
+    content: 'AI Powered' !important;
+    position: absolute !important;
+    right: -30px !important; /* සම්පූර්ණයෙන්ම එළියට පැන තිබීම සඳහා */
+    top: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    
+    background: rgba(240, 244, 255, 0.95) !important;
+    backdrop-filter: blur(4px) !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    padding: 2px 8px 2px 22px !important;
+    border-radius: 15px !important;
+    letter-spacing: 0.2px !important;
+    pointer-events: none !important;
+    z-index: 1000000 !important;
+    white-space: nowrap !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 2px 8px rgba(155, 114, 243, 0.12) !important;
+    font-family: 'Poppins', sans-serif !important;
+    animation: none !important;
+}
 
+/* Animated Gemini Icon (Pop-out Restored) */
+#main-menu .menu-primary li#Primary_Navbar-App_Deploy a::before {
+    content: '' !important;
+    position: absolute !important;
+    right: 25px !important; /* සම්පූර්ණයෙන්ම එළියට පැන තිබීම සඳහා */
+    top: 10px !important;
+    width: 14px !important;
+    height: 14px !important;
+    z-index: 1000001 !important;
+    pointer-events: none !important;
+    
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z' fill='url(%23g1)'/%3E%3Cpath d='M19 14L19.5 16.5L22 17L19.5 17.5L19 20L18.5 17.5L16 17L18.5 16.5L19 14Z' fill='url(%23g2)'/%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234285f4'/%3E%3Cstop offset='100%25' stop-color='%239b72f3'/%3E%3C/linearGradient%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f97316'/%3E%3Cstop offset='100%25' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+    
+    animation: gemini-sparkle-icon 3s infinite ease-in-out !important;
+}
 
+/* Hide scrollbar from Categories list in Store pages */
+#accordion {
+    -ms-overflow-style: none !important;  /* IE and Edge */
+    scrollbar-width: none !important;  /* Firefox */
+}
 
+#accordion::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari and Opera */
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* Hide broken icon boxes in Categories list */
+.list-group.hdcProSide .list-group-item:after {
+    display: none !important;
+}

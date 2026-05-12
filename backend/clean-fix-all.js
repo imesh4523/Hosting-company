@@ -59,7 +59,7 @@ phpMappings.forEach(([from, to]) => { frag = frag.replace(from, to); });
 
 // Fix store links -> redirect to youuhost.com store
 const storeLinks = [
-    'ssl-certificaties', 'codeguard', 'marketgoo', 'sitelock', 'ultasecurity',
+    'ssl-certificaties', 'codeguard', 'marketgoo', 'sitelock', 'youuhostsecurity',
     'shared-hosting', 'windows-shared-hosting', 'linux-vps-hosting', 'linux-vds-hosting',
     'windows-vps-hosting', 'windows-vds-hosting', 'macos-vps-hosting', 'macos-vds-hosting',
     'bluestacks-android-vps', 'dedicated-hosting', 'wordpress-hosting', 'email-hosting',

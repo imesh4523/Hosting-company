@@ -11,11 +11,10 @@ export async function GET() {
         email: true,
         role: true,
         fraudScore: true,
-        trustLevel: true,
-        suspended: true,
+        status: true,
         createdAt: true,
         _count: {
-          select: { vms: true, invoices: true, tickets: true },
+          select: { VPSInstance: true, invoices: true, Ticket: true },
         },
       },
       orderBy: { createdAt: "desc" },

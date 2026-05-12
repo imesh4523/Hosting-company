@@ -9,8 +9,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       where: { id },
       data: {
         name: body.name,
-        trustLevel: body.trustLevel,
-        suspended: body.suspended,
+        status: body.suspended ? "banned" : "active",
         fraudScore: body.fraudScore,
       },
     });

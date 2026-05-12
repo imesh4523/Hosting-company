@@ -101,7 +101,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 // DELETE /api/admin/cloud-accounts/:id
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
-    const vmCount = await prisma.vM.count({ where: { cloudAccountId: req.params.id as string, status: "active" } });
+    const vmCount = await (prisma as any).vPSInstance.count({ where: { cloudAccountId: req.params.id as string, status: "active" } });
     if (vmCount > 0) { res.status(400).json({ success: false, error: `Cannot delete: ${vmCount} active VMs still use this account` }); return; }
     await prisma.cloudAccount.delete({ where: { id: req.params.id as string } });
     res.json({ success: true, message: "Account deleted" });

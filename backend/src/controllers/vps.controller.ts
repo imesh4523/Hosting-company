@@ -29,18 +29,26 @@ export const deployVPS = async (req: Request, res: Response) => {
       image,
     });
 
-    // 3. Save to DB
-    const vm = await prisma.vM.create({
+    // 3. Save to DB using the correct model VPSInstance
+    const vm = await (prisma as any).vPSInstance.create({
       data: {
         name,
-        providerId: remoteVM.id,
+        hostname: name,
+        providerId: remoteVM.id.toString(),
         plan: planId,
-        region: remoteVM.region,
-        ip: remoteVM.ip,
+        ram: 2048, // Default or from plan
+        cpu: 1,
+        disk: 50,
+        bandwidth: 1000,
+        price: 10,
+        hourlyPrice: 0.015,
+        region: remoteVM.region || region,
+        ip: remoteVM.ip || '0.0.0.0',
         userId,
         cloudAccountId: cloudAccount.id,
-        provider: cloudAccount.provider,
         status: 'active',
+        password: 'root', // Should be encrypted
+        rootPassword: 'root',
       },
     });
 
@@ -52,6 +60,7 @@ export const deployVPS = async (req: Request, res: Response) => {
 
     res.status(201).json({ message: 'VM deployment started', vm });
   } catch (error: any) {
+    console.error('Deploy error:', error);
     res.status(500).json({ message: 'Failed to deploy VM', error: error.message });
   }
 };
@@ -59,18 +68,26 @@ export const deployVPS = async (req: Request, res: Response) => {
 export const getMyVPS = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const vms = await prisma.vM.findMany({
+    const instances = await (prisma as any).vPSInstance.findMany({
       where: { userId },
       include: { 
-        account: true,
-        plan: {
-          select: { name: true, priceMonthly: true }
-        }
+        CloudAccount: true
       },
     });
+
+    // Map to frontend structure (Frontend expects plan.name and plan.priceMonthly)
+    const vms = instances.map((vps: any) => ({
+      ...vps,
+      plan: {
+        name: vps.plan,
+        priceMonthly: vps.price
+      }
+    }));
+
     res.json(vms);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching VM list' });
+  } catch (error: any) {
+    console.error('Fetch error:', error);
+    res.status(500).json({ message: 'Error fetching VM list', error: error.message });
   }
 };
 
@@ -78,11 +95,10 @@ export const getVPSDetails = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as any).user.id;
-    const vm = await prisma.vM.findFirst({
+    const vm = await (prisma as any).vPSInstance.findFirst({
       where: { id: id as string, userId },
       include: { 
-        account: true,
-        plan: true
+        CloudAccount: true
       },
     });
 
@@ -90,8 +106,17 @@ export const getVPSDetails = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'VM not found' });
     }
 
-    res.json(vm);
-  } catch (error) {
+    // Map to frontend structure
+    const mappedVm = {
+      ...vm,
+      plan: {
+        name: vm.plan,
+        priceMonthly: vm.price
+      }
+    };
+
+    res.json(mappedVm);
+  } catch (error: any) {
     res.status(500).json({ message: 'Error fetching VM details' });
   }
 };
@@ -102,16 +127,16 @@ export const vpsAction = async (req: Request, res: Response) => {
     const { action } = req.body; // power_on, power_off, reboot
     const userId = (req as any).user.id;
 
-    const vm = await prisma.vM.findFirst({
+    const vm = await (prisma as any).vPSInstance.findFirst({
       where: { id: id as string, userId },
-      include: { account: true },
+      include: { CloudAccount: true },
     });
 
-    if (!vm || !vm.providerId || !vm.account) {
+    if (!vm || !vm.providerId || !vm.CloudAccount) {
       return res.status(404).json({ message: 'VM not found' });
     }
 
-    const provider = CloudProviderFactory.create(vm.account.provider, vm.account.credentials);
+    const provider = CloudProviderFactory.create(vm.CloudAccount.provider, vm.CloudAccount.credentials);
     
     if (action === 'power_on') await provider.startVM(vm.providerId);
     else if (action === 'power_off') await provider.stopVM(vm.providerId);
@@ -119,7 +144,7 @@ export const vpsAction = async (req: Request, res: Response) => {
     else return res.status(400).json({ message: 'Invalid action' });
     
     res.json({ message: `Action ${action} initiated` });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to perform action' });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Failed to perform action', error: error.message });
   }
 };
